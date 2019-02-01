@@ -1,6 +1,7 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
+import java.io.Serializable;
 
-public class Word
+public class Word implements Serializable
 {
 	private String mNative;
 	private String mTranslation;

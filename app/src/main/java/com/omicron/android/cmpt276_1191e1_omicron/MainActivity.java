@@ -11,7 +11,7 @@ import android.widget.Button;
 public class MainActivity extends AppCompatActivity
 {
     /*
-        This Main Activity is the activity that will act as the Start Menu
+     *  This Main Activity is the activity that will act as the Start Menu
     */
 
     // SET UP ARRAY TO STORE WORDS
@@ -29,22 +29,29 @@ public class MainActivity extends AppCompatActivity
                     new Word( "Nine", "Neuf" )
             };
 
+
+
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_main );
 
-        // start game button
+        // start game button; used to switch to gameActivity
         Button btn1 = (Button) findViewById( R.id.button_start );
 
         // set listener to switch to Game Activity
-        btn1.setOnClickListener( new View.OnClickListener( )
+        btn1.setOnClickListener( new View.OnClickListener(  )
             {
                 @Override
                 public void onClick( View v )
                 {
-                    startActivity( new Intent( MainActivity.this, GameActivity.class ) );
+                	Intent gameActivity = new Intent( MainActivity.this, GameActivity.class );
+
+                	//save wordArray for Game Activity
+					gameActivity.putExtra( "wordArray", wordArray );
+
+                    startActivity( gameActivity );
                 }
             }
         );
