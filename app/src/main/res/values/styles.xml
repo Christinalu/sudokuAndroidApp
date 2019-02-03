@@ -17,4 +17,17 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <!-- THEME FOR THE DICTIONARY POP UP -->
+    <style name="AppTheme.dictionaryTheme">
+        <item name="android:windowIsTranslucent"> true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowBackground">@color/translucent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+    </style>
+
 </resources>

@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
 public class GameActivity extends AppCompatActivity
 {
@@ -30,5 +31,33 @@ public class GameActivity extends AppCompatActivity
 		{
 			wordArray =  (Word[]) wordArraySrc.getSerializableExtra("wordArray");
 		}
+
+		//create dictionary button
+		Button btnDictionary = (Button) findViewById( R.id.button_dictionary );
+
+		btnDictionary.setOnClickListener( new View.OnClickListener( )
+				{
+					@Override
+					public void onClick( View v )
+					{
+						//create activity window for the dictionary
+						Intent activityDictionary = new Intent( GameActivity.this, DictionaryActivity.class );
+
+						//save wordArray for Dictionary Activity
+						activityDictionary.putExtra( "wordArray", wordArray );
+
+						startActivity( activityDictionary ); //switch to dictionary window
+					}
+				}
+		);
+
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+
+		//disable slide in animation
+		overridePendingTransition(0, 0);
 	}
 }

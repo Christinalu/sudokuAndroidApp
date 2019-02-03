@@ -16,6 +16,8 @@ public class MainActivity extends AppCompatActivity
 
     // SET UP ARRAY TO STORE WORDS
     // a Word (pair) contains the word in native language, and its translation
+    // note: this array will remain of size 9, and only changed when modes are switched
+    //       this is required in DictionaryActivity.java
     private Word[] wordArray = new Word[]
             {
                     new Word( "One", "Un" ),
@@ -38,10 +40,10 @@ public class MainActivity extends AppCompatActivity
         setContentView( R.layout.activity_main );
 
         // start game button; used to switch to gameActivity
-        Button btn1 = (Button) findViewById( R.id.button_start );
+        Button btnStart = (Button) findViewById( R.id.button_start );
 
         // set listener to switch to Game Activity
-        btn1.setOnClickListener( new View.OnClickListener(  )
+        btnStart.setOnClickListener( new View.OnClickListener(  )
             {
                 @Override
                 public void onClick( View v )
