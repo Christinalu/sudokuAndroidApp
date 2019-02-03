@@ -24,6 +24,13 @@
             android:name=".GameActivity"
             android:label="@string/title_activity_game"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+
+        <!-- DICTIONARY -->
+        <activity
+            android:name=".DictionaryActivity"
+            android:label="DictionaryActivity"
+            android:theme="@style/AppTheme.dictionaryTheme"></activity>
+
     </application>
 
 </manifest>
