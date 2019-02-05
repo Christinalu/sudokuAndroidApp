@@ -6,10 +6,18 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 
 public class MainActivity extends AppCompatActivity
 {
+    RadioGroup Difficulty;
+    RadioButton btnDifficulty;
+
+    RadioGroup Language;
+    RadioButton btnLanguage;
+
     /*
      *  This Main Activity is the activity that will act as the Start Menu
     */
@@ -33,11 +41,24 @@ public class MainActivity extends AppCompatActivity
 
 
 
+
+
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_main );
+
+        //choose the level of difficulty
+        Difficulty = findViewById(R.id.button_level);
+        int difficultyId=Difficulty.getCheckedRadioButtonId();
+        btnDifficulty=findViewById(difficultyId);
+
+        //choose the language
+        Language=findViewById(R.id.button_language);
+        int LanguageId=Language.getCheckedRadioButtonId();
+        btnLanguage=findViewById(LanguageId);
+
 
         // start game button; used to switch to gameActivity
         Button btnStart = (Button) findViewById( R.id.button_start );
@@ -48,6 +69,8 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onClick( View v )
                 {
+                   // int levelId=Difficulty.getCheckedRadioButtonId();
+                    //btnDifficulty=findViewById(levelId);
                 	Intent gameActivity = new Intent( MainActivity.this, GameActivity.class );
 
                 	//save wordArray for Game Activity
@@ -59,4 +82,5 @@ public class MainActivity extends AppCompatActivity
         );
 
     }
+
 }
