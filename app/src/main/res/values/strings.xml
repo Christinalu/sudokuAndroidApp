@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Sudoku-Word-Omicron</string>
     <string name="title_activity_game">GameActivity</string>
-    <string name="menu">Main Menu</string>
+    <string name="sudoku">Sudoku Vocabulary</string>
     <string name="languages">English to French</string>
     <string name="language_selection">Language</string>
     <string name="french_english">French-English</string>

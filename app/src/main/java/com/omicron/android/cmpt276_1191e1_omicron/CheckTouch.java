@@ -49,24 +49,24 @@ public class CheckTouch
 				//add padding
 				if( i>=3 ) //add extra space between rows
 				{
-					sqrT = sqrT + 15;
-					sqrB = sqrB + 15;
+					sqrT = sqrT + 10;
+					sqrB = sqrB + 10;
 				}
 				if( i>=6 )
 				{
-					sqrT = sqrT + 15;
-					sqrB = sqrB + 15;
+					sqrT = sqrT + 10;
+					sqrB = sqrB + 10;
 				}
 
 				if( j>=3 ) //add extra space between columns
 				{
-					sqrL = sqrL + 15;
-					sqrR = sqrR + 15;
+					sqrL = sqrL + 10;
+					sqrR = sqrR + 10;
 				}
 				if( j>=6 )
 				{
-					sqrL = sqrL + 15;
-					sqrR = sqrR + 15;
+					sqrL = sqrL + 10;
+					sqrR = sqrR + 10;
 				}
 
 				//validate touch coordinate
