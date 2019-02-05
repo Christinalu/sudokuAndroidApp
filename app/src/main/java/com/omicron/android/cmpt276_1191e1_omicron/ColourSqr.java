@@ -18,7 +18,9 @@ public class ColourSqr
 		float right;
 		float bottom;
 
-		Log.d( "TAG", "--PASS-ColourSqr" );
+		Log.d( "TAG", "--PASS-Colouring-Square" );
+		Log.d( "TAG", "--sqrLO-2: " + sqrLO );
+		Log.d( "TAG", "--sqrTO-2: " + sqrTO );
 
 		if( p.getRow() != -1 ) //colour red
 		{
@@ -28,7 +30,7 @@ public class ColourSqr
 				return;
 			}
 			//if( p.getRow() )
-			Log.d( "TAG", "--PASS-ColourSqr-2" );
+			//Log.d( "TAG", "--PASS-ColourSqr-2" );
 			left = sqrLO + (p.getColumn() * (105 + 5));
 			top = sqrTO + (p.getRow() * (105 + 5));
 			right = left + (105);
@@ -61,9 +63,9 @@ public class ColourSqr
 		}
 		else  //colour back to grey
 		{
-			Log.d( "TAG", "--PASS-ColourSqr-3" );
+			//Log.d( "TAG", "--PASS-ColourSqr-3" );
 			left = sqrLO + (sqrSelected.getColumn() * (105 + 5));
-			Log.d( "TAG", "--PASS-ColourSqr-4" );
+			//Log.d( "TAG", "--PASS-ColourSqr-4" );
 			top = sqrTO + (sqrSelected.getRow() * (105 + 5));
 			right = left + (105);
 			bottom = top + (105);
@@ -99,9 +101,9 @@ public class ColourSqr
 		{
 			paint.setColor(Color.parseColor("#c2c2c2"));
 
-			Log.d( "TAG", "--PASS-ColourSqr-3" );
+			//Log.d( "TAG", "--PASS-ColourSqr-3" );
 			left = sqrLO + (sqrLastSelected.getColumn() * (105 + 5));
-			Log.d( "TAG", "--PASS-ColourSqr-4" );
+			//Log.d( "TAG", "--PASS-ColourSqr-4" );
 			top = sqrTO + (sqrLastSelected.getRow() * (105 + 5));
 			right = left + (105);
 			bottom = top + (105);
