@@ -1,5 +1,7 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
+import android.util.Log;
+
 public class CheckTouch
 {
 	private int x;
@@ -31,6 +33,8 @@ public class CheckTouch
 
 	public Pair check( int xp, int yp )
 	{
+		Log.d( "TAG", "--PASS-Checking-Touch" );
+
 		//update
 		x = xp;
 		y = yp;
@@ -70,7 +74,7 @@ public class CheckTouch
 				}
 
 				//validate touch coordinate
-				if( (xp>=sqrL && yp>=sqrT) && (xp<=sqrR && yp<=sqrB) )
+				if( (xp>=sqrL && yp>=sqrT) && (xp<=sqrR-0 && yp<=sqrB-0) )
 				{
 					touch = true;
 					m = i;
@@ -79,7 +83,7 @@ public class CheckTouch
 				}
 			}
 		}
-
+		
 		if( touch == true )
 		{
 			p.update( m, n );
