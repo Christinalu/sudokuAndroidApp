@@ -83,7 +83,7 @@ public class CheckTouch
 				}
 			}
 		}
-
+		
 		if( touch == true )
 		{
 			p.update( m, n );

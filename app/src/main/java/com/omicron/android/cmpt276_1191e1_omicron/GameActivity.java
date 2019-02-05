@@ -48,7 +48,18 @@ public class GameActivity extends AppCompatActivity
 	public float sqrLO;
 	public float sqrTO;
 
+	public float txtLO;
+	public float txtTO;
+	public float txtRO;
+	public float txtBO;
+
+	public drw drawR;
+	public Pair lastRectColoured = new Pair( -1, -1 ); //stores the last coloured square
+	public Pair currentRectColoured = new Pair( -1, -1 ); //stores the current coloured square
+
 	public Rect[][] rectArr = new Rect[9][9];
+	public Rect[][] textArr = new Rect[3][3];
+
 
 
 	@Override
@@ -75,10 +86,35 @@ public class GameActivity extends AppCompatActivity
 												 //save wordArray for Dictionary Activity
 												 activityDictionary.putExtra("wordArray", wordArray);
 
+												 //canvas.drawRect( 100, 100, 500, 500, paint );
+
 												 startActivity(activityDictionary); //switch to dictionary window
 											 }
 										 }
 		);
+
+		////// test/////
+
+		Button btnTest = (Button) findViewById(R.id.button_test);
+
+		btnTest.setOnClickListener(new View.OnClickListener() {
+											 @Override
+											 public void onClick(View v) {
+												 //create activity window for the dictionary
+												 //Intent activityDictionary = new Intent(GameActivity.this, DictionaryActivity.class);
+
+												 //save wordArray for Dictionary Activity
+												 //activityDictionary.putExtra("wordArray", wordArray);
+
+												 canvas.drawRect( 100, 100, 500, 500, paint );
+
+												 //startActivity(activityDictionary); //switch to dictionary window
+											 }
+										 }
+		);
+
+
+		/////////////
 
 
 
@@ -93,7 +129,7 @@ public class GameActivity extends AppCompatActivity
 		Log.d( "TAG", "--screenH: " + screenH );
 		Log.d( "TAG", "--screenW: " + screenW );
 
-		bgMap = Bitmap.createBitmap(1080, 1000, Bitmap.Config.ARGB_8888);
+		bgMap = Bitmap.createBitmap(1080, 1500, Bitmap.Config.ARGB_8888);
 		canvas = new Canvas(bgMap);
 
 		//original coordinates of where to draw square
@@ -117,19 +153,96 @@ public class GameActivity extends AppCompatActivity
 
 
 		imgView.setImageBitmap(bgMap);
-		RelativeLayout rectLayout = (RelativeLayout) findViewById(R.id.rect_layout);
+		rectLayout = (RelativeLayout) findViewById(R.id.rect_layout);
 		rectLayout.addView(imgView);
+
+		drawR = new drw(  );
 
 
 		checkTouch = new CheckTouch( sqrLO, sqrTO );
 		sqrColour = new ColourSqr( );
 
-		final Rect rectangle = new Rect( 100, 100, 200, 200);
-		canvas.drawRect( rectangle, paint );
 
-		//create rect matrix-2
+		final Rect rectangle = new Rect( 100, 100, 200, 200);
+		//canvas.drawRect( rectangle, paint );
+
+		/** CREATE RECT MATRIX **/
+		for( int i=0; i<9; i++ ) //row
+		{
+			for( int j=0; j<9; j++ ) //column
+			{
+				//increase square dimensions
+				sqrL = sqrLO + j*(105+5);
+				sqrT = sqrTO + i*(105+5);
+				sqrR = sqrL + 105;
+				sqrB = sqrT + 105;
+
+				//add padding
+				if( i>=3 ) //add extra space between rows
+				{
+					sqrT = sqrT + 15;
+					sqrB = sqrB + 15;
+				}
+				if( i>=6 )
+				{
+					sqrT = sqrT + 15;
+					sqrB = sqrB + 15;
+				}
+
+				if( j>=3 ) //add extra space between columns
+				{
+					sqrL = sqrL + 15;
+					sqrR = sqrR + 15;
+				}
+				if( j>=6 )
+				{
+					sqrL = sqrL + 15;
+					sqrR = sqrR + 15;
+				}
+				rectArr[i][j] = new Rect( (int)(sqrL), (int)sqrT, (int)sqrR, (int)sqrB );
+
+				canvas.drawRect( rectArr[i][j], paint );
+			}
+		}
+
+
+		/** DRAW TEXT BUTTONS **/
+
+		/*txtLO = (float) (screenW / 2.0 - 900 / 2.0 );
+		txtTO = 50;
+		float txtRO = screenW / 2 - 900 / 2 + 300;
+		float txtBO = 155;
+
+		float txtL;
+		float txtT;
+		float txtR;
+		float txtB;
+
+		for( int i=0; i<3; i++ )
+		{
+			for( int j=0; j<3; j++ )
+			{
+				//increase square dimensions
+				txtL = txtLO + j*(300+30);
+				txtT = sqrTO + i*(70+30);
+				txtR = txtL + 300;
+				txtB = txtT + 300;
+
+
+				txtArr[i][j] = new Rect( (int)(txtL), (int)txtT, (int)txtR, (int)txtB );
+
+				canvas.drawRect( rectArr[i][j], paint );
+			}
+		}*/
+
 		
 
+
+		//canvas.drawRect( 100, 100, 500, 500, paint );
+
+		//drw = new draw( GameActivity.this );
+
+		//setContentView( drawR );
 
 		// ON-TOUCH
 		handleTouch = new View.OnTouchListener( )
@@ -143,21 +256,18 @@ public class GameActivity extends AppCompatActivity
 				switch( event.getAction( ) )
 				{
 					case MotionEvent.ACTION_DOWN:
-						Log.i("TAG", "-- down");
+						//Log.i("TAG", "-- down");
 
 
-						if( rectangle.contains( x, y ) )
-						{
-							Toast.makeText(GameActivity.this, "RECT CLICKED", Toast.LENGTH_SHORT).show( );
-						}
+						drawR.reDraw( rectArr, x, y, paint, canvas, rectLayout, lastRectColoured, currentRectColoured );
 
 
 						break;
 					case MotionEvent.ACTION_MOVE:
-						Log.i("TAG", "moving: (" + x + ", " + y + ")");
+						//Log.i("TAG", "moving: (" + x + ", " + y + ")");
 						break;
 					case MotionEvent.ACTION_UP:
-						Log.i("TAG", "-- up");
+						//Log.i("TAG", "-- up");
 						break;
 				}
 
@@ -166,7 +276,7 @@ public class GameActivity extends AppCompatActivity
 		};
 
 
-
+		//rectLayout.
 		rectLayout.setOnTouchListener( handleTouch );
 
 
