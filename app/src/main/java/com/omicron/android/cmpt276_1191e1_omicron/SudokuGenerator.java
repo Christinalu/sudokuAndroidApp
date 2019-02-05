@@ -1,0 +1,82 @@
+package com.omicron.android.cmpt276_1191e1_omicron;
+import java.util.Random;
+import static java.lang.Math.sqrt;
+
+public class SudokuGenerator {
+    //This class accepts a hardcoded Puzzle and randomizes it to generate a new puzzle which is guaranteed to be unique and the same difficulty and the puzzle taken in as the argument.
+    private int size;
+    public int[][] Puzzle;
+
+    public SudokuGenerator(int[][] arr) {
+        size = arr.length;
+        Puzzle = new int[size][size];
+        copyarr(arr,Puzzle);
+        scramble(Puzzle);
+    }
+
+    private void zero(int[] arr) {
+        for (int i=0; i<arr.length; i++) arr[i] = 0;
+    }
+    private void copyarr(int[][] arr1, int[][] arr2) {
+        //copy arr1 to arr2
+        int colrow = size;
+        for (int i=0; i<colrow; i++) {
+            for (int j=0; j<colrow; j++) {
+                arr2[i][j] = arr1[i][j];
+            }
+        }
+    }
+    private void randomize(int[] arr, int a) {
+        //function takes an int array of size a that will be used store a randomized order vector
+        int[] numused = new int[a];
+        zero(numused);
+        int randpos;
+        Random rand = new Random();
+        int i = 0;
+        while (i < a) {
+            randpos = rand.nextInt(100);
+            randpos = randpos%a;
+            if (numused[randpos] == 0) {
+                arr[i] = randpos;
+                numused[randpos] = 1;
+                i++;
+            }
+        }
+    }
+    private void scramble(int[][] Puzzle) {
+        int colrow = size;
+        int tempSec;
+        int puzzleSec;
+        int[][] temparr = new int[colrow][colrow];
+        copyarr(Puzzle,temparr);
+        int[] order = new int[3];
+        //swap rows in 3x9 until 9x9 fully swapped
+        for (int i=0; i<3; i++) {
+            //ith box down
+            randomize(order,3);
+            for (int j=0; j<3; j++) {
+                //row in box
+                puzzleSec = (i*3)+j;
+                tempSec = (i*3)+order[j];
+                for (int k=0; k<colrow; k++) {
+                    //col
+                    Puzzle[puzzleSec][k] = temparr[tempSec][k];
+                }
+            }
+        }
+        //swap cols 9x3 until 9x9 fully swapped
+        for (int i=0; i<3; i++) {
+            //ith box to the right
+            randomize(order,3);
+            for (int j=0; j<3; j++) {
+                //col in the box
+                puzzleSec = (i*3)+j;
+                tempSec = (i*3)+order[j];
+                for (int k=0; k<colrow; k++) {
+                    //row
+                    Puzzle[k][puzzleSec] = temparr[k][tempSec];
+                }
+            }
+        }
+    }
+}
