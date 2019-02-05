@@ -48,6 +48,8 @@ public class GameActivity extends AppCompatActivity
 	public float sqrLO;
 	public float sqrTO;
 
+	public Rect[][] rectArr = new Rect[9][9];
+
 
 	@Override
 	protected void onCreate( Bundle savedInstanceState )
@@ -124,6 +126,9 @@ public class GameActivity extends AppCompatActivity
 
 		final Rect rectangle = new Rect( 100, 100, 200, 200);
 		canvas.drawRect( rectangle, paint );
+
+		//create rect matrix-2
+		
 
 
 		// ON-TOUCH
