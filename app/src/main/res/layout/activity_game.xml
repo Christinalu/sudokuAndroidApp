@@ -18,10 +18,44 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="144dp"
-            android:layout_marginTop="453dp"
+            android:layout_marginStart="110dp"
+            android:layout_marginTop="470dp"
             android:gravity="center"
             android:text="HINT" />
+
+        <Button
+            android:id="@+id/undo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="470dp"
+            android:gravity="center"
+            android:text="undo" />
+
+        <Button
+            android:id="@+id/switch_lang"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="200dp"
+            android:layout_marginTop="470dp"
+            android:gravity="center"
+            android:text="switch" />
+
+        <Button
+            android:id="@+id/finish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="290dp"
+            android:layout_marginTop="470dp"
+            android:gravity="center"
+            android:text="Finish" />
+
 
         <RelativeLayout
             android:id="@+id/rect_layout"
@@ -32,11 +66,54 @@
             android:layout_marginStart="0dp"
             android:layout_marginTop="0dp">
 
-
-
-
         </RelativeLayout>
 
+
+
     </RelativeLayout>
+
+
+    <TableLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/keypad"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:stretchColumns="*">
+        <TableRow>
+            <Button android:id="@+id/keypad_1"
+                android:text="un">
+            </Button>
+            <Button android:id="@+id/keypad_2"
+                android:text="deux">
+            </Button>
+            <Button android:id="@+id/keypad_3"
+                android:text="trois">
+            </Button>
+        </TableRow>
+        <TableRow>
+            <Button android:id="@+id/keypad_4"
+                android:text="quatre">
+            </Button>
+            <Button android:id="@+id/keypad_5"
+                android:text="cinq">
+            </Button>
+            <Button android:id="@+id/keypad_6"
+                android:text="six">
+            </Button>
+        </TableRow>
+        <TableRow>
+            <Button android:id="@+id/keypad_7"
+                android:text="sept">
+            </Button>
+            <Button android:id="@+id/keypad_8"
+                android:text="huit">
+            </Button>
+            <Button android:id="@+id/keypad_9"
+                android:text="neuf">
+            </Button>
+        </TableRow>
+    </TableLayout>
 
 </android.support.design.widget.CoordinatorLayout>
