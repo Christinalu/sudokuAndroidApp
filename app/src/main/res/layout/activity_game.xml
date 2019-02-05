@@ -21,7 +21,7 @@
             android:layout_marginStart="144dp"
             android:layout_marginTop="453dp"
             android:gravity="center"
-            android:text="HINT" />
+            android:text="HINT"/>
 
         <RelativeLayout
             android:id="@+id/rect_layout"
