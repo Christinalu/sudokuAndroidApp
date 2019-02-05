@@ -11,7 +11,11 @@
         android:theme="@style/AppTheme.NoActionBar">
 
         <!-- MENU -->
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="keyboard|orientation|keyboardHidden|screenSize">
+
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,13 +27,17 @@
         <activity
             android:name=".GameActivity"
             android:label="@string/title_activity_game"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
+            android:configChanges="keyboard|orientation|keyboardHidden|screenSize"></activity>
 
         <!-- DICTIONARY -->
         <activity
             android:name=".DictionaryActivity"
             android:label="DictionaryActivity"
-            android:theme="@style/AppTheme.dictionaryTheme"></activity>
+            android:theme="@style/AppTheme.dictionaryTheme"
+            android:screenOrientation="portrait"
+            android:configChanges="keyboard|orientation|keyboardHidden|screenSize"></activity>
 
     </application>
 
