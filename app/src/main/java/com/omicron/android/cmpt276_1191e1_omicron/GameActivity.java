@@ -128,7 +128,7 @@ public class GameActivity extends AppCompatActivity
 		imgView.setImageBitmap(bgMap);
 		rectLayout = (RelativeLayout) findViewById(R.id.rect_layout);
 		rectLayout.addView(imgView);
-		
+
 
 
 			/** CREATE RECT MATRIX **/
