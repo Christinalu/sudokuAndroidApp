@@ -63,6 +63,11 @@ public class GameActivity extends AppCompatActivity
 
 	public Paint paintblack = new Paint();
 
+	//int array storing unput so far
+	public int [][] testArr = {{6,7,3,0,0,0,2,0,8},{4,0,2,0,7,3,0,0,1},{0,0,5,6,0,8,4,3,7},{8,0,9,0,3,7,5,0,6},{3,4,0,2,6,0,0,7,0},{0,6,7,8,0,9,1,0,3},{7,5,6,0,1,2,3,0,4},{1,0,8,7,0,0,9,6,0},{2,0,4,3,8,6,0,1,5}};
+
+	public SudokuGenerator usrSudokuArr = new SudokuGenerator( testArr ); //stores the generated puzzle
+	public ButtonListener listeners;
 
 
 	@Override
@@ -207,89 +212,25 @@ public class GameActivity extends AppCompatActivity
 				canvas.drawRect( rectArr[i][j], paint );
 			}
 		}
+		final Paint paint2 = new Paint();
+
 
 			/** SET BUTTON LISTENERS **/
 
 		Button btn1 = (Button) findViewById(R.id.keypad_1);
-		btn1.setOnClickListener(new View.OnClickListener() {
-									   @Override
-									   public void onClick(View v) {
-										   Toast.makeText(GameActivity.this, "BTN-1", Toast.LENGTH_SHORT).show();
-									   }
-								   }
-		);
-
 		Button btn2 = (Button) findViewById(R.id.keypad_2);
-		btn2.setOnClickListener(new View.OnClickListener() {
-									@Override
-									public void onClick(View v) {
-										Toast.makeText(GameActivity.this, "BTN-2", Toast.LENGTH_SHORT).show();
-									}
-								}
-		);
-
 		Button btn3 = (Button) findViewById(R.id.keypad_3);
-		btn3.setOnClickListener(new View.OnClickListener() {
-									@Override
-									public void onClick(View v) {
-										Toast.makeText(GameActivity.this, "BTN-3", Toast.LENGTH_SHORT).show();
-									}
-								}
-		);
-
 		Button btn4 = (Button) findViewById(R.id.keypad_4);
-		btn4.setOnClickListener(new View.OnClickListener() {
-									@Override
-									public void onClick(View v) {
-										Toast.makeText(GameActivity.this, "BTN-4", Toast.LENGTH_SHORT).show();
-									}
-								}
-		);
-
 		Button btn5 = (Button) findViewById(R.id.keypad_5);
-		btn5.setOnClickListener(new View.OnClickListener() {
-									@Override
-									public void onClick(View v) {
-										Toast.makeText(GameActivity.this, "BTN-5", Toast.LENGTH_SHORT).show();
-									}
-								}
-		);
-
 		Button btn6 = (Button) findViewById(R.id.keypad_6);
-		btn6.setOnClickListener(new View.OnClickListener() {
-									@Override
-									public void onClick(View v) {
-										Toast.makeText(GameActivity.this, "BTN-6", Toast.LENGTH_SHORT).show();
-									}
-								}
-		);
-
 		Button btn7 = (Button) findViewById(R.id.keypad_7);
-		btn7.setOnClickListener(new View.OnClickListener() {
-									@Override
-									public void onClick(View v) {
-										Toast.makeText(GameActivity.this, "BTN-7", Toast.LENGTH_SHORT).show();
-									}
-								}
-		);
-
 		Button btn8 = (Button) findViewById(R.id.keypad_8);
-		btn8.setOnClickListener(new View.OnClickListener() {
-									@Override
-									public void onClick(View v) {
-										Toast.makeText(GameActivity.this, "BTN-8", Toast.LENGTH_SHORT).show();
-									}
-								}
-		);
-
 		Button btn9 = (Button) findViewById(R.id.keypad_9);
-		btn9.setOnClickListener(new View.OnClickListener() {
-									@Override
-									public void onClick(View v) {
-										Toast.makeText(GameActivity.this, "BTN-9", Toast.LENGTH_SHORT).show();
-									}
-								}
-		);
+
+
+		listeners = new ButtonListener( currentRectColoured, usrSudokuArr, btn1, btn2, btn3,
+				btn4, btn5, btn6, btn7, btn8, btn9 );
+
 
 
 		//buttonMatrix.create( GameActivity, btn1  );
@@ -325,9 +266,7 @@ public class GameActivity extends AppCompatActivity
 				canvas.drawRect( rectArr[i][j], paint );
 			}
 		}*/
-
 		
-
 
 		//canvas.drawRect( 100, 100, 500, 500, paint );
 
@@ -404,8 +343,8 @@ public class GameActivity extends AppCompatActivity
 					txtL = txtL + 15;
 				}
 				puzzleLoc[i][j] = new PairF(txtT,txtL);
-				if (usrSudokuArr[i][j]!=0) {
-					canvas.drawText(wordArray[0][usrSudokuArr[i][j]-1], 50, 120, paintblack);
+				if (usrSudokuArr.Puzzle[i][j]!=0) {
+					canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getTranslation(), 50, 120, paintblack);
 				}
 			}
 		}
