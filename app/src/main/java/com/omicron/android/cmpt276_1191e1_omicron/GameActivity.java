@@ -61,6 +61,8 @@ public class GameActivity extends AppCompatActivity
 	public Rect[][] rectArr = new Rect[9][9];
 	public Rect[][] textArr = new Rect[3][3];
 
+	public Paint paintblack = new Paint();
+
 
 
 	@Override
@@ -364,14 +366,49 @@ public class GameActivity extends AppCompatActivity
 			}
 		};
 
-
 		//rectLayout.
 		rectLayout.setOnTouchListener( handleTouch );
 
+		//
+		paintblack.setColor(Color.parseColor("#0000ff"));
+		paintblack.setTextSize(30);
+		float txtL = sqrLO+50;
+		float txtT = sqrTO+120;
+		//drawing from something declared already
+		PairF[][] puzzleLoc = new PairF[9][9];
+		/** CREATE PUZZLE OVERLAY **/
+		for( int i=0; i<9; i++ ) //row
+		{
+			for( int j=0; j<9; j++ ) //column
+			{
+				//increase square dimensions
+				txtL = txtL + j*(105+5);
+				txtT = txtT + i*(105+5);
 
+				//add padding
+				if( i>=3 ) //add extra space between rows
+				{
+					txtT = txtT + 15;
+				}
+				if( i>=6 )
+				{
+					txtT = txtT + 15;
+				}
 
-
-
+				if( j>=3 ) //add extra space between columns
+				{
+					txtL = txtL + 15;
+				}
+				if( j>=6 )
+				{
+					txtL = txtL + 15;
+				}
+				puzzleLoc[i][j] = new PairF(txtT,txtL);
+				if (usrSudokuArr[i][j]!=0) {
+					canvas.drawText(wordArray[0][usrSudokuArr[i][j]-1], 50, 120, paintblack);
+				}
+			}
+		}
 
 	}
 
