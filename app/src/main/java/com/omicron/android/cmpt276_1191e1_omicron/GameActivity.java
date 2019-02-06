@@ -61,6 +61,8 @@ public class GameActivity extends AppCompatActivity
 	public Rect[][] rectArr = new Rect[9][9];
 	public Rect[][] textArr = new Rect[3][3];
 
+	public Paint paintblack = new Paint();
+
 	//int array storing unput so far
 	public int [][] testArr = {{6,7,3,0,0,0,2,0,8},{4,0,2,0,7,3,0,0,1},{0,0,5,6,0,8,4,3,7},{8,0,9,0,3,7,5,0,6},{3,4,0,2,6,0,0,7,0},{0,6,7,8,0,9,1,0,3},{7,5,6,0,1,2,3,0,4},{1,0,8,7,0,0,9,6,0},{2,0,4,3,8,6,0,1,5}};
 
@@ -303,11 +305,50 @@ public class GameActivity extends AppCompatActivity
 			}
 		};
 
-
 		//rectLayout.
 		rectLayout.setOnTouchListener( handleTouch );
 
+		//
+		paintblack.setColor(Color.parseColor("#0000ff"));
+		paintblack.setTextSize(30);
+		float txtL = sqrLO+50;
+		float txtT = sqrTO+120;
+		//drawing from something declared already
+		PairF[][] puzzleLoc = new PairF[9][9];
+		/** CREATE PUZZLE OVERLAY **/
+		for( int i=0; i<9; i++ ) //row
+		{
+			for( int j=0; j<9; j++ ) //column
+			{
+				//increase square dimensions
+				txtL = txtL + j*(105+5);
+				txtT = txtT + i*(105+5);
 
+
+				//add padding
+				if( i>=3 ) //add extra space between rows
+				{
+					txtT = txtT + 15;
+				}
+				if( i>=6 )
+				{
+					txtT = txtT + 15;
+				}
+
+				if( j>=3 ) //add extra space between columns
+				{
+					txtL = txtL + 15;
+				}
+				if( j>=6 )
+				{
+					txtL = txtL + 15;
+				}
+				puzzleLoc[i][j] = new PairF(txtT,txtL);
+				if (usrSudokuArr.Puzzle[i][j]!=0) {
+					canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getTranslation(), 50, 120, paintblack);
+				}
+			}
+		}
 	}
 
 
