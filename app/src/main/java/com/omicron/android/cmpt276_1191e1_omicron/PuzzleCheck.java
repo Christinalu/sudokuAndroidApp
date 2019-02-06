@@ -1,6 +1,11 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
 public class PuzzleCheck {
+
+    /*
+     * This Class checks if the user has correctly completed the puzzle
+    */
+
     private int size;
     public boolean isTrue;
 

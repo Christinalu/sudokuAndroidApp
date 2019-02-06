@@ -10,6 +10,10 @@ import android.widget.TextView;
 
 public class DictionaryActivity extends AppCompatActivity
 {
+	/*
+	 *	This Class implements the Hint button, that is, the Dictionary
+	*/
+
 	public Word[] wordArray;
 	public TextView tvToChange;
 

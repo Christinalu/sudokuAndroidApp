@@ -3,6 +3,9 @@ import java.io.Serializable;
 
 public class Word implements Serializable
 {
+	/*
+	 * This Object holds a word in native language and its translation
+	*/
 	private String mNative;
 	private String mTranslation;
 

@@ -28,6 +28,7 @@ public class SudokuGenerator {
         printOriginal( );
     }
 
+    // test method to print for debugging
     public void printOriginal( )
 	{
 		for( int i=0; i<size; i++ )
@@ -37,6 +38,7 @@ public class SudokuGenerator {
 		Log.d( "MATRIX"," \n\n");
 	}
 
+    // test method to print for debugging
 	public void printCurrent( )
 	{
 		for( int i=0; i<size; i++ )
