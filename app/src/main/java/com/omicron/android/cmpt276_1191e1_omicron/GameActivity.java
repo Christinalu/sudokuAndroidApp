@@ -264,9 +264,7 @@ public class GameActivity extends AppCompatActivity
 				canvas.drawRect( rectArr[i][j], paint );
 			}
 		}*/
-
 		
-
 
 		//canvas.drawRect( 100, 100, 500, 500, paint );
 
