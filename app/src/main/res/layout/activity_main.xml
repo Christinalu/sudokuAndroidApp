@@ -91,7 +91,7 @@
             android:id="@+id/button-start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="START"
+            android:text="START NEW GAME"
             tools:layout_editor_absoluteX="147dp"
             tools:layout_editor_absoluteY="326dp" />
 

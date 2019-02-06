@@ -308,10 +308,6 @@ public class GameActivity extends AppCompatActivity
 		rectLayout.setOnTouchListener( handleTouch );
 
 
-
-
-
-
 	}
 
 
