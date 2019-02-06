@@ -1,18 +1,42 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
+import android.util.Log;
+
 import java.util.Random;
 import static java.lang.Math.sqrt;
 
 public class SudokuGenerator {
     //This class accepts a hardcoded Puzzle and randomizes it to generate a new puzzle which is guaranteed to be unique and the same difficulty and the puzzle taken in as the argument.
     private int size;
-    public int[][] Puzzle;
+    public int[][] PuzzleOriginal;
+    public int[][] Puzzle; //stores user input changes
 
     public SudokuGenerator(int[][] arr) {
         size = arr.length;
         Puzzle = new int[size][size];
         copyarr(arr,Puzzle);
         scramble(Puzzle);
+        PuzzleOriginal = new int[size][size];
+        copyarr( Puzzle, PuzzleOriginal );
+        printOriginal( );
     }
+
+    public void printOriginal( )
+	{
+		for( int i=0; i<size; i++ )
+		{
+			Log.d("MATRIX", " " + PuzzleOriginal[i][0] + " " + PuzzleOriginal[i][1] + " " + PuzzleOriginal[i][2]+ " " + PuzzleOriginal[i][3]+ " " + PuzzleOriginal[i][4]+ " " + PuzzleOriginal[i][5]+ " " + PuzzleOriginal[i][6]+ " " + PuzzleOriginal[i][7]+ " " + PuzzleOriginal[i][8] );
+		}
+		Log.d( "MATRIX"," \n\n");
+	}
+
+	public void printCurrent( )
+	{
+		for( int i=0; i<size; i++ )
+		{
+			Log.d("MATRIX", " " + Puzzle[i][0] + " " + Puzzle[i][1] + " " + Puzzle[i][2]+ " " + Puzzle[i][3]+ " " + Puzzle[i][4]+ " " + Puzzle[i][5]+ " " + Puzzle[i][6]+ " " + Puzzle[i][7]+ " " + Puzzle[i][8] );
+		}
+        Log.d( "MATRIX"," \n\n");
+	}
 
     private void zero(int[] arr) {
         for (int i=0; i<arr.length; i++) arr[i] = 0;
