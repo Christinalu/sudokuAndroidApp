@@ -66,18 +66,13 @@ public class drw
 			Log.d( "TAG", "--current-sqr-coloured: [" + currentRectColoured.getRow() + "] [" + currentRectColoured.getColumn() + "]" );
 
 			rectLayout.invalidate( );
-
-			////////////////////////
-			//
-			// 	HERE DO NOT FORGET TO DESELECT SQUARE IF CLICKED OUTSIDE MATRIX
-			//
-			/////////////////
 		}
 
-		//if new square coloured, decolour prev
+		//if new square coloured, de-colour prev
 		if( newSqrTouched == true )
 		{
 			paint.setColor(Color.parseColor("#c2c2c2"));
+
 			if( (lastRectColoured.getRow() != -1) )
 			{
 				if( (lastRectColoured.getRow() == currentRectColoured.getRow() )
@@ -90,7 +85,6 @@ public class drw
 					canvas.drawRect(rectArr[lastRectColoured.getRow()][lastRectColoured.getColumn()], paint);
 				}
 			}
-			//currentRectColoured.update( -1, -1 ); //set -1 because no new rect was drawn
 
 			rectLayout.invalidate( );
 		}

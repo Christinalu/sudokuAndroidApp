@@ -9,8 +9,12 @@ import android.widget.Toast;
 
 public class ButtonListener extends AppCompatActivity
 {
-	//public Pair currentRectColoured;
-	//public SudokuGenerator usrSudokuArr;
+	/*
+	 *	This class is used to save space from GameActivity
+	 *	it initializes all buttons
+	 *	this also contains code that will let buttons respond by,
+	 *	if selecting valid square, will update PuzzleOriginal
+	*/
 
 	public ButtonListener(final Pair currentRectColoured2, final SudokuGenerator usrSudokuArr2,
 						  Button btn1, Button btn2, Button btn3, Button btn4, Button btn5,

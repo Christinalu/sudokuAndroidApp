@@ -5,6 +5,14 @@ import java.util.Random;
 import static java.lang.Math.sqrt;
 
 public class SudokuGenerator {
+
+    /*
+     *    -- IMPORTANT --
+     *  This generating function can generate UNIQUE puzzles based on
+     *  pre-defined unique puzzles. One puzzle can be used to
+     *  generate approximately (3!)^8 = 1679616 new unique solutions
+    */
+
     //This class accepts a hardcoded Puzzle and randomizes it to generate a new puzzle which is guaranteed to be unique and the same difficulty and the puzzle taken in as the argument.
     private int size;
     public int[][] PuzzleOriginal;
@@ -20,6 +28,7 @@ public class SudokuGenerator {
         printOriginal( );
     }
 
+    // test method to print for debugging
     public void printOriginal( )
 	{
 		for( int i=0; i<size; i++ )
@@ -29,6 +38,7 @@ public class SudokuGenerator {
 		Log.d( "MATRIX"," \n\n");
 	}
 
+    // test method to print for debugging
 	public void printCurrent( )
 	{
 		for( int i=0; i<size; i++ )
