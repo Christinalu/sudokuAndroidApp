@@ -22,7 +22,7 @@ public class ButtonListener extends AppCompatActivity
 	public ButtonListener(final Pair currentRectColoured2, final SudokuGenerator usrSudokuArr2, final RedrawText textOverlay2,
 						  final Button btn1, final Button btn2, final Button btn3, final Button btn4, final Button btn5,
 						  final Button btn6, final Button btn7, final Button btn8, final Button btn9, final drw drawR,
-						  int[] touchX2, int[] touchY2, Pair lastRectColoured2 )
+						  int[] touchX2, int[] touchY2, Pair lastRectColoured2, final int usrLangPref )
 	{
 		final Pair currentRectColoured = currentRectColoured2;
 		final SudokuGenerator usrSudokuArr = usrSudokuArr2;
@@ -54,8 +54,8 @@ public class ButtonListener extends AppCompatActivity
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 1;
 
 											// redraw square matrix and text overlay
-											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
-											textOverlay.reDrawText(  );
+											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
 											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 											if (check.isTrue) {
@@ -86,8 +86,8 @@ public class ButtonListener extends AppCompatActivity
 										{
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 2;
 											// redraw text overlay
-											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
-											textOverlay.reDrawText(  );
+											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
 											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 											if (check.isTrue) {
@@ -118,8 +118,8 @@ public class ButtonListener extends AppCompatActivity
 										{
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 3;
 											// redraw text overlay
-											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
-											textOverlay.reDrawText(  );
+											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
 											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 											if (check.isTrue) {
@@ -150,8 +150,8 @@ public class ButtonListener extends AppCompatActivity
 										{
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 4;
 											// redraw text overlay
-											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
-											textOverlay.reDrawText(  );
+											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
 											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 											if (check.isTrue) {
@@ -182,8 +182,8 @@ public class ButtonListener extends AppCompatActivity
 										{
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 5;
 											// redraw text overlay
-											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
-											textOverlay.reDrawText(  );
+											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
 											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 											if (check.isTrue) {
@@ -214,8 +214,8 @@ public class ButtonListener extends AppCompatActivity
 										{
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 6;
 											// redraw text overlay
-											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
-											textOverlay.reDrawText(  );
+											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
 											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 											if (check.isTrue) {
@@ -247,8 +247,8 @@ public class ButtonListener extends AppCompatActivity
 										{
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 7;
 											// redraw text overlay
-											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
-											textOverlay.reDrawText(  );
+											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
 											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 											if (check.isTrue) {
@@ -279,8 +279,8 @@ public class ButtonListener extends AppCompatActivity
 										{
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 8;
 											// redraw text overlay
-											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
-											textOverlay.reDrawText(  );
+											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
 											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 											if (check.isTrue) {
@@ -311,8 +311,8 @@ public class ButtonListener extends AppCompatActivity
 										{
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 9;
 											// redraw text overlay
-											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
-											textOverlay.reDrawText(  );;
+											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+											textOverlay.reDrawText( usrLangPref );;
 											Log.d( "MATRIX", " changed entry" );
 											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 											if (check.isTrue) {
