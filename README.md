@@ -7,8 +7,14 @@
 
 
 # Requirements
-Android 5.0 or later
+Android 5.0 or later.
 
+
+Sudoku Vocabulary App is optimized for: 
+* Device Name: Nexus 5
+* Resolution: 1080 * 1920 :420 dpi
+* API: 21
+* CPU/ABI: x86
 
 # Implemented Features
 * [First Iteration] (https://csil-git1.cs.surrey.sfu.ca/eazizika/CMPT276-1191E1-Omicron/wikis/First-Iteration)
