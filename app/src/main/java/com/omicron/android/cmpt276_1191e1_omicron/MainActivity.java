@@ -6,12 +6,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 
 public class MainActivity extends AppCompatActivity
 {
+    private static final String TAG="MainActivity";
     RadioGroup Difficulty;
     RadioButton btnDifficulty;
 
@@ -45,6 +47,12 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_main );
+        // let us know that the activity man has started succesfully
+        Log.d(TAG,"onCreate:started.");
+//        //showing logo
+//        ImageView logo=(ImageView)findViewById(R.id.logo);
+//        int imageResource=getResources().getIdentifier("@drawable/logo",null,this.getPackageName());
+//        logo.setImageResource(imageResource);
 
         //choose the level of difficulty
         Difficulty = findViewById(R.id.button_level);
