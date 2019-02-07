@@ -25,7 +25,18 @@ public class MainActivity extends AppCompatActivity
     // a Word (pair) contains the word in native language, and its translation
     // note: this array will remain of size 9, and only changed when modes are switched
     //       this is required in DictionaryActivity.java
-    private Word[] wordArray ;
+    private Word[] wordArray =new Word[]
+            {
+                    new Word( "One", "Un" ),
+                    new Word( "Two", "Deux" ),
+                    new Word( "Three", "Trois" ),
+                    new Word( "Four", "Quatre" ),
+                    new Word( "Five", "Cinq" ),
+                    new Word( "Six", "Six" ),
+                    new Word( "Seven", "Sept" ),
+                    new Word( "Eight", "Huit" ),
+                    new Word( "Nine", "Neuf" )
+            };;
 
 
     @Override
