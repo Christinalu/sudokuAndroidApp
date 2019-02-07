@@ -33,7 +33,7 @@ public class drw
 		usrSudokuArr = usrSudokuArr2;
 	}
 
-	public void reDraw( int[] x, int[] y, Pair lastRectColoured, Pair currentRectColoured, boolean forcePaint )
+	public void reDraw( int[] x, int[] y, Pair lastRectColoured, Pair currentRectColoured, boolean forcePaint, int usrLangPref )
 	{
 		newSqrTouched = false; //reset
 		prevNewSqrTouched = newSqrTouched;
@@ -101,7 +101,7 @@ public class drw
 			Log.d( "TAG", "--last-sqr-coloured-2: [" + lastRectColoured.getRow() + "] [" + lastRectColoured.getColumn() + "]" );
 
 			// redraw text overlay
-			textOverlay.reDrawText(  );
+			textOverlay.reDrawText( usrLangPref );
 
 			rectLayout.invalidate( );
 		}
@@ -135,7 +135,7 @@ public class drw
 			}
 
 			// redraw text overlay
-			textOverlay.reDrawText( );
+			textOverlay.reDrawText( usrLangPref );
 
 			rectLayout.invalidate( );
 		}

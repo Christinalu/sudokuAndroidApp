@@ -242,7 +242,7 @@ public class GameActivity extends AppCompatActivity
 
 		// call function to set all listeners
 		listeners = new ButtonListener( currentRectColoured, usrSudokuArr, textOverlay, btn1, btn2, btn3,
-				btn4, btn5, btn6, btn7, btn8, btn9, drawR, touchX, touchY, lastRectColoured );
+				btn4, btn5, btn6, btn7, btn8, btn9, drawR, touchX, touchY, lastRectColoured, usrLangPref );
 
 		Log.d( "ERROR-2", "after call to ButtonListeners" );
 
@@ -275,7 +275,7 @@ public class GameActivity extends AppCompatActivity
 						}
 
 						// call function to redraw if user touch detected
-						drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, true );
+						drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, true, usrLangPref );
 
 						break;
 					case MotionEvent.ACTION_MOVE:
