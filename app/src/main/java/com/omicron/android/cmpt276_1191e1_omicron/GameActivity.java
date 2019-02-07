@@ -29,6 +29,7 @@ public class GameActivity extends AppCompatActivity
 	*/
 
 	public Word[] wordArray;
+	private int usrLangPref;
 
 	public Paint paint = new Paint( );
 	public Bitmap bgMap;
@@ -79,6 +80,7 @@ public class GameActivity extends AppCompatActivity
 		Intent wordArraySrc = getIntent( );
 		if (wordArraySrc != null) {
 			wordArray = (Word[]) wordArraySrc.getSerializableExtra("wordArray");
+			usrLangPref =  (int) wordArraySrc.getSerializableExtra("usrLangPref");
 		}
 
 		//create dictionary button
@@ -205,6 +207,20 @@ public class GameActivity extends AppCompatActivity
 		Button btn7 = (Button) findViewById(R.id.keypad_7);
 		Button btn8 = (Button) findViewById(R.id.keypad_8);
 		Button btn9 = (Button) findViewById(R.id.keypad_9);
+
+		// choose button language based on user preference
+		if( usrLangPref == 0 )
+		{
+			btn1.setText( "ONE" );
+			btn2.setText( "TWO" );
+			btn3.setText( "THREE" );
+			btn4.setText( "FOUR" );
+			btn5.setText( "FIVE" );
+			btn6.setText( "SIX" );
+			btn7.setText( "SEVEN" );
+			btn8.setText( "EIGHT" );
+			btn9.setText( "NINE" );
+		}
 
 		/* predefine variables to text overlay */
 		paintblack.setColor(Color.parseColor("#0000ff"));

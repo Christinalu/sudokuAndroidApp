@@ -16,6 +16,7 @@ public class MainActivity extends AppCompatActivity
     RadioButton btnDifficulty;
 
     RadioGroup Language;
+    private int usrLangPref = 0; // 0=eng_fr, 1=fr_eng
 
     /*
      *  This Main Activity is the activity that will act as the Start Menu
@@ -73,6 +74,7 @@ public class MainActivity extends AppCompatActivity
                                         new Word( "Eight", "Huit" ),
                                         new Word( "Nine", "Neuf" )
                                 };
+                                usrLangPref = 0;
                         break;
                     case R.id.button_fr_eng:
                         // Your code
@@ -88,6 +90,7 @@ public class MainActivity extends AppCompatActivity
                                         new Word( "Huit", "Eight" ),
                                         new Word( "Neuf", "Nine" )
                                 };
+                                usrLangPref = 1;
                         break;
                     default:
                         wordArray = new Word[]
@@ -102,6 +105,7 @@ public class MainActivity extends AppCompatActivity
                                         new Word( "Eight", "Huit" ),
                                         new Word( "Nine", "Neuf" )
                                 };
+                                usrLangPref = 1;
                         break;
                 }
             }
@@ -122,6 +126,7 @@ public class MainActivity extends AppCompatActivity
                 	//save wordArray for Game Activity
 
 					gameActivity.putExtra( "wordArray", wordArray );
+                    gameActivity.putExtra( "usrLangPref", usrLangPref );
 
                     startActivity( gameActivity );
                 }
