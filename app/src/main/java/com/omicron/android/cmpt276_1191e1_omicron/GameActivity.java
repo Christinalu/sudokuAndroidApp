@@ -30,6 +30,7 @@ public class GameActivity extends AppCompatActivity
 
 	public Word[] wordArray;
 	private int usrLangPref;
+	private int usrDiffPref;
 
 	public Paint paint = new Paint( );
 	public Bitmap bgMap;
@@ -62,11 +63,8 @@ public class GameActivity extends AppCompatActivity
 	//
 	////////////
 
-	public int [][] seedArr = {	{6,7,3,0,0,0,2,0,8}, {4,0,2,0,7,3,0,0,1}, {0,0,5,6,0,8,4,3,7},
-								{8,0,9,0,3,7,5,0,6}, {3,4,0,2,6,0,0,7,0}, {0,6,7,8,0,9,1,0,3},
-								{7,5,6,0,1,2,3,0,4}, {1,0,8,7,0,0,9,6,0}, {2,0,4,3,8,6,0,1,5}};
+	public int [][] seedArr = new int[9][9];
 
-	public SudokuGenerator usrSudokuArr = new SudokuGenerator( seedArr ); // stores the generated puzzle, including arrays of solution and user current puzzle
 	public ButtonListener listeners; // used to call another function to implement all button listeners, to save space in GameActivity
 
 
@@ -82,6 +80,154 @@ public class GameActivity extends AppCompatActivity
 			wordArray = (Word[]) wordArraySrc.getSerializableExtra("wordArray");
 			usrLangPref =  (int) wordArraySrc.getSerializableExtra("usrLangPref");
 		}
+
+		//set intent to receive Puzzle array from Main Activity
+		Intent usrDiffPrefSrc = getIntent( );
+		if (usrDiffPrefSrc != null) {
+			usrDiffPref =  (int) usrDiffPrefSrc.getSerializableExtra("usrDiffPref");
+		}
+        if (usrDiffPref==0) {
+            seedArr[0][0] = 6;
+            seedArr[0][1] = 7;
+            seedArr[0][2] = 3;
+            seedArr[0][6] = 2;
+            seedArr[0][8] = 9;
+
+            seedArr[1][0] = 4;
+            seedArr[1][2] = 2;
+            seedArr[1][4] = 7;
+            seedArr[1][5] = 3;
+            seedArr[1][8] = 1;
+
+            seedArr[2][2] = 5;
+            seedArr[2][3] = 6;
+            seedArr[2][5] = 8;
+            seedArr[2][6] = 4;
+            seedArr[2][7] = 3;
+            seedArr[2][8] = 7;
+
+            seedArr[3][0] = 8;
+            seedArr[3][2] = 9;
+            seedArr[3][4] = 3;
+            seedArr[3][5] = 7;
+            seedArr[3][6] = 5;
+            seedArr[3][8] = 6;
+
+            seedArr[4][0] = 3;
+            seedArr[4][1] = 4;
+            seedArr[4][3] = 2;
+            seedArr[4][4] = 6;
+            seedArr[4][7] = 7;
+
+            seedArr[5][1] = 6;
+            seedArr[5][2] = 7;
+            seedArr[5][3] = 8;
+            seedArr[5][5] = 9;
+            seedArr[5][6] = 1;
+            seedArr[5][8] = 3;
+
+            seedArr[6][0] = 7;
+            seedArr[6][1] = 5;
+            seedArr[6][2] = 6;
+            seedArr[6][4] = 1;
+            seedArr[6][5] = 2;
+            seedArr[6][6] = 3;
+            seedArr[6][8] = 4;
+
+            seedArr[7][0] = 1;
+            seedArr[7][2] = 8;
+            seedArr[7][3] = 7;
+            seedArr[7][6] = 9;
+            seedArr[7][7] = 6;
+
+            seedArr[8][0] = 2;
+            seedArr[8][2] = 4;
+            seedArr[8][3] = 3;
+            seedArr[8][4] = 8;
+            seedArr[8][5] = 6;
+            seedArr[8][7] = 1;
+            seedArr[8][8] = 5;
+        }
+        if (usrDiffPref==1) {
+            seedArr[0][0] = 1;
+            seedArr[0][4] = 9;
+            seedArr[0][7] = 2;
+            seedArr[0][8] = 5;
+
+            seedArr[1][0] = 7;
+            seedArr[1][1] = 3;
+            seedArr[1][4] = 6;
+            seedArr[1][7] = 9;
+
+            seedArr[2][5] = 3;
+            seedArr[2][6] = 6;
+
+            seedArr[3][0] = 3;
+            seedArr[3][2] = 6;
+            seedArr[3][3] = 5;
+            seedArr[3][4] = 4;
+
+            seedArr[4][1] = 2;
+            seedArr[4][7] = 4;
+
+            seedArr[5][4] = 8;
+            seedArr[5][5] = 6;
+            seedArr[5][6] = 7;
+            seedArr[5][8] = 3;
+
+            seedArr[6][2] = 7;
+            seedArr[6][3] = 3;
+
+            seedArr[7][1] = 9;
+            seedArr[7][4] = 7;
+            seedArr[7][7] = 8;
+            seedArr[7][8] = 2;
+
+            seedArr[8][0] = 6;
+            seedArr[8][1] = 8;
+            seedArr[8][4] = 1;
+            seedArr[8][8] = 7;
+        }
+        if (usrDiffPref==2) {
+            seedArr[0][8] = 8;
+
+            seedArr[1][0] = 6;
+            seedArr[1][1] = 4;
+            seedArr[1][2] = 5;
+            seedArr[1][4] = 2;
+
+            seedArr[2][3] = 9;
+            seedArr[2][5] = 7;
+            seedArr[2][6] = 6;
+            seedArr[2][7] = 4;
+
+            seedArr[3][0] = 2;
+            seedArr[3][6] = 1;
+            seedArr[3][7] = 7;
+
+            seedArr[4][0] = 5;
+            seedArr[4][4] = 4;
+            seedArr[4][8] = 6;
+
+            seedArr[5][1] = 1;
+            seedArr[5][2] = 3;
+            seedArr[5][8] = 5;
+
+            seedArr[6][1] = 2;
+            seedArr[6][2] = 9;
+            seedArr[6][3] = 5;
+            seedArr[6][5] = 6;
+
+            seedArr[7][4] = 1;
+            seedArr[7][6] = 5;
+            seedArr[7][7] = 9;
+            seedArr[7][8] = 4;
+
+            seedArr[8][0] = 7;
+        }
+
+        // stores the generated puzzle, including arrays of solution and user current puzzle
+        SudokuGenerator usrSudokuArr = new SudokuGenerator( seedArr );
 
 		//create dictionary button
 		Button btnDictionary = (Button) findViewById(R.id.button_dictionary);
