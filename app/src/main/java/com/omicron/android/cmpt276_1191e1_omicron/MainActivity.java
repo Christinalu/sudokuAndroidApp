@@ -16,7 +16,6 @@ public class MainActivity extends AppCompatActivity
     RadioButton btnDifficulty;
 
     RadioGroup Language;
-    RadioButton btnLanguage;
 
     /*
      *  This Main Activity is the activity that will act as the Start Menu
@@ -26,18 +25,7 @@ public class MainActivity extends AppCompatActivity
     // a Word (pair) contains the word in native language, and its translation
     // note: this array will remain of size 9, and only changed when modes are switched
     //       this is required in DictionaryActivity.java
-    private Word[] wordArray = new Word[]
-            {
-                    new Word( "One", "Un" ),
-                    new Word( "Two", "Deux" ),
-                    new Word( "Three", "Trois" ),
-                    new Word( "Four", "Quatre" ),
-                    new Word( "Five", "Cinq" ),
-                    new Word( "Six", "Six" ),
-                    new Word( "Seven", "Sept" ),
-                    new Word( "Eight", "Huit" ),
-                    new Word( "Nine", "Neuf" )
-            };
+    private Word[] wordArray ;
 
 
     @Override
@@ -51,11 +39,62 @@ public class MainActivity extends AppCompatActivity
         int difficultyId=Difficulty.getCheckedRadioButtonId();
         btnDifficulty=findViewById(difficultyId);
 
+
+
         //choose the language
         Language=findViewById(R.id.button_language);
-        int LanguageId=Language.getCheckedRadioButtonId();
-        btnLanguage=findViewById(LanguageId);
-
+        Language.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                int LanguageId = group.getCheckedRadioButtonId();
+                switch (LanguageId) {
+                    case R.id.button_eng_fr:
+                        // Your code
+                         wordArray = new Word[]
+                                {
+                                        new Word( "One", "Un" ),
+                                        new Word( "Two", "Deux" ),
+                                        new Word( "Three", "Trois" ),
+                                        new Word( "Four", "Quatre" ),
+                                        new Word( "Five", "Cinq" ),
+                                        new Word( "Six", "Six" ),
+                                        new Word( "Seven", "Sept" ),
+                                        new Word( "Eight", "Huit" ),
+                                        new Word( "Nine", "Neuf" )
+                                };
+                        break;
+                    case R.id.button_fr_eng:
+                        // Your code
+                         wordArray = new Word[]
+                                {
+                                        new Word( "Un", "One" ),
+                                        new Word( "Deux", "Two" ),
+                                        new Word( "Trois", "Three" ),
+                                        new Word( "Quatre", "Four" ),
+                                        new Word( "Cinq", "Five" ),
+                                        new Word( "Six", "Six" ),
+                                        new Word( "Sept", "Seven" ),
+                                        new Word( "Huit", "Eight" ),
+                                        new Word( "Neuf", "Nine" )
+                                };
+                        break;
+                    default:
+                        wordArray = new Word[]
+                                {
+                                        new Word( "One", "Un" ),
+                                        new Word( "Two", "Deux" ),
+                                        new Word( "Three", "Trois" ),
+                                        new Word( "Four", "Quatre" ),
+                                        new Word( "Five", "Cinq" ),
+                                        new Word( "Six", "Six" ),
+                                        new Word( "Seven", "Sept" ),
+                                        new Word( "Eight", "Huit" ),
+                                        new Word( "Nine", "Neuf" )
+                                };
+                        break;
+                }
+            }
+        });
 
         // start game button; used to switch to gameActivity
         Button btnStart = (Button) findViewById( R.id.button_start );
@@ -66,11 +105,11 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onClick( View v )
                 {
-                   // int levelId=Difficulty.getCheckedRadioButtonId();
-                    //btnDifficulty=findViewById(levelId);
+
                 	Intent gameActivity = new Intent( MainActivity.this, GameActivity.class );
 
                 	//save wordArray for Game Activity
+
 					gameActivity.putExtra( "wordArray", wordArray );
 
                     startActivity( gameActivity );
