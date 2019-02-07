@@ -14,23 +14,36 @@ public class drw
 {
 	private Paint paint;
 	private boolean newSqrTouched;
+	private Rect[][] rectArr;
+	private Canvas canvas;
+	private RelativeLayout rectLayout;
+	private RedrawText textOverlay;
+	private boolean prevNewSqrTouched;
+	private SudokuGenerator usrSudokuArr;
 
-	public drw( )
+
+	public drw( Rect[][] rectArr2, Paint paint2, Canvas canvas2,
+				RelativeLayout rectLayout2, RedrawText textOverlay2, SudokuGenerator usrSudokuArr2 )
 	{
-
+		paint = paint2;
+		rectArr = rectArr2;
+		canvas = canvas2;
+		rectLayout = rectLayout2;
+		textOverlay = textOverlay2;
+		usrSudokuArr = usrSudokuArr2;
 	}
 
-	public void reDraw( Rect[][] rectArr, int x, int y, Paint paint, Canvas canvas,
-						RelativeLayout rectLayout, Pair lastRectColoured, Pair currentRectColoured )
+	public void reDraw( int[] x, int[] y, Pair lastRectColoured, Pair currentRectColoured, boolean forcePaint )
 	{
 		newSqrTouched = false; //reset
+		prevNewSqrTouched = newSqrTouched;
 
 		//loop and draw if valid rect clicked
 		for( int i=0; i<9; i++ )
 		{
 			for( int j=0; j<9; j++ )
 			{
-				if( rectArr[i][j].contains( x, y ) )
+				if( rectArr[i][j].contains( x[0], y[0] ) )
 				{
 					lastRectColoured.update( currentRectColoured.getRow(), currentRectColoured.getColumn() );
 
@@ -41,7 +54,7 @@ public class drw
 					canvas.drawRect(rectArr[i][j], paint);
 
 					//Log.d("TAG", "left: " + rectArr[i][j].left + " top: " + rectArr[i][j].top);
-					Log.d( "TAG", "--current-sqr-coloured: [" + i + "] [" + j + "]" );
+					Log.d( "TAG", "--current-sqr-coloured-1: [" + i + "] [" + j + "]" );
 
 					rectLayout.invalidate( );
 
@@ -56,14 +69,39 @@ public class drw
 		if( newSqrTouched == false )
 		{
 			//draw current so far back to grey
-			paint.setColor(Color.parseColor("#c2c2c2"));
-			if( currentRectColoured.getRow() != -1 )
+
+			// set proper colour for changeable vs fixed squares
+			if( currentRectColoured.getRow() != -1 && usrSudokuArr.PuzzleOriginal[currentRectColoured.getRow()][currentRectColoured.getColumn()] != 0 )
 			{
+				paint.setColor(Color.parseColor("#a2a2a2")); // set darker colour for fixed numbers
+			}
+			else
+			{
+				paint.setColor(Color.parseColor("#c2c2c2")); // set lighter colour for fixed numbers
+			}
+
+			if( currentRectColoured.getRow() != -1 ) // if statement to avoid indexing element -1
+			{
+
+				canvas.drawRect(rectArr[currentRectColoured.getRow()][currentRectColoured.getColumn()], paint);
+				Log.d( "TAG", "--drawn" );
+			}
+
+			if( forcePaint == true )
+			{
+				currentRectColoured.update(-1, -1); //set -1 because no new rect was drawn
+			}
+			else
+			{
+				paint.setColor(Color.parseColor("#ff0000")); // here activate when button is used to insert
 				canvas.drawRect(rectArr[currentRectColoured.getRow()][currentRectColoured.getColumn()], paint);
 			}
-			currentRectColoured.update( -1, -1 ); //set -1 because no new rect was drawn
 
-			Log.d( "TAG", "--current-sqr-coloured: [" + currentRectColoured.getRow() + "] [" + currentRectColoured.getColumn() + "]" );
+			Log.d( "TAG", "--current-sqr-coloured-2: [" + currentRectColoured.getRow() + "] [" + currentRectColoured.getColumn() + "]" );
+			Log.d( "TAG", "--last-sqr-coloured-2: [" + lastRectColoured.getRow() + "] [" + lastRectColoured.getColumn() + "]" );
+
+			// redraw text overlay
+			textOverlay.reDrawText(  );
 
 			rectLayout.invalidate( );
 		}
@@ -71,7 +109,17 @@ public class drw
 		//if new square coloured, de-colour prev
 		if( newSqrTouched == true )
 		{
-			paint.setColor(Color.parseColor("#c2c2c2"));
+			// set proper colour for changeable vs fixed squares
+			if( lastRectColoured.getRow() != -1 && usrSudokuArr.PuzzleOriginal[lastRectColoured.getRow()][lastRectColoured.getColumn()] != 0 )
+			{
+				paint.setColor(Color.parseColor("#a2a2a2")); // set darker colour for fixed numbers
+			}
+			else
+			{
+				paint.setColor(Color.parseColor("#c2c2c2")); // set lighter colour for fixed numbers
+			}
+
+			Log.d( "TAG", "--current-sqr-coloured-3: [" + currentRectColoured.getRow() + "] [" + currentRectColoured.getColumn() + "]" );
 
 			if( (lastRectColoured.getRow() != -1) )
 			{
@@ -85,6 +133,9 @@ public class drw
 					canvas.drawRect(rectArr[lastRectColoured.getRow()][lastRectColoured.getColumn()], paint);
 				}
 			}
+
+			// redraw text overlay
+			textOverlay.reDrawText( );
 
 			rectLayout.invalidate( );
 		}

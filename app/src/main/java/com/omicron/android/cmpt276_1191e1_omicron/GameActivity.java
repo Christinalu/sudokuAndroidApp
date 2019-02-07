@@ -39,6 +39,8 @@ public class GameActivity extends AppCompatActivity
 
 	public float sqrLO; // original left coordinate of where puzzle starts
 	public float sqrTO; // original top coordinate of where puzzle starts
+	public float txtL; // text coordinates
+	public float txtT;
 
 	public drw drawR; // class that draws the squares either highlighted or not, based on touch
 	public Pair lastRectColoured = new Pair( -1, -1 ); // stores the last coloured square coordinates
@@ -46,6 +48,10 @@ public class GameActivity extends AppCompatActivity
 
 	public Rect[][] rectArr = new Rect[9][9]; // stores all squares in a 2D array
 	public Paint paintblack = new Paint();
+	public RedrawText textOverlay; // class used to redraw GUI text overlay
+
+	private int[] touchX = { 0 };
+	private int[] touchY = { 0 };
 
 	// an unique puzzle template input
 
@@ -106,7 +112,6 @@ public class GameActivity extends AppCompatActivity
 		// create canvas and bitmap
 		bgMap = Bitmap.createBitmap(1080, 1500, Bitmap.Config.ARGB_8888);
 		canvas = new Canvas(bgMap);
-		drawR = new drw(  ); // class used to draw/update square matrix
 
 		//original coordinates of where to draw square
 		sqrLO = (float) (screenW / 2.0 - 1005 / 2.0 );
@@ -167,6 +172,23 @@ public class GameActivity extends AppCompatActivity
 				}
 
 				rectArr[i][j] = new Rect( (int)(sqrL), (int)sqrT, (int)sqrR, (int)sqrB ); // create the new square
+
+				//set proper colour for changeable vs fixed squares
+				if( usrSudokuArr.PuzzleOriginal[i][j] != 0 )
+				{
+					paint.setColor(Color.parseColor("#a2a2a2")); // set darker colour for fixed numbers
+				}
+				else
+				{
+					paint.setColor(Color.parseColor("#c2c2c2")); // set lighter colour for fixed numbers
+				}
+
+				///////////////
+				//
+				//	later add so that when user touches restricted square that cannot be changed, it wont be coloured
+				//
+				//////////////
+
 				canvas.drawRect( rectArr[i][j], paint ); // draw square on canvas
 			}
 		}
@@ -184,9 +206,34 @@ public class GameActivity extends AppCompatActivity
 		Button btn8 = (Button) findViewById(R.id.keypad_8);
 		Button btn9 = (Button) findViewById(R.id.keypad_9);
 
+		/* predefine variables to text overlay */
+		paintblack.setColor(Color.parseColor("#0000ff"));
+		paintblack.setTextSize(30);
+		// re-adjust text to fit
+		sqrLO = sqrLO + 9;
+		sqrTO = sqrTO + 105/2 + 10;
+
+		// create 2D array of text coordinates
+		final PairF[][] puzzleLoc = new PairF[9][9];
+
+		// initialize text overlay
+		textOverlay = new RedrawText( txtL, txtT, sqrLO, sqrTO, puzzleLoc,
+				usrSudokuArr, canvas, paintblack, wordArray );
+
+		drawR = new drw( rectArr, paint, canvas, rectLayout, textOverlay, usrSudokuArr ); // class used to draw/update square matrix
+
+		Log.d( "ERROR-2", "\nbefore call to ButtonListeners" );
+
 		// call function to set all listeners
-		listeners = new ButtonListener( currentRectColoured, usrSudokuArr, btn1, btn2, btn3,
-				btn4, btn5, btn6, btn7, btn8, btn9 );
+		listeners = new ButtonListener( currentRectColoured, usrSudokuArr, textOverlay, btn1, btn2, btn3,
+				btn4, btn5, btn6, btn7, btn8, btn9, drawR, touchX, touchY, lastRectColoured );
+
+		Log.d( "ERROR-2", "after call to ButtonListeners" );
+
+		if( textOverlay == null )
+		{
+			Log.d( "NULL-2", "textOverlay initialized null" );
+		}
 
 
 
@@ -198,16 +245,21 @@ public class GameActivity extends AppCompatActivity
 			@Override
 			public boolean onTouch( View v, MotionEvent event )
 			{
-				int x = (int) event.getX( );
-				int y = (int) event.getY( );
+				touchX[0] = (int) event.getX( );
+				touchY[0] = (int) event.getY( );
 
 				switch( event.getAction( ) )
 				{
 					case MotionEvent.ACTION_DOWN:
 						//Log.i("TAG", "-- down");
 
+						if( textOverlay == null )
+						{
+							Log.d( "NULL-2", "textOverlay null in onTouch in GameActivity" );
+						}
+
 						// call function to redraw if user touch detected
-						drawR.reDraw( rectArr, x, y, paint, canvas, rectLayout, lastRectColoured, currentRectColoured );
+						drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, true );
 
 						break;
 					case MotionEvent.ACTION_MOVE:
@@ -225,22 +277,6 @@ public class GameActivity extends AppCompatActivity
 		// initialize onTouchListener
 		rectLayout.setOnTouchListener( handleTouch );
 
-		paintblack.setColor(Color.parseColor("#0000ff"));
-		paintblack.setTextSize(30);
-
-		// re-adjust text to fit
-		sqrLO = sqrLO + 9;
-		sqrTO = sqrTO + 105/2 + 10;
-
-		float txtL; // text coordinates
-		float txtT;
-
-		// create 2D array of text coordinates
-		PairF[][] puzzleLoc = new PairF[9][9];
-
-
-		/////// !!!!!!!! //////////
-		/////////////
 
 
 			/** CREATE TEXT PUZZLE OVERLAY **/
