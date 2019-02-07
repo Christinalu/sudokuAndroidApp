@@ -18,9 +18,11 @@ public class RedrawText
 	private Canvas canvas;
 	private Paint paintblack;
 	private Word[] wordArray;
+	//private int usrLangPref;
 
 	public RedrawText( float txtL2, float txtT2, float sqrLO2, float sqrTO2, PairF[][] puzzleLoc2,
-					   SudokuGenerator usrSudokuArr2, Canvas canvas2, Paint paintblack2, Word[] wordArray2 )
+					   SudokuGenerator usrSudokuArr2, Canvas canvas2, Paint paintblack2,
+					   Word[] wordArray2 )
 	{
 		// import data on initialize
 		txtL = txtL2;
@@ -32,8 +34,9 @@ public class RedrawText
 		canvas = canvas2;
 		paintblack = paintblack2;
 		wordArray = wordArray2;
+		//usrLangPref = usrLangPref2;
 	}
-	public void reDrawText(  )
+	public void reDrawText( int usrLangPref )
 	{
 		Log.d( "MATRIX", "--PASS" );
 		for( int i=0; i<9; i++ ) //row
@@ -65,8 +68,25 @@ public class RedrawText
 				}
 				puzzleLoc[i][j] = new PairF(txtT,txtL);
 
-				if (usrSudokuArr.Puzzle[i][j]!=0) { // draw only if the original puzzle contains a number
+				// choose what language to draw
+				if( usrSudokuArr.Puzzle[i][j]!=0 && usrSudokuArr.PuzzleOriginal[i][j]!=0 && usrLangPref == 0 ) { // draw only if the puzzle contains a number; and draw the native translated word
+					//draw translation
 					canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getTranslation(), txtL, txtT, paintblack);
+				}
+				else if( usrSudokuArr.Puzzle[i][j]!=0 && usrSudokuArr.PuzzleOriginal[i][j]!=0 && usrLangPref == 1)
+				{
+					//draw native
+					canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getTranslation(), txtL, txtT, paintblack);
+				}
+				else if( usrSudokuArr.Puzzle[i][j]!=0 && usrSudokuArr.PuzzleOriginal[i][j]==0 && usrLangPref == 0)
+				{
+					//draw native
+					canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getNative(), txtL, txtT, paintblack);
+				}
+				else if( usrSudokuArr.Puzzle[i][j]!=0 && usrSudokuArr.PuzzleOriginal[i][j]==0 && usrLangPref == 1)
+				{
+					//draw native
+					canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getNative(), txtL, txtT, paintblack);
 				}
 			}
 		}

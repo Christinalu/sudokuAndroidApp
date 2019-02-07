@@ -22,7 +22,7 @@ public class ButtonListener extends AppCompatActivity
 	public ButtonListener(final Pair currentRectColoured2, final SudokuGenerator usrSudokuArr2, final RedrawText textOverlay2,
 						  Button btn1, Button btn2, Button btn3, Button btn4, Button btn5,
 						  Button btn6, Button btn7, Button btn8, Button btn9, final drw drawR,
-						  int[] touchX2, int[] touchY2, Pair lastRectColoured2 )
+						  int[] touchX2, int[] touchY2, Pair lastRectColoured2, final int usrLangPref )
 	{
 		final Pair currentRectColoured = currentRectColoured2;
 		final SudokuGenerator usrSudokuArr = usrSudokuArr2;
@@ -54,8 +54,8 @@ public class ButtonListener extends AppCompatActivity
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 1;
 
 											// redraw square matrix and text overlay
-											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
-											textOverlay.reDrawText(  );
+											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
 										}
 										usrSudokuArr.printCurrent( );
@@ -73,8 +73,8 @@ public class ButtonListener extends AppCompatActivity
 										{
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 2;
 											// redraw text overlay
-											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
-											textOverlay.reDrawText(  );
+											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
 										}
 										usrSudokuArr.printCurrent( );
@@ -92,8 +92,8 @@ public class ButtonListener extends AppCompatActivity
 										{
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 3;
 											// redraw text overlay
-											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
-											textOverlay.reDrawText(  );
+											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
 										}
 										usrSudokuArr.printCurrent( );
@@ -111,8 +111,8 @@ public class ButtonListener extends AppCompatActivity
 										{
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 4;
 											// redraw text overlay
-											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
-											textOverlay.reDrawText(  );
+											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
 										}
 										usrSudokuArr.printCurrent( );
@@ -130,8 +130,8 @@ public class ButtonListener extends AppCompatActivity
 										{
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 5;
 											// redraw text overlay
-											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
-											textOverlay.reDrawText(  );
+											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
 										}
 										usrSudokuArr.printCurrent( );
@@ -149,8 +149,8 @@ public class ButtonListener extends AppCompatActivity
 										{
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 6;
 											// redraw text overlay
-											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
-											textOverlay.reDrawText(  );
+											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
 										}
 										usrSudokuArr.printCurrent( );
@@ -169,8 +169,8 @@ public class ButtonListener extends AppCompatActivity
 										{
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 7;
 											// redraw text overlay
-											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
-											textOverlay.reDrawText(  );
+											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
 										}
 										usrSudokuArr.printCurrent( );
@@ -188,8 +188,8 @@ public class ButtonListener extends AppCompatActivity
 										{
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 8;
 											// redraw text overlay
-											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
-											textOverlay.reDrawText(  );
+											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
 										}
 										usrSudokuArr.printCurrent( );
@@ -207,8 +207,8 @@ public class ButtonListener extends AppCompatActivity
 										{
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 9;
 											// redraw text overlay
-											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
-											textOverlay.reDrawText(  );;
+											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+											textOverlay.reDrawText( usrLangPref );;
 											Log.d( "MATRIX", " changed entry" );
 										}
 										usrSudokuArr.printCurrent( );
