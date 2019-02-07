@@ -62,11 +62,11 @@ public class GameActivity extends AppCompatActivity
 	//
 	////////////
 
-	public int [][] testArr = {	{6,7,3,0,0,0,2,0,8}, {4,0,2,0,7,3,0,0,1}, {0,0,5,6,0,8,4,3,7},
+	public int [][] seedArr = {	{6,7,3,0,0,0,2,0,8}, {4,0,2,0,7,3,0,0,1}, {0,0,5,6,0,8,4,3,7},
 								{8,0,9,0,3,7,5,0,6}, {3,4,0,2,6,0,0,7,0}, {0,6,7,8,0,9,1,0,3},
 								{7,5,6,0,1,2,3,0,4}, {1,0,8,7,0,0,9,6,0}, {2,0,4,3,8,6,0,1,5}};
 
-	public SudokuGenerator usrSudokuArr = new SudokuGenerator( testArr ); // stores the generated puzzle, including arrays of solution and user current puzzle
+	public SudokuGenerator usrSudokuArr = new SudokuGenerator( seedArr ); // stores the generated puzzle, including arrays of solution and user current puzzle
 	public ButtonListener listeners; // used to call another function to implement all button listeners, to save space in GameActivity
 
 

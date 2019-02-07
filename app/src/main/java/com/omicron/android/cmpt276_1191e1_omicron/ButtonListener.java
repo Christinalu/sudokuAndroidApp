@@ -20,8 +20,8 @@ public class ButtonListener extends AppCompatActivity
 	private int[] touchY = { 0 };
 
 	public ButtonListener(final Pair currentRectColoured2, final SudokuGenerator usrSudokuArr2, final RedrawText textOverlay2,
-						  Button btn1, Button btn2, Button btn3, Button btn4, Button btn5,
-						  Button btn6, Button btn7, Button btn8, Button btn9, final drw drawR,
+						  final Button btn1, final Button btn2, final Button btn3, final Button btn4, final Button btn5,
+						  final Button btn6, final Button btn7, final Button btn8, final Button btn9, final drw drawR,
 						  int[] touchX2, int[] touchY2, Pair lastRectColoured2 )
 	{
 		final Pair currentRectColoured = currentRectColoured2;
@@ -57,6 +57,19 @@ public class ButtonListener extends AppCompatActivity
 											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
 											textOverlay.reDrawText(  );
 											Log.d( "MATRIX", " changed entry" );
+											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
+											if (check.isTrue) {
+												Toast.makeText(v.getContext(), "COMPLETED!", Toast.LENGTH_SHORT).show();
+												btn1.setOnClickListener(null);
+												btn2.setOnClickListener(null);
+												btn3.setOnClickListener(null);
+												btn4.setOnClickListener(null);
+												btn5.setOnClickListener(null);
+												btn6.setOnClickListener(null);
+												btn7.setOnClickListener(null);
+												btn8.setOnClickListener(null);
+												btn9.setOnClickListener(null);
+											}
 										}
 										usrSudokuArr.printCurrent( );
 									}
@@ -76,6 +89,19 @@ public class ButtonListener extends AppCompatActivity
 											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
 											textOverlay.reDrawText(  );
 											Log.d( "MATRIX", " changed entry" );
+											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
+											if (check.isTrue) {
+												Toast.makeText(v.getContext(), "COMPLETED!", Toast.LENGTH_SHORT).show();
+												btn1.setOnClickListener(null);
+												btn2.setOnClickListener(null);
+												btn3.setOnClickListener(null);
+												btn4.setOnClickListener(null);
+												btn5.setOnClickListener(null);
+												btn6.setOnClickListener(null);
+												btn7.setOnClickListener(null);
+												btn8.setOnClickListener(null);
+												btn9.setOnClickListener(null);
+											}
 										}
 										usrSudokuArr.printCurrent( );
 									}
@@ -95,6 +121,19 @@ public class ButtonListener extends AppCompatActivity
 											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
 											textOverlay.reDrawText(  );
 											Log.d( "MATRIX", " changed entry" );
+											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
+											if (check.isTrue) {
+												Toast.makeText(v.getContext(), "COMPLETED!", Toast.LENGTH_SHORT).show();
+												btn1.setOnClickListener(null);
+												btn2.setOnClickListener(null);
+												btn3.setOnClickListener(null);
+												btn4.setOnClickListener(null);
+												btn5.setOnClickListener(null);
+												btn6.setOnClickListener(null);
+												btn7.setOnClickListener(null);
+												btn8.setOnClickListener(null);
+												btn9.setOnClickListener(null);
+											}
 										}
 										usrSudokuArr.printCurrent( );
 									}
@@ -114,6 +153,19 @@ public class ButtonListener extends AppCompatActivity
 											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
 											textOverlay.reDrawText(  );
 											Log.d( "MATRIX", " changed entry" );
+											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
+											if (check.isTrue) {
+												Toast.makeText(v.getContext(), "COMPLETED!", Toast.LENGTH_SHORT).show();
+												btn1.setOnClickListener(null);
+												btn2.setOnClickListener(null);
+												btn3.setOnClickListener(null);
+												btn4.setOnClickListener(null);
+												btn5.setOnClickListener(null);
+												btn6.setOnClickListener(null);
+												btn7.setOnClickListener(null);
+												btn8.setOnClickListener(null);
+												btn9.setOnClickListener(null);
+											}
 										}
 										usrSudokuArr.printCurrent( );
 									}
@@ -133,6 +185,19 @@ public class ButtonListener extends AppCompatActivity
 											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
 											textOverlay.reDrawText(  );
 											Log.d( "MATRIX", " changed entry" );
+											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
+											if (check.isTrue) {
+												Toast.makeText(v.getContext(), "COMPLETED!", Toast.LENGTH_SHORT).show();
+												btn1.setOnClickListener(null);
+												btn2.setOnClickListener(null);
+												btn3.setOnClickListener(null);
+												btn4.setOnClickListener(null);
+												btn5.setOnClickListener(null);
+												btn6.setOnClickListener(null);
+												btn7.setOnClickListener(null);
+												btn8.setOnClickListener(null);
+												btn9.setOnClickListener(null);
+											}
 										}
 										usrSudokuArr.printCurrent( );
 									}
@@ -152,6 +217,19 @@ public class ButtonListener extends AppCompatActivity
 											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
 											textOverlay.reDrawText(  );
 											Log.d( "MATRIX", " changed entry" );
+											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
+											if (check.isTrue) {
+												Toast.makeText(v.getContext(), "COMPLETED!", Toast.LENGTH_SHORT).show();
+												btn1.setOnClickListener(null);
+												btn2.setOnClickListener(null);
+												btn3.setOnClickListener(null);
+												btn4.setOnClickListener(null);
+												btn5.setOnClickListener(null);
+												btn6.setOnClickListener(null);
+												btn7.setOnClickListener(null);
+												btn8.setOnClickListener(null);
+												btn9.setOnClickListener(null);
+											}
 										}
 										usrSudokuArr.printCurrent( );
 
@@ -172,6 +250,19 @@ public class ButtonListener extends AppCompatActivity
 											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
 											textOverlay.reDrawText(  );
 											Log.d( "MATRIX", " changed entry" );
+											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
+											if (check.isTrue) {
+												Toast.makeText(v.getContext(), "COMPLETED!", Toast.LENGTH_SHORT).show();
+												btn1.setOnClickListener(null);
+												btn2.setOnClickListener(null);
+												btn3.setOnClickListener(null);
+												btn4.setOnClickListener(null);
+												btn5.setOnClickListener(null);
+												btn6.setOnClickListener(null);
+												btn7.setOnClickListener(null);
+												btn8.setOnClickListener(null);
+												btn9.setOnClickListener(null);
+											}
 										}
 										usrSudokuArr.printCurrent( );
 									}
@@ -191,6 +282,19 @@ public class ButtonListener extends AppCompatActivity
 											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
 											textOverlay.reDrawText(  );
 											Log.d( "MATRIX", " changed entry" );
+											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
+											if (check.isTrue) {
+												Toast.makeText(v.getContext(), "COMPLETED!", Toast.LENGTH_SHORT).show();
+												btn1.setOnClickListener(null);
+												btn2.setOnClickListener(null);
+												btn3.setOnClickListener(null);
+												btn4.setOnClickListener(null);
+												btn5.setOnClickListener(null);
+												btn6.setOnClickListener(null);
+												btn7.setOnClickListener(null);
+												btn8.setOnClickListener(null);
+												btn9.setOnClickListener(null);
+											}
 										}
 										usrSudokuArr.printCurrent( );
 									}
@@ -210,6 +314,19 @@ public class ButtonListener extends AppCompatActivity
 											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false );
 											textOverlay.reDrawText(  );;
 											Log.d( "MATRIX", " changed entry" );
+											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
+											if (check.isTrue) {
+												Toast.makeText(v.getContext(), "COMPLETED!", Toast.LENGTH_SHORT).show();
+												btn1.setOnClickListener(null);
+												btn2.setOnClickListener(null);
+												btn3.setOnClickListener(null);
+												btn4.setOnClickListener(null);
+												btn5.setOnClickListener(null);
+												btn6.setOnClickListener(null);
+												btn7.setOnClickListener(null);
+												btn8.setOnClickListener(null);
+												btn9.setOnClickListener(null);
+											}
 										}
 										usrSudokuArr.printCurrent( );
 									}

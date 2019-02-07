@@ -82,31 +82,62 @@ public class SudokuGenerator {
         int tempSec;
         int puzzleSec;
         int[][] temparr = new int[colrow][colrow];
-        copyarr(Puzzle,temparr);
+        copyarr(Puzzle, temparr);
         int[] order = new int[3];
         //swap rows in 3x9 until 9x9 fully swapped
-        for (int i=0; i<3; i++) {
+        for (int i = 0; i < 3; i++) {
             //ith box down
-            randomize(order,3);
-            for (int j=0; j<3; j++) {
+            randomize(order, 3);
+            for (int j = 0; j < 3; j++) {
                 //row in box
-                puzzleSec = (i*3)+j;
-                tempSec = (i*3)+order[j];
-                for (int k=0; k<colrow; k++) {
+                puzzleSec = (i * 3) + j;
+                tempSec = (i * 3) + order[j];
+                for (int k = 0; k < colrow; k++) {
                     //col
                     Puzzle[puzzleSec][k] = temparr[tempSec][k];
                 }
             }
         }
+        copyarr(Puzzle, temparr);
         //swap cols 9x3 until 9x9 fully swapped
-        for (int i=0; i<3; i++) {
+        for (int i = 0; i < 3; i++) {
             //ith box to the right
-            randomize(order,3);
-            for (int j=0; j<3; j++) {
+            randomize(order, 3);
+            for (int j = 0; j < 3; j++) {
                 //col in the box
-                puzzleSec = (i*3)+j;
-                tempSec = (i*3)+order[j];
-                for (int k=0; k<colrow; k++) {
+                puzzleSec = (i * 3) + j;
+                tempSec = (i * 3) + order[j];
+                for (int k = 0; k < colrow; k++) {
+                    //row
+                    Puzzle[k][puzzleSec] = temparr[k][tempSec];
+                }
+            }
+        }
+        copyarr(Puzzle, temparr);
+        //swap row boxes
+        randomize(order, 3);
+        for (int i = 0; i < 3; i++) {
+            //ith box
+            for (int j = 0; j < 3; j++) {
+                //row in the box
+                puzzleSec = (i * 3) + j;
+                tempSec = (order[i] * 3) + j;
+                for (int k = 0; k < colrow; k++) {
+                    //col
+                    Puzzle[puzzleSec][k] = temparr[tempSec][k];
+                }
+            }
+        }
+        copyarr(Puzzle, temparr);
+        //swap col boxes
+        randomize(order, 3);
+        for (int i = 0; i < 3; i++) {
+            //ith box
+            for (int j = 0; j < 3; j++) {
+                //col in the box
+                puzzleSec = (i * 3) + j;
+                tempSec = (order[i] * 3) + j;
+                for (int k = 0; k < colrow; k++) {
                     //row
                     Puzzle[k][puzzleSec] = temparr[k][tempSec];
                 }
