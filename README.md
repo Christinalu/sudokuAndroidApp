@@ -3,7 +3,6 @@
 # Introduction
 >This is an educational game app for users who are learning a new language and enjoy Sudoku puzzles.
 
-
 >The idea of the Sudoku Vocabulary Practice App is to replace the digits 1 through 9 with nine pairs of words. Each pair of words consists of one word in the user's native language (say English), and one word in the language being studied.
 
 
@@ -12,7 +11,7 @@ Android 5.0 or later
 
 
 # Implemented Features
-* [First Iteration] (first iteration.md)
+* [First Iteration] (https://csil-git1.cs.surrey.sfu.ca/eazizika/CMPT276-1191E1-Omicron/wikis/First-Iteration)
 
 
 # Installation
