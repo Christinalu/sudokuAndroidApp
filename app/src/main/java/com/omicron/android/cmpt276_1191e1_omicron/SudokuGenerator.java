@@ -90,7 +90,9 @@ public class SudokuGenerator {
             }
         }
     }
-    private void scramble(int[][] Puzzle) {
+
+    private void scramble(int[][] Puzzle)
+    {
         int colrow = size;
         int tempSec;
         int puzzleSec;
@@ -157,4 +159,6 @@ public class SudokuGenerator {
             }
         }
     }
+
+    
 }
