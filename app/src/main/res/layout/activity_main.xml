@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
+    android:background="@color/mediumaquamarine"
     tools:context=".MainActivity">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -23,26 +24,26 @@
 
         <TextView
             android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             android:text="@string/sudoku"
-            android:textSize="35sp"
+            android:textColor="@color/translucent"
+            android:textSize="30dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
 
         <RadioGroup
             android:id="@+id/button_level"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="17dp"
                 android:text="@string/difficulty_level" />
 
             <RadioButton
@@ -50,6 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
+                android:textSize="17dp"
                 android:text="@string/easy_level" />
 
 
@@ -57,12 +59,14 @@
                 android:id="@+id/button_medium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="17dp"
                 android:text="@string/medium_level" />
 
             <RadioButton
                 android:id="@+id/button_hard"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="17dp"
                 android:text="@string/hard_level" />
 
         </RadioGroup>
@@ -71,11 +75,14 @@
             android:id="@+id/button_language"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="17dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="17dp"
                 android:text="@string/language_selection" />
 
             <RadioButton
@@ -83,6 +90,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
+                android:textSize="17dp"
                 android:text="@string/english_french" />
 
 
@@ -90,6 +98,7 @@
                 android:id="@+id/button_fr_eng"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="17dp"
                 android:text="@string/french_english" />
 
 
@@ -99,6 +108,9 @@
             android:id="@+id/button-start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/hint"
+            android:layout_marginTop="30dp"
+            android:width="200dp"
             android:text="@string/start"
             tools:layout_editor_absoluteX="147dp"
             tools:layout_editor_absoluteY="326dp" />
