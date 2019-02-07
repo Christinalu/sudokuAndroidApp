@@ -1,24 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#008577</color>
-    <color name="white">#ffffff</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="translucent">#a0ffffff</color>
-    <color name="orchid">#DA70D6</color>
-    <color name="blueviolet">#8a2be2</color>
-    <color name="gold">#FFD700</color>
-    <color name="mistyrose">#FFE4E1</color>
-    <color name="orange">#FCA454</color>
-    <color name="lightGreen">#52E76E</color>
-    <color name="grey">#999999</color>
-    <color name="cyan">#52E7CD</color>
-    <color name="mediumaquamarine">#4CCDA1</color>
-    <color name="cornflowerblue">#6495ED</color>
-    <color name="cadetblue">#5F9EA0</color>
-    <color name="darkolivegreen">#556B2F</color>
-    <color name="indigo">#4B0082</color>
-    <color name="mediumturquoise">#48D1CC</color>
-    <color name="darkslateblue">#483D8B</color>
-
 </resources>
