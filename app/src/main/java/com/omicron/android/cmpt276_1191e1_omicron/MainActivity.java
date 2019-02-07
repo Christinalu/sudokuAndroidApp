@@ -6,14 +6,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 
 public class MainActivity extends AppCompatActivity
 {
-    private static final String TAG="MainActivity";
     RadioGroup Difficulty;
     RadioButton btnDifficulty;
 
@@ -47,17 +45,17 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_main );
-        // let us know that the activity man has started succesfully
-        Log.d(TAG,"onCreate:started.");
-//        //showing logo
-//        ImageView logo=(ImageView)findViewById(R.id.logo);
-//        int imageResource=getResources().getIdentifier("@drawable/logo",null,this.getPackageName());
-//        logo.setImageResource(imageResource);
 
         //choose the level of difficulty
         Difficulty = findViewById(R.id.button_level);
+        int difficultyId=Difficulty.getCheckedRadioButtonId();
+        btnDifficulty=findViewById(difficultyId);
+
         //choose the language
         Language=findViewById(R.id.button_language);
+        int LanguageId=Language.getCheckedRadioButtonId();
+        btnLanguage=findViewById(LanguageId);
+
 
         // start game button; used to switch to gameActivity
         Button btnStart = (Button) findViewById( R.id.button_start );
@@ -68,19 +66,8 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onClick( View v )
                 {
-                   int levelId=Difficulty.getCheckedRadioButtonId();
-                    btnDifficulty=findViewById(levelId);
-                    //consequense of btnDifficulty
-                    //
-                    //
-                    //
-                    int LanguageId=Language.getCheckedRadioButtonId();
-                    btnLanguage=findViewById(LanguageId);
-                    //consequense of btnLanguage
-                    //
-                    //
-                    //
-                    //
+                   // int levelId=Difficulty.getCheckedRadioButtonId();
+                    //btnDifficulty=findViewById(levelId);
                 	Intent gameActivity = new Intent( MainActivity.this, GameActivity.class );
 
                 	//save wordArray for Game Activity
@@ -90,9 +77,6 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         );
-
-
-
 
     }
 
