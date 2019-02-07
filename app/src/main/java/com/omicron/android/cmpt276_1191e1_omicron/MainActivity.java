@@ -56,14 +56,8 @@ public class MainActivity extends AppCompatActivity
 
         //choose the level of difficulty
         Difficulty = findViewById(R.id.button_level);
-        int difficultyId=Difficulty.getCheckedRadioButtonId();
-        btnDifficulty=findViewById(difficultyId);
-
         //choose the language
         Language=findViewById(R.id.button_language);
-        int LanguageId=Language.getCheckedRadioButtonId();
-        btnLanguage=findViewById(LanguageId);
-
 
         // start game button; used to switch to gameActivity
         Button btnStart = (Button) findViewById( R.id.button_start );
@@ -74,8 +68,19 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onClick( View v )
                 {
-                   // int levelId=Difficulty.getCheckedRadioButtonId();
-                    //btnDifficulty=findViewById(levelId);
+                   int levelId=Difficulty.getCheckedRadioButtonId();
+                    btnDifficulty=findViewById(levelId);
+                    //consequense of btnDifficulty
+                    //
+                    //
+                    //
+                    int LanguageId=Language.getCheckedRadioButtonId();
+                    btnLanguage=findViewById(LanguageId);
+                    //consequense of btnLanguage
+                    //
+                    //
+                    //
+                    //
                 	Intent gameActivity = new Intent( MainActivity.this, GameActivity.class );
 
                 	//save wordArray for Game Activity
@@ -85,6 +90,9 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         );
+
+
+
 
     }
 
