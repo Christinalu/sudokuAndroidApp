@@ -1,30 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--this is for english-french-->
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".GameActivity">
+    android:background="@color/mediumaquamarine"
+    android:layout_height="match_parent">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical">
-
-        <Button
-            android:id="@+id/button_dictionary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="110dp"
-            android:layout_marginTop="470dp"
-            android:gravity="center"
-            android:text="HINT" />
-
-
-
 
         <RelativeLayout
             android:id="@+id/rect_layout"
@@ -37,9 +23,27 @@
 
         </RelativeLayout>
 
-
-
     </RelativeLayout>
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/actionButtons"
+        android:layout_marginTop="470dp"
+        android:stretchColumns="*">
+
+        <TableRow>
+            <Button
+                android:id="@+id/button_dictionary"
+                android:background="@drawable/hint_buttons"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:gravity="center"
+                android:text="HINT"/>
+
+        </TableRow>
+    </TableLayout>
 
 
     <TableLayout
@@ -50,39 +54,62 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:stretchColumns="*">
+
         <TableRow>
             <Button android:id="@+id/keypad_1"
-                android:text="un">
+                android:background="@drawable/normal_buttons"
+                android:text="un"
+                android:textColor="@android:color/white">
             </Button>
+
             <Button android:id="@+id/keypad_2"
-                android:text="deux">
+                android:background="@drawable/normal_buttons"
+                android:text="deux"
+                android:textColor="@android:color/white">
             </Button>
+
             <Button android:id="@+id/keypad_3"
-                android:text="trois">
+                android:background="@drawable/normal_buttons"
+                android:text="trois"
+                android:textColor="@android:color/white">
             </Button>
         </TableRow>
+
         <TableRow>
             <Button android:id="@+id/keypad_4"
-                android:text="quatre">
+                android:background="@drawable/normal_buttons"
+                android:text="quatre"
+                android:textColor="@android:color/white">
             </Button>
             <Button android:id="@+id/keypad_5"
-                android:text="cinq">
+                android:background="@drawable/normal_buttons"
+                android:text="cinq"
+                android:textColor="@android:color/white">
             </Button>
             <Button android:id="@+id/keypad_6"
-                android:text="six">
+                android:background="@drawable/normal_buttons"
+                android:text="six"
+                android:textColor="@android:color/white">
             </Button>
         </TableRow>
         <TableRow>
             <Button android:id="@+id/keypad_7"
-                android:text="sept">
+                android:background="@drawable/normal_buttons"
+                android:text="sept"
+                android:textColor="@android:color/white">
             </Button>
             <Button android:id="@+id/keypad_8"
-                android:text="huit">
+                android:background="@drawable/normal_buttons"
+                android:text="huit"
+                android:textColor="@android:color/white">
             </Button>
             <Button android:id="@+id/keypad_9"
-                android:text="neuf">
+                android:background="@drawable/normal_buttons"
+                android:text="neuf"
+                android:textColor="@android:color/white">
             </Button>
         </TableRow>
+
     </TableLayout>
 
 </android.support.design.widget.CoordinatorLayout>
