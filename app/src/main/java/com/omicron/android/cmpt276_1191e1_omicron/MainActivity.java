@@ -17,6 +17,7 @@ public class MainActivity extends AppCompatActivity
 
     RadioGroup Language;
     private int usrLangPref = 0; // 0=eng_fr, 1=fr_eng
+    private int usrDiffPref; //0=easy,1=medium,2=difficult
 
     /*
      *  This Main Activity is the activity that will act as the Start Menu
@@ -37,8 +38,7 @@ public class MainActivity extends AppCompatActivity
                     new Word( "Seven", "Sept" ),
                     new Word( "Eight", "Huit" ),
                     new Word( "Nine", "Neuf" )
-            };;
-
+            };
 
     @Override
     protected void onCreate( Bundle savedInstanceState )
@@ -48,10 +48,23 @@ public class MainActivity extends AppCompatActivity
 
         //choose the level of difficulty
         Difficulty = findViewById(R.id.button_level);
-        int difficultyId=Difficulty.getCheckedRadioButtonId();
-        btnDifficulty=findViewById(difficultyId);
-
-
+        Difficulty.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                int difficultyId = group.getCheckedRadioButtonId();
+                switch(difficultyId) {
+                    case R.id.button_easy:
+                        usrDiffPref = 0;
+                        break;
+                    case R.id.button_medium:
+                        usrDiffPref = 1;
+                        break;
+                    case R.id.button_hard:
+                        usrDiffPref = 2;
+                        break;
+                }
+            }
+        });
 
         //choose the language
         Language=findViewById(R.id.button_language);
@@ -127,6 +140,7 @@ public class MainActivity extends AppCompatActivity
 
 					gameActivity.putExtra( "wordArray", wordArray );
                     gameActivity.putExtra( "usrLangPref", usrLangPref );
+                    gameActivity.putExtra("usrDiffPref",usrDiffPref);
 
                     startActivity( gameActivity );
                 }
