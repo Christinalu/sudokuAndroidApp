@@ -17,7 +17,7 @@ Sudoku Vocabulary App is optimized for:
 * CPU/ABI: x86
 
 # Implemented Features
-* [First Iteration] (https://csil-git1.cs.surrey.sfu.ca/eazizika/CMPT276-1191E1-Omicron/wikis/First-Iteration)
+* [First iteration] (https://csil-git1.cs.surrey.sfu.ca/eazizika/CMPT276-1191E1-Omicron/wikis/First-Iteration)
 
 
 # Installation
@@ -25,9 +25,3 @@ Sudoku Vocabulary App is optimized for:
 
 # FAQ
 
-
-# Maintainers
-* Ghazaleh Azizi Kashi (eazizika)
-* Justin Liu  (jzl1)
-* Gheorghe Nicolaescu (gnicolae)
-* Xiaolu Zhu (xza172)
