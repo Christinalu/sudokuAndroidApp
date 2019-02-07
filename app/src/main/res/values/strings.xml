@@ -10,4 +10,6 @@
     <string name="easy_level">Easy</string>
     <string name="medium_level">Medium</string>
     <string name="hard_level">Hard</string>
+    <string name="share">logo</string>
+    <string name="start">START NEW GAME</string>
 </resources>
