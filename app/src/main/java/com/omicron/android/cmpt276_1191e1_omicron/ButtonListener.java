@@ -59,7 +59,7 @@ public class ButtonListener extends AppCompatActivity
 											Log.d( "MATRIX", " changed entry" );
 											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 											if (check.isTrue) {
-												Toast.makeText(v.getContext(), "COMPLETED!", Toast.LENGTH_SHORT).show();
+												Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
 												btn1.setOnClickListener(null);
 												btn2.setOnClickListener(null);
 												btn3.setOnClickListener(null);
@@ -91,7 +91,7 @@ public class ButtonListener extends AppCompatActivity
 											Log.d( "MATRIX", " changed entry" );
 											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 											if (check.isTrue) {
-												Toast.makeText(v.getContext(), "COMPLETED!", Toast.LENGTH_SHORT).show();
+												Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
 												btn1.setOnClickListener(null);
 												btn2.setOnClickListener(null);
 												btn3.setOnClickListener(null);
@@ -123,7 +123,7 @@ public class ButtonListener extends AppCompatActivity
 											Log.d( "MATRIX", " changed entry" );
 											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 											if (check.isTrue) {
-												Toast.makeText(v.getContext(), "COMPLETED!", Toast.LENGTH_SHORT).show();
+												Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
 												btn1.setOnClickListener(null);
 												btn2.setOnClickListener(null);
 												btn3.setOnClickListener(null);
@@ -155,7 +155,7 @@ public class ButtonListener extends AppCompatActivity
 											Log.d( "MATRIX", " changed entry" );
 											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 											if (check.isTrue) {
-												Toast.makeText(v.getContext(), "COMPLETED!", Toast.LENGTH_SHORT).show();
+												Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
 												btn1.setOnClickListener(null);
 												btn2.setOnClickListener(null);
 												btn3.setOnClickListener(null);
@@ -187,7 +187,7 @@ public class ButtonListener extends AppCompatActivity
 											Log.d( "MATRIX", " changed entry" );
 											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 											if (check.isTrue) {
-												Toast.makeText(v.getContext(), "COMPLETED!", Toast.LENGTH_SHORT).show();
+												Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
 												btn1.setOnClickListener(null);
 												btn2.setOnClickListener(null);
 												btn3.setOnClickListener(null);
@@ -219,7 +219,7 @@ public class ButtonListener extends AppCompatActivity
 											Log.d( "MATRIX", " changed entry" );
 											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 											if (check.isTrue) {
-												Toast.makeText(v.getContext(), "COMPLETED!", Toast.LENGTH_SHORT).show();
+												Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
 												btn1.setOnClickListener(null);
 												btn2.setOnClickListener(null);
 												btn3.setOnClickListener(null);
@@ -252,7 +252,7 @@ public class ButtonListener extends AppCompatActivity
 											Log.d( "MATRIX", " changed entry" );
 											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 											if (check.isTrue) {
-												Toast.makeText(v.getContext(), "COMPLETED!", Toast.LENGTH_SHORT).show();
+												Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
 												btn1.setOnClickListener(null);
 												btn2.setOnClickListener(null);
 												btn3.setOnClickListener(null);
@@ -284,7 +284,7 @@ public class ButtonListener extends AppCompatActivity
 											Log.d( "MATRIX", " changed entry" );
 											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 											if (check.isTrue) {
-												Toast.makeText(v.getContext(), "COMPLETED!", Toast.LENGTH_SHORT).show();
+												Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
 												btn1.setOnClickListener(null);
 												btn2.setOnClickListener(null);
 												btn3.setOnClickListener(null);
@@ -316,7 +316,7 @@ public class ButtonListener extends AppCompatActivity
 											Log.d( "MATRIX", " changed entry" );
 											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 											if (check.isTrue) {
-												Toast.makeText(v.getContext(), "COMPLETED!", Toast.LENGTH_SHORT).show();
+												Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
 												btn1.setOnClickListener(null);
 												btn2.setOnClickListener(null);
 												btn3.setOnClickListener(null);
