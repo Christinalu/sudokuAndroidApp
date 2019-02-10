@@ -29,6 +29,10 @@ public class ButtonListener extends AppCompatActivity
 		final RedrawText textOverlay = textOverlay2;
 		final Pair lastRectColoured = lastRectColoured2;
 
+		// pulled out of button listeners
+		final PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
+		final PuzzleTrack track = new PuzzleTrack( usrSudokuArr.Puzzle );
+
 		Log.d( "ERROR-2", "before touch[0] inside buttonListener" );
 
 		touchX[0] = touchX2[0];
@@ -51,24 +55,24 @@ public class ButtonListener extends AppCompatActivity
 										//if current button selected is valid and is not restricted
 										if( currentRectColoured.getRow() != -1 && usrSudokuArr.PuzzleOriginal[currentRectColoured.getRow()][currentRectColoured.getColumn()	] == 0 )
 										{
+											// increase the count of inserted numbers
+											track.track( usrSudokuArr, currentRectColoured, check ); //important, track must occur before usrSudokuArr.Puzzle[][] = 1
+
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 1;
 
 											// redraw square matrix and text overlay
 											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
 											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
-											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
-											if (check.isTrue) {
-												Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
-												btn1.setOnClickListener(null);
-												btn2.setOnClickListener(null);
-												btn3.setOnClickListener(null);
-												btn4.setOnClickListener(null);
-												btn5.setOnClickListener(null);
-												btn6.setOnClickListener(null);
-												btn7.setOnClickListener(null);
-												btn8.setOnClickListener(null);
-												btn9.setOnClickListener(null);
+
+											//removed test check is puzzle was correct
+											//improved -will only check for puzzle only on last user input, instead of every time the user clicker a button (which was pointless since the puzzleCheck by default will be false because its incomplete)
+
+											//have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
+											if( track.enableCheck )
+											{
+												track.checkPuzzle(usrSudokuArr, check, v, btn1, btn2, btn3,
+														btn4, btn5, btn6, btn7, btn8, btn9);
 											}
 										}
 										usrSudokuArr.printCurrent( );
@@ -84,23 +88,20 @@ public class ButtonListener extends AppCompatActivity
 										//if current button selected is valid and is not restricted
 										if( currentRectColoured.getRow() != -1 && usrSudokuArr.PuzzleOriginal[currentRectColoured.getRow()][currentRectColoured.getColumn()	] == 0 )
 										{
+											// increase the count of inserted numbers
+											track.track( usrSudokuArr, currentRectColoured, check ); //important, track must occur before usrSudokuArr.Puzzle[][] = 1
+
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 2;
 											// redraw text overlay
 											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
 											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
-											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
-											if (check.isTrue) {
-												Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
-												btn1.setOnClickListener(null);
-												btn2.setOnClickListener(null);
-												btn3.setOnClickListener(null);
-												btn4.setOnClickListener(null);
-												btn5.setOnClickListener(null);
-												btn6.setOnClickListener(null);
-												btn7.setOnClickListener(null);
-												btn8.setOnClickListener(null);
-												btn9.setOnClickListener(null);
+
+											//have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
+											if( track.enableCheck )
+											{
+												track.checkPuzzle(usrSudokuArr, check, v, btn1, btn2, btn3,
+														btn4, btn5, btn6, btn7, btn8, btn9);
 											}
 										}
 										usrSudokuArr.printCurrent( );
@@ -116,23 +117,20 @@ public class ButtonListener extends AppCompatActivity
 										//if current button selected is valid and is not restricted
 										if( currentRectColoured.getRow() != -1 && usrSudokuArr.PuzzleOriginal[currentRectColoured.getRow()][currentRectColoured.getColumn()	] == 0 )
 										{
+											// increase the count of inserted numbers
+											track.track( usrSudokuArr, currentRectColoured, check ); //important, track must occur before usrSudokuArr.Puzzle[][] = 1
+
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 3;
 											// redraw text overlay
 											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
 											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
-											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
-											if (check.isTrue) {
-												Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
-												btn1.setOnClickListener(null);
-												btn2.setOnClickListener(null);
-												btn3.setOnClickListener(null);
-												btn4.setOnClickListener(null);
-												btn5.setOnClickListener(null);
-												btn6.setOnClickListener(null);
-												btn7.setOnClickListener(null);
-												btn8.setOnClickListener(null);
-												btn9.setOnClickListener(null);
+
+											//have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
+											if( track.enableCheck )
+											{
+												track.checkPuzzle(usrSudokuArr, check, v, btn1, btn2, btn3,
+														btn4, btn5, btn6, btn7, btn8, btn9);
 											}
 										}
 										usrSudokuArr.printCurrent( );
@@ -148,23 +146,20 @@ public class ButtonListener extends AppCompatActivity
 										//if current button selected is valid and is not restricted
 										if( currentRectColoured.getRow() != -1 && usrSudokuArr.PuzzleOriginal[currentRectColoured.getRow()][currentRectColoured.getColumn()	] == 0 )
 										{
+											// increase the count of inserted numbers
+											track.track( usrSudokuArr, currentRectColoured, check ); //important, track must occur before usrSudokuArr.Puzzle[][] = 1
+
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 4;
 											// redraw text overlay
 											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
 											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
-											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
-											if (check.isTrue) {
-												Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
-												btn1.setOnClickListener(null);
-												btn2.setOnClickListener(null);
-												btn3.setOnClickListener(null);
-												btn4.setOnClickListener(null);
-												btn5.setOnClickListener(null);
-												btn6.setOnClickListener(null);
-												btn7.setOnClickListener(null);
-												btn8.setOnClickListener(null);
-												btn9.setOnClickListener(null);
+
+											//have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
+											if( track.enableCheck )
+											{
+												track.checkPuzzle(usrSudokuArr, check, v, btn1, btn2, btn3,
+														btn4, btn5, btn6, btn7, btn8, btn9);
 											}
 										}
 										usrSudokuArr.printCurrent( );
@@ -180,23 +175,20 @@ public class ButtonListener extends AppCompatActivity
 										//if current button selected is valid and is not restricted
 										if( currentRectColoured.getRow() != -1 && usrSudokuArr.PuzzleOriginal[currentRectColoured.getRow()][currentRectColoured.getColumn()	] == 0 )
 										{
+											// increase the count of inserted numbers
+											track.track( usrSudokuArr, currentRectColoured, check ); //important, track must occur before usrSudokuArr.Puzzle[][] = 1
+
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 5;
 											// redraw text overlay
 											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
 											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
-											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
-											if (check.isTrue) {
-												Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
-												btn1.setOnClickListener(null);
-												btn2.setOnClickListener(null);
-												btn3.setOnClickListener(null);
-												btn4.setOnClickListener(null);
-												btn5.setOnClickListener(null);
-												btn6.setOnClickListener(null);
-												btn7.setOnClickListener(null);
-												btn8.setOnClickListener(null);
-												btn9.setOnClickListener(null);
+
+											//have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
+											if( track.enableCheck )
+											{
+												track.checkPuzzle(usrSudokuArr, check, v, btn1, btn2, btn3,
+														btn4, btn5, btn6, btn7, btn8, btn9);
 											}
 										}
 										usrSudokuArr.printCurrent( );
@@ -212,23 +204,20 @@ public class ButtonListener extends AppCompatActivity
 										//if current button selected is valid and is not restricted
 										if( currentRectColoured.getRow() != -1 && usrSudokuArr.PuzzleOriginal[currentRectColoured.getRow()][currentRectColoured.getColumn()	] == 0 )
 										{
+											// increase the count of inserted numbers
+											track.track( usrSudokuArr, currentRectColoured, check ); //important, track must occur before usrSudokuArr.Puzzle[][] = 1
+
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 6;
 											// redraw text overlay
 											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
 											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
-											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
-											if (check.isTrue) {
-												Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
-												btn1.setOnClickListener(null);
-												btn2.setOnClickListener(null);
-												btn3.setOnClickListener(null);
-												btn4.setOnClickListener(null);
-												btn5.setOnClickListener(null);
-												btn6.setOnClickListener(null);
-												btn7.setOnClickListener(null);
-												btn8.setOnClickListener(null);
-												btn9.setOnClickListener(null);
+
+											//have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
+											if( track.enableCheck )
+											{
+												track.checkPuzzle(usrSudokuArr, check, v, btn1, btn2, btn3,
+														btn4, btn5, btn6, btn7, btn8, btn9);
 											}
 										}
 										usrSudokuArr.printCurrent( );
@@ -245,23 +234,20 @@ public class ButtonListener extends AppCompatActivity
 										//if current button selected is valid and is not restricted
 										if( currentRectColoured.getRow() != -1 && usrSudokuArr.PuzzleOriginal[currentRectColoured.getRow()][currentRectColoured.getColumn()	] == 0 )
 										{
+											// increase the count of inserted numbers
+											track.track( usrSudokuArr, currentRectColoured, check ); //important, track must occur before usrSudokuArr.Puzzle[][] = 1
+
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 7;
 											// redraw text overlay
 											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
 											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
-											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
-											if (check.isTrue) {
-												Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
-												btn1.setOnClickListener(null);
-												btn2.setOnClickListener(null);
-												btn3.setOnClickListener(null);
-												btn4.setOnClickListener(null);
-												btn5.setOnClickListener(null);
-												btn6.setOnClickListener(null);
-												btn7.setOnClickListener(null);
-												btn8.setOnClickListener(null);
-												btn9.setOnClickListener(null);
+
+											//have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
+											if( track.enableCheck )
+											{
+												track.checkPuzzle(usrSudokuArr, check, v, btn1, btn2, btn3,
+														btn4, btn5, btn6, btn7, btn8, btn9);
 											}
 										}
 										usrSudokuArr.printCurrent( );
@@ -277,23 +263,20 @@ public class ButtonListener extends AppCompatActivity
 										//if current button selected is valid and is not restricted
 										if( currentRectColoured.getRow() != -1 && usrSudokuArr.PuzzleOriginal[currentRectColoured.getRow()][currentRectColoured.getColumn()	] == 0 )
 										{
+											// increase the count of inserted numbers
+											track.track( usrSudokuArr, currentRectColoured, check ); //important, track must occur before usrSudokuArr.Puzzle[][] = 1
+
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 8;
 											// redraw text overlay
 											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
 											textOverlay.reDrawText( usrLangPref );
 											Log.d( "MATRIX", " changed entry" );
-											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
-											if (check.isTrue) {
-												Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
-												btn1.setOnClickListener(null);
-												btn2.setOnClickListener(null);
-												btn3.setOnClickListener(null);
-												btn4.setOnClickListener(null);
-												btn5.setOnClickListener(null);
-												btn6.setOnClickListener(null);
-												btn7.setOnClickListener(null);
-												btn8.setOnClickListener(null);
-												btn9.setOnClickListener(null);
+
+											//have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
+											if( track.enableCheck )
+											{
+												track.checkPuzzle(usrSudokuArr, check, v, btn1, btn2, btn3,
+														btn4, btn5, btn6, btn7, btn8, btn9);
 											}
 										}
 										usrSudokuArr.printCurrent( );
@@ -309,23 +292,20 @@ public class ButtonListener extends AppCompatActivity
 										//if current button selected is valid and is not restricted
 										if( currentRectColoured.getRow() != -1 && usrSudokuArr.PuzzleOriginal[currentRectColoured.getRow()][currentRectColoured.getColumn()	] == 0 )
 										{
+											// increase the count of inserted numbers
+											track.track( usrSudokuArr, currentRectColoured, check ); //important, track must occur before usrSudokuArr.Puzzle[][] = 1
+
 											usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = 9;
 											// redraw text overlay
 											drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
 											textOverlay.reDrawText( usrLangPref );;
 											Log.d( "MATRIX", " changed entry" );
-											PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
-											if (check.isTrue) {
-												Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
-												btn1.setOnClickListener(null);
-												btn2.setOnClickListener(null);
-												btn3.setOnClickListener(null);
-												btn4.setOnClickListener(null);
-												btn5.setOnClickListener(null);
-												btn6.setOnClickListener(null);
-												btn7.setOnClickListener(null);
-												btn8.setOnClickListener(null);
-												btn9.setOnClickListener(null);
+
+											//have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
+											if( track.enableCheck )
+											{
+												track.checkPuzzle(usrSudokuArr, check, v, btn1, btn2, btn3,
+														btn4, btn5, btn6, btn7, btn8, btn9);
 											}
 										}
 										usrSudokuArr.printCurrent( );

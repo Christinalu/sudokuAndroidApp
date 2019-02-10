@@ -90,7 +90,7 @@ public class GameActivity extends AppCompatActivity
 		//create dictionary button
 		Button btnDictionary = (Button) findViewById(R.id.button_dictionary);
 
-		btnDictionary.setOnClickListener(new View.OnClickListener() {
+		btnDictionary.setOnClickListener(new View.OnClickListener() { // important, SudokuGenerator usrSudokuArr must be initialized before
 											 @Override
 											 public void onClick(View v) {
 												 //create activity window for the dictionary
