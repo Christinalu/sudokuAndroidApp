@@ -10,18 +10,16 @@ public class SudokuGenerator {
      *    -- IMPORTANT --
      *  This generating function can generate UNIQUE puzzles based on
      *  pre-defined unique puzzles. One puzzle can be used to
-     *  generate approximately (3!)^8 = 1679616 new unique solutions
+     *  generate approximately (3!)^8 = 1679616 new puzzles
     */
 
     //This class accepts a hardcoded Puzzle and randomizes it to generate a new puzzle which is guaranteed to be unique and the same difficulty and the puzzle taken in as the argument.
     private int size;
     public int[][] PuzzleOriginal;
     public int[][] Puzzle; //stores user input changes
-    private int[][] PuzzSeedEasy;
-    private int[][] PuzzSeedMed;
-    private int[][] PuzzSeedHard;
 
-    public SudokuGenerator(int i) {
+    public SudokuGenerator(int i)
+    {
         size = 9;
         PuzzleOriginal = new int[size][size];
         Puzzle = new int[size][size];
@@ -40,8 +38,7 @@ public class SudokuGenerator {
             copyarr(PuzzSeedMed, Puzzle);
         }
         else {
-            //// change testArr back to easy puzzle /////
-            copyarr(testSeed, Puzzle);
+            copyarr(PuzzSeedEasy, Puzzle);
         }
         scramble(Puzzle);
         copyarr( Puzzle, PuzzleOriginal );
@@ -67,11 +64,15 @@ public class SudokuGenerator {
         Log.d( "MATRIX"," \n\n");
 	}
 
-    private void zero(int[] arr) {
+	//zero an array
+    private void zero(int[] arr)
+    {
         for (int i=0; i<arr.length; i++) arr[i] = 0;
     }
-    public void copyarr(int[][] arr1, int[][] arr2) {
-        //copy arr1 to arr2
+
+    //copy an array into another
+    public void copyarr(int[][] arr1, int[][] arr2)
+    {
         int colrow = size;
         for (int i=0; i<colrow; i++) {
             for (int j=0; j<colrow; j++) {
@@ -79,8 +80,10 @@ public class SudokuGenerator {
             }
         }
     }
-    private void randomize(int[] arr, int a) {
-        //function takes an int array of size a that will be used store a randomized order vector
+
+    //function takes an int array of size a that will be used store a randomized order vector
+    private void randomize(int[] arr, int a)
+    {
         int[] numUsed = new int[a];
         zero(numUsed);
         int randPos;
@@ -92,13 +95,12 @@ public class SudokuGenerator {
             if (numUsed[randPos] == 0) { // if not used before
                 arr[i] = randPos; // put rand num back in arr
                 numUsed[randPos] = 1; // mark as used
-                i++; // by putting i++ here this only moves on until it find valid num -- ie it keeps looping until find a num that was not used to far -- if pseudorand is good, should not cause infinite loop
+                i++; // by putting i++ here this only moves on until it find valid num
             }
-            //  // what if the same number is generated all over, the if statement doesnt cover that
-
         }
     }
 
+    // takes a 2D puzzle array and will shuffle rows/columns to create a new puzzle with unique solution
     private void scramble(int[][] Puzzle)
     {
         int colrow = size;
@@ -119,12 +121,12 @@ public class SudokuGenerator {
                 tempSec = (i * 3) + order[j]; //go to a specific row based on the randomizer
                 for (int k = 0; k < colrow; k++) {
                     //col
-                    Puzzle[puzzleSec][k] = temparr[tempSec][k]; //swap kth sqr in a 1x9 row of the original row with the sqr from the randomized row -- ie swap the two rows
+                    Puzzle[puzzleSec][k] = temparr[tempSec][k]; //swap the two rows
                 }
             }
         }
 
-        //repeat 3x9 for col
+        // repeat 3x9 for col
         copyarr(Puzzle, temparr);
         //swap cols 9x3 until 9x9 fully swapped
         for (int i = 0; i < 3; i++) {
@@ -149,12 +151,11 @@ public class SudokuGenerator {
         Log.d( "RAND", " -- " + order[0] + ", " + order[1] + ", " + order[2] );
         for (int i = 0; i < 3; i++) { // for each 3x9
             //ith box
-            for (int j = 0; j < 3; j++) { // for each of the rows in a 3x9 - ie copy the 3 rows to another 3x9
+            for (int j = 0; j < 3; j++) { // for each of the rows in a 3x9
                 //row in the box
                 puzzleSec = (i * 3) + j; // inside the ith 3x9
-                tempSec = (order[i] * 3) + j; // swap with the chosen 3x9 from arr based on randomize() - ie this determines the row to copy from the chosen 3x9 based on randomize()
+                tempSec = (order[i] * 3) + j; // swap with the chosen 3x9 from arr based on randomize()
                 for (int k = 0; k < colrow; k++) {
-                    //col
                     Puzzle[puzzleSec][k] = temparr[tempSec][k]; // copy the row from randomize()
                 }
             }
@@ -176,24 +177,4 @@ public class SudokuGenerator {
             }
         }
     }
-
-    /* private void randomizer2( int[][] Puzzle )
-    {
-        int colA;
-        int colB;
-        Random rand = new Random();
-        int [][] tempArr = new int[9][9];
-
-        copyarr(Puzzle, tempArr );
-
-
-        //randomize a single 3x3 column
-        for( int i=0; i<5; i++ ) //swap any random columns 5 times
-        {
-            colA =  rand.nextInt( ) % 3;  //caution, later add maxRandomCalls to prevent freeze
-            colB =  rand.nextInt( ) % 3;  //caution, later add maxRandomCalls to prevent freeze
-        }
-
-        //to check if algo works, use a complete puzzle then scrambl then use PuzzleCheck to see if still valid
-    }*/
 }

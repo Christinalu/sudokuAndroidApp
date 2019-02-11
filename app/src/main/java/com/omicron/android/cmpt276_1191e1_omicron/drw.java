@@ -80,14 +80,15 @@ public class drw
 				paint.setColor(Color.parseColor("#c2c2c2")); // set lighter colour for fixed numbers
 			}
 
-			if( currentRectColoured.getRow() != -1 ) // if statement to avoid indexing element -1
+			if( currentRectColoured.getRow() != -1 ) // 'if statement' to avoid indexing element -1
 			{
 
 				canvas.drawRect(rectArr[currentRectColoured.getRow()][currentRectColoured.getColumn()], paint);
 				Log.d( "TAG", "--drawn" );
 			}
 
-			if( forcePaint == true )
+			if( forcePaint == true ) // when forcePaint set to 'true', when user touched outside valid square, it will deselect the square
+									 // when set to 'false' it means a button was clicked, and should keep the square selected
 			{
 				currentRectColoured.update(-1, -1); //set -1 because no new rect was drawn
 			}

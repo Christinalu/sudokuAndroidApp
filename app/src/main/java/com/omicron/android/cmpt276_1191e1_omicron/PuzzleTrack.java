@@ -32,7 +32,9 @@ public class PuzzleTrack
 		}
 
 	}
-	public void track(SudokuGenerator usrSudokuArr, Pair currentRectColoured, PuzzleCheck check ) // returns true if user
+
+	// will track and increase counter if a new cell was filled
+	public void track(SudokuGenerator usrSudokuArr, Pair currentRectColoured )
 	{
 		if( usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] == 0 ) //if sqr selected was not selected so far
 		{
@@ -44,14 +46,10 @@ public class PuzzleTrack
 		{
 			enableCheck = true; //allow for puzzle to be checked
 		}
-
-		//// /////  make sure to deal with case where in last square being filled, it wont automatically stop the game if iputting wrong input
-		// ie check for correct puzzle only when sqrFilled == sqrFilled - 1
 	}
 
-	public void checkPuzzle( SudokuGenerator usrSudokuArr, PuzzleCheck check, View v,
-							 Button btn1, Button btn2, Button btn3, Button btn4, Button btn5,
-							 Button btn6, Button btn7, Button btn8, Button btn9 )
+	// check if puzzle is correct, if it is then disable buttons
+	public void checkPuzzle( SudokuGenerator usrSudokuArr, PuzzleCheck check, View v, Button [] btnArr)
 	{
 		check.PuzzleCheckStart(usrSudokuArr.Puzzle);
 		isCorrect = check.isTrue;
@@ -60,15 +58,15 @@ public class PuzzleTrack
 		{
 			//disable buttons
 			Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
-			btn1.setOnClickListener(null);
-			btn2.setOnClickListener(null);
-			btn3.setOnClickListener(null);
-			btn4.setOnClickListener(null);
-			btn5.setOnClickListener(null);
-			btn6.setOnClickListener(null);
-			btn7.setOnClickListener(null);
-			btn8.setOnClickListener(null);
-			btn9.setOnClickListener(null);
+			btnArr[0].setOnClickListener(null);
+			btnArr[1].setOnClickListener(null);
+			btnArr[2].setOnClickListener(null);
+			btnArr[3].setOnClickListener(null);
+			btnArr[4].setOnClickListener(null);
+			btnArr[5].setOnClickListener(null);
+			btnArr[6].setOnClickListener(null);
+			btnArr[7].setOnClickListener(null);
+			btnArr[8].setOnClickListener(null);
 		}
 		else
 		{
