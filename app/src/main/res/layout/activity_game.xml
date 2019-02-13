@@ -11,21 +11,34 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
 
         <Button
             android:id="@+id/button_dictionary"
-            android:layout_width="wrap_content"
+            android:layout_width="261dp"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="460dp"
             android:width="390dp"
             android:background="@drawable/hint"
             android:gravity="center"
             android:text="HINT" />
+
+        <Button
+            android:id="@+id/button_zoom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="460dp"
+            android:layout_alignParentRight="true"
+            android:width="130dp"
+            android:background="@drawable/hint"
+            android:gravity="center"
+            android:text="ZOOM" />
 
 
         <RelativeLayout
@@ -36,6 +49,11 @@
             android:layout_alignParentTop="true"
             android:layout_marginStart="0dp"
             android:layout_marginTop="0dp">
+
+            <ImageView
+                android:id="@+id/img_view"
+                android:layout_width="match_parent"
+                android:layout_height="1000dp" />
 
         </RelativeLayout>
 

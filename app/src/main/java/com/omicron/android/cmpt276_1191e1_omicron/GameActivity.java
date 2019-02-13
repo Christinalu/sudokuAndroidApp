@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -15,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -38,25 +41,49 @@ public class GameActivity extends AppCompatActivity
 	private ImageView imgView;
 	private RelativeLayout rectLayout;
 	private View.OnTouchListener handleTouch;
+	private SudokuGenerator usrSudokuArr;
 
-	private float sqrLO; // original left coordinate of where puzzle starts
-	private float sqrTO; // original top coordinate of where puzzle starts
-	private float txtL; // text coordinates
-	private float txtT;
+	private int sqrLO; // original left coordinate of where puzzle starts
+	private int sqrTO; // original top coordinate of where puzzle starts
+	private int txtL; // text coordinates
+	private int txtT;
 
 	private drw drawR; // class that draws the squares either highlighted or not, based on touch
 	private Pair lastRectColoured = new Pair( -1, -1 ); // stores the last coloured square coordinates
 	private Pair currentRectColoured = new Pair( -1, -1 ); // stores the current coloured square
 
 	private Rect[][] rectArr = new Rect[9][9]; // stores all squares in a 2D array
+	private Rect[][] rectArrZoom = new Rect[9][9]; // stores all ZOOM MODE squares in a 2D array
 	private Paint paintblack = new Paint();
 	private RedrawText textOverlay; // class used to redraw GUI text overlay
 
 	private int[] touchX = { 0 }; // hold user touch (x,y) coordinate
 	private int[] touchY = { 0 };
 
+	private int sqrL; //duplicate square coordinates
+	private int sqrT;
+	private int sqrR;
+	private int sqrB;
+
 	private Button [] btnArr;
 	private ButtonListener listeners; // used to call another function to implement all button listeners, to save space in GameActivity
+
+	private float scale = 1f;
+	private Matrix matrix =  new Matrix( );
+	private ScaleGestureDetector scaleGD;
+
+	private int[] zoomOn = { 0 }; //indicates if user activated zoom 1==true, 0==false
+	private int[] iX = { 0 }; //initial touch coordinate
+	private int[] iY = { 0 };
+	private int[] dX = { 0 }; //change in X coordinate
+	private int[] dY = { 0 };
+	private int[] touchXZ = { 0 }; //stores where user would click in zoom mode
+	private int[] touchYZ = { 0 };
+	private int[] touchXZclick = { 0 }; //stores where user would click in zoom mode, but when there is no drag, only click down and up
+	private int[] touchYZclick = { 0 };
+	private int drag = 0; // 1==user drags on screen
+	private final static int BIT_MAP_W = 1052;
+	private final static int BIT_MAP_H = 1055;
 
 
 	@Override
@@ -78,12 +105,15 @@ public class GameActivity extends AppCompatActivity
 		}
 
         // stores the generated puzzle, including arrays of solution and user current puzzle
-        SudokuGenerator usrSudokuArr = new SudokuGenerator( usrDiffPref );
+        usrSudokuArr = new SudokuGenerator( usrDiffPref );
+
+		//initialize ScaleGestureDetector
+		//scaleGD = new ScaleGestureDetector( this, new ScaleListener( ) );
 
 		//create dictionary button
 		Button btnDictionary = (Button) findViewById(R.id.button_dictionary);
 
-		btnDictionary.setOnClickListener(new View.OnClickListener() { // important, SudokuGenerator usrSudokuArr must be initialized before this
+		btnDictionary.setOnClickListener(new View.OnClickListener() { // important, SudokuGenerator Arr must be initialized before this
 											 @Override
 											 public void onClick(View v) {
 												 //create activity window for the dictionary
@@ -102,30 +132,39 @@ public class GameActivity extends AppCompatActivity
 		// get display metrics
 		DisplayMetrics displayMetrics = new DisplayMetrics( );
 		getWindowManager( ).getDefaultDisplay( ).getMetrics( displayMetrics );
-		int screenH = displayMetrics.heightPixels;
-		int screenW = displayMetrics.widthPixels;
+		final int screenH = displayMetrics.heightPixels;
+		final int screenW = displayMetrics.widthPixels;
 
 		Log.d( "TAG", "--screenH: " + screenH );
 		Log.d( "TAG", "--screenW: " + screenW );
 
 		// create canvas and bitmap
-		bgMap = Bitmap.createBitmap(1080, 1500, Bitmap.Config.ARGB_8888);
+
+		///////////////
+		//
+		//	here adapt bitmap width and height from 1100 to something else that matches screens
+		//	also note 1100 is present in other functions
+		//
+		///////////////
+
+		// bitmap dimension: width=37+9×(105+5)+15+15−5=1052 height=40+9×(105+5)+15+15−5=1055
+		// important to keep this exactly for scaling ie "zoom mode"
+		bgMap = Bitmap.createBitmap(BIT_MAP_W, BIT_MAP_H, Bitmap.Config.ARGB_8888); // important to keep bitmap aligned!, width=37+9×(105+5)+15+15−5=1052 height=40+9×(105+5)+15+15−5=1055
 		canvas = new Canvas(bgMap);
 
 		//original coordinates of where to draw square
-		sqrLO = (float) (screenW / 2.0 - 1005 / 2.0 );
-		sqrTO = 50 ;
+		sqrLO = (int) (1052 / 2.0 - 1005 / 2.0 );  //(screenW / 2.0 - 1005 / 2.0 );
+		sqrTO = 40;
 
 		Log.d( "TAG", "--sqrLO: " + sqrLO );
 		Log.d( "TAG", "--sqrTO: " + sqrTO );
 
-		//duplicate square coordinates
-		float sqrL;
-		float sqrT;
-		float sqrR;
-		float sqrB;
+		// initialize 'zoom' touch coordinate in center of screen
+		//touchXZclick[0] =
+
 
 		imgView = new ImageView(this);
+		//imgView = (ImageView) findViewById( R.id.img_view );
 		paint.setColor(Color.parseColor("#c2c2c2"));
 
 		// get the RelativeLayout rect_layout as the main layout to draw on
@@ -234,9 +273,9 @@ public class GameActivity extends AppCompatActivity
 
 		// initialize text overlay
 		textOverlay = new RedrawText( txtL, txtT, sqrLO, sqrTO, puzzleLoc,
-				usrSudokuArr, canvas, paintblack, wordArray );
+				usrSudokuArr, canvas, paintblack, wordArray, zoomOn );
 
-		drawR = new drw( rectArr, paint, canvas, rectLayout, textOverlay, usrSudokuArr ); // class used to draw/update square matrix
+		drawR = new drw( rectArr, paint, canvas, rectLayout, textOverlay, usrSudokuArr, zoomOn, touchXZclick, touchYZclick ); // class used to draw/update square matrix
 
 		Log.d( "ERROR-2", "\nbefore call to ButtonListeners" );
 
@@ -252,16 +291,118 @@ public class GameActivity extends AppCompatActivity
 		}
 
 
+		/////////////
+		//
+		//	dont forget to set zoomOn[0] to 0 when zooming out
+		//
+		///////////
+
+
+
+		/* ZOOM BUTTON */ ///// ---------------------------------------------------------------------------------------------------------------------------------------------
+
+		Button btnZoom =findViewById( R.id.button_zoom );
+		btnZoom.setOnClickListener(new View.OnClickListener( )
+			{
+				@Override
+				public void onClick( View v )
+				{
+					zoomOn[0] = 1; //set zoom as activated
+					canvas.save( );
+					canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR); //clear screen
+					//canvas.translate(50, 50);
+					canvas.scale( 2.0f, 2.0f );
+					//canvas.drawRect( 0f, 0f, 10, 10, paint );
+					//canvas.drawRect( 0.0f, 0.0f, 150.0f, 150.0f, paint );
+
+					//reset scale corner coordinates
+					sqrLO = (int) (BIT_MAP_W / 2 - 1005 / 2 );
+					sqrTO = 40 ;
+
+					//////////
+					/** CREATE RECT MATRIX **/
+
+					for( int i=0; i<9; i++ ) //row
+					{
+						for( int j=0; j<9; j++ ) //column
+						{
+							//increase square dimensions
+							sqrL = sqrLO + j*(105+5);
+							sqrT = sqrTO + i*(105+5);
+							sqrR = sqrL + 105;
+							sqrB = sqrT + 105;
+
+							//add padding
+							if( i>=3 ) //add extra space between rows
+							{
+								sqrT = sqrT + 15;
+								sqrB = sqrB + 15;
+							}
+							if( i>=6 )
+							{
+								sqrT = sqrT + 15;
+								sqrB = sqrB + 15;
+							}
+
+							if( j>=3 ) //add extra space between columns
+							{
+								sqrL = sqrL + 15;
+								sqrR = sqrR + 15;
+							}
+							if( j>=6 )
+							{
+								sqrL = sqrL + 15;
+								sqrR = sqrR + 15;
+							}
+
+							// overwrite array
+							rectArr[i][j] = new Rect( (int)(sqrL), (int)sqrT, (int)sqrR, (int)sqrB ); // create the new square
+
+							//set proper colour for changeable vs fixed squares
+							if( usrSudokuArr.PuzzleOriginal[i][j] != 0 )
+							{
+								paint.setColor(Color.parseColor("#a2a2a2")); // set darker colour for fixed numbers
+							}
+							else
+							{
+								paint.setColor(Color.parseColor("#c2c2c2")); // set lighter colour for fixed numbers
+							}
+
+							///////////////
+							//
+							//	later add so that when user touches restricted square that cannot be changed, it wont be coloured
+							//
+							//////////////
+
+							canvas.drawRect( rectArr[i][j], paint ); // draw square on canvas
+						}
+					}
+
+					canvas.restore( );
+
+					//////////
+
+					// call function to redraw if user touch detected
+					drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, true, usrLangPref );
+
+					rectLayout.invalidate( );
+
+
+					Log.d( "ZOOM", "--btnZoom clicked" );
+				}
+			}
+		);
+
 
 			/** DRAW TEXT BUTTONS **/
 
-		// ON-TOUCH
+		// ON-TOUCH																	-----------------------------------------------------------------------------------------
 		handleTouch = new View.OnTouchListener( )
 		{
 			@Override
 			public boolean onTouch( View v, MotionEvent event )
 			{
-				touchX[0] = (int) event.getX( );
+				touchX[0] = (int) event.getX( ); // touch coordinate on actual screen
 				touchY[0] = (int) event.getY( );
 
 				switch( event.getAction( ) )
@@ -274,16 +415,63 @@ public class GameActivity extends AppCompatActivity
 							Log.d( "NULL-2", "textOverlay null in onTouch in GameActivity" );
 						}
 
-						// call function to redraw if user touch detected
-						drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, true, usrLangPref );
+						//save click down coordinate
+						if( zoomOn[0] == 1 ) { // when zoom mode enabled
+							//change "zoomed in" coordinate
+							touchXZclick[0] = (int) (touchXZ[0] + touchX[0] / 2f);
+							touchYZclick[0] = (int) (touchYZ[0] + touchY[0] / 2f);
+
+							drawR.reDraw( touchXZclick, touchYZclick, lastRectColoured, currentRectColoured, true, usrLangPref );
+							Log.d( "TAG", "click down: (" + touchXZclick[0] + ", " + touchYZclick[0] + ")" );
+						} else {
+							iX[0] = touchX[0]; //initial coordinate
+							iY[0] = touchY[0];
+							// call function to redraw if user touch detected
+							drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, true, usrLangPref );
+							Log.i("TAG", "normal click: (" + touchX[0] + ", " + touchY[0] + ")");
+						}
 
 						break;
 					case MotionEvent.ACTION_MOVE:
-						//Log.i("TAG", "moving: (" + x + ", " + y + ")");
+						Log.i("TAG", "moving: (" + touchX[0] + ", " + touchY[0] + ")");
+
+						drag = 1;
+
+						//get on click up distance travelled
+						dX[0] = ( touchX[0] - iX[0] ) / 2; // final - initial
+						dY[0] = ( touchY[0] - iY[0] ) / 2; // divide by 2 to scale move to zoom
+
+						Log.i("TAG", "moved: (" + dX[0] + ", " + dY[0] + ")");
+
 						break;
 					case MotionEvent.ACTION_UP:
 						//Log.i("TAG", "-- up");
+
+						//update where "zoomed in" coordinates landed
+						if( zoomOn[0] == 1 )
+						{
+							if( drag == 1 ) {
+								touchXZ[0] = touchXZ[0] + dX[0];
+								touchYZ[0] = touchYZ[0] + dY[0];
+							}
+							//fix out of bounds
+							if (touchXZ[0] > screenW){ touchXZ[0] = screenW; }
+							else if (touchXZ[0] < 0){ touchXZ[0] = 0; }
+							if (touchYZ[0] > screenH){ touchYZ[0] = screenH; }
+							else if (touchYZ[0] < 0){ touchYZ[0] = 0; }
+
+							drag = 0; //disable drag
+							Log.d( "TAG", "click up: (" + touchXZ[0] + ", " + touchYZ[0] + ")" );
+						}
+
 						break;
+
+						//////////////
+						//
+						//	deal with case when user keeps swiping in a direction out of bounds - limit touchXZ
+						//
+						/////////////////
+
 				}
 
 				return true;
@@ -333,6 +521,32 @@ public class GameActivity extends AppCompatActivity
 		}
 	}
 
+	/*
+	//function that scales canvas view
+	private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener
+	{
+		@Override
+		public boolean onScale( ScaleGestureDetector detector )
+		{
+			scale = scale * detector.getScaleFactor( );
+
+			//set limit to scale
+			scale = Math.max( 1f, Math.min( scale, 2f ) );
+			matrix.setScale( scale, scale );
+			imgView.setImageMatrix( matrix );
+
+			return true;
+		}
+	}
+
+	@Override
+	public boolean onTouchEvent( MotionEvent event )
+	{
+		scaleGD.onTouchEvent( event );
+		return true;
+	}
+*/
+
 
 	@Override
 	public void onStart( )
@@ -342,4 +556,6 @@ public class GameActivity extends AppCompatActivity
 		//disable slide in animation
 		overridePendingTransition(0, 0);
 	}
+
+
 }

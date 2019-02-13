@@ -20,10 +20,17 @@ public class drw
 	private RedrawText textOverlay;
 	private boolean prevNewSqrTouched;
 	private SudokuGenerator usrSudokuArr;
+	private int[] zoomOn;
+	private int[] zoomX;
+	private int[] zoomY;
+	private int px;
+	private int py;
+	//private int[] zoomOn;
 
 
 	public drw( Rect[][] rectArr2, Paint paint2, Canvas canvas2,
-				RelativeLayout rectLayout2, RedrawText textOverlay2, SudokuGenerator usrSudokuArr2 )
+				RelativeLayout rectLayout2, RedrawText textOverlay2, SudokuGenerator usrSudokuArr2,
+				int [] zoomOn2, int[] zoomX2, int[] zoomY2 )
 	{
 		paint = paint2;
 		rectArr = rectArr2;
@@ -31,9 +38,14 @@ public class drw
 		rectLayout = rectLayout2;
 		textOverlay = textOverlay2;
 		usrSudokuArr = usrSudokuArr2;
+		zoomOn = zoomOn2;
+		zoomX = zoomX2;
+		zoomY = zoomY2;
+		//zoomOn = zoomOn2;
 	}
 
-	public void reDraw( int[] x, int[] y, Pair lastRectColoured, Pair currentRectColoured, boolean forcePaint, int usrLangPref )
+	public void reDraw( int[] x, int[] y, Pair lastRectColoured, Pair currentRectColoured,
+						boolean forcePaint, int usrLangPref )
 	{
 		newSqrTouched = false; //reset
 		prevNewSqrTouched = newSqrTouched;
@@ -43,7 +55,17 @@ public class drw
 		{
 			for( int j=0; j<9; j++ )
 			{
-				if( rectArr[i][j].contains( x[0], y[0] ) )
+				// important: scale coordinates if called from button listener (in "zoom mode")
+				// needed because when called from listener, it is not called with zoom coordiantes
+				// because listeners set with 'final' regular variable, so have to transform to 'zoom'
+				if( zoomOn[0] == 1 )
+				{ px = zoomX[0]; py = zoomY[0]; }
+				else{ px = x[0]; py = y[0]; }
+
+				if( (zoomOn[0] == 1 && py > 525) || (zoomOn[0] == 1 && px > 527) ) //if in 'zoom mode' and if outside (right or lower) bound, mark as invalid
+				{ break; }
+
+				if( rectArr[i][j].contains( px, py ) )
 				{
 					lastRectColoured.update( currentRectColoured.getRow(), currentRectColoured.getColumn() );
 
@@ -51,7 +73,17 @@ public class drw
 
 					//Toast.makeText(GameActivity.this, "REKT CLICKED", Toast.LENGTH_SHORT).show();
 
-					canvas.drawRect(rectArr[i][j], paint);
+					if( zoomOn[0] == 1 )//colour on zoom mode
+					{
+						canvas.save( );
+						canvas.scale( 2.0f, 2.0f );
+						canvas.drawRect(rectArr[i][j], paint);
+						canvas.restore( );
+					}
+					else{
+						canvas.drawRect(rectArr[i][j], paint);
+					}
+
 
 					//Log.d("TAG", "left: " + rectArr[i][j].left + " top: " + rectArr[i][j].top);
 					Log.d( "TAG", "--current-sqr-coloured-1: [" + i + "] [" + j + "]" );
@@ -82,8 +114,16 @@ public class drw
 
 			if( currentRectColoured.getRow() != -1 ) // 'if statement' to avoid indexing element -1
 			{
-
-				canvas.drawRect(rectArr[currentRectColoured.getRow()][currentRectColoured.getColumn()], paint);
+				if( zoomOn[0] == 1 )//colour on zoom mode
+				{
+					canvas.save( );
+					canvas.scale( 2.0f, 2.0f );
+					canvas.drawRect(rectArr[currentRectColoured.getRow()][currentRectColoured.getColumn()], paint);
+					canvas.restore( );
+				}
+				else {
+					canvas.drawRect(rectArr[currentRectColoured.getRow()][currentRectColoured.getColumn()], paint);
+				}
 				Log.d( "TAG", "--drawn" );
 			}
 
@@ -95,7 +135,16 @@ public class drw
 			else
 			{
 				paint.setColor(Color.parseColor("#ff0000")); // here activate when button is used to insert
-				canvas.drawRect(rectArr[currentRectColoured.getRow()][currentRectColoured.getColumn()], paint);
+				if( zoomOn[0] == 1 )//colour on zoom mode
+				{
+					canvas.save( );
+					canvas.scale( 2.0f, 2.0f );
+					canvas.drawRect(rectArr[currentRectColoured.getRow()][currentRectColoured.getColumn()], paint);
+					canvas.restore( );
+				}
+				else {
+					canvas.drawRect(rectArr[currentRectColoured.getRow()][currentRectColoured.getColumn()], paint);
+				}
 			}
 
 			Log.d( "TAG", "--current-sqr-coloured-2: [" + currentRectColoured.getRow() + "] [" + currentRectColoured.getColumn() + "]" );
@@ -124,14 +173,24 @@ public class drw
 
 			if( (lastRectColoured.getRow() != -1) )
 			{
-				if( (lastRectColoured.getRow() == currentRectColoured.getRow() )
+				Log.d( "TAG", "--pass lastRow: " + lastRectColoured.getRow() + ", currentRow: " + currentRectColoured.getRow() );
+				if( (lastRectColoured.getRow() == currentRectColoured.getRow() ) // skip redrawing if the same square clicked twice in a row?
 					&& ( lastRectColoured.getColumn() == currentRectColoured.getColumn() ) )
 				{
 					//pass
 				}
 				else
 				{
-					canvas.drawRect(rectArr[lastRectColoured.getRow()][lastRectColoured.getColumn()], paint);
+					if( zoomOn[0] == 1 )//colour on zoom mode
+					{
+						canvas.save( );
+						canvas.scale( 2.0f, 2.0f );
+						canvas.drawRect(rectArr[lastRectColoured.getRow()][lastRectColoured.getColumn()], paint);
+						canvas.restore( );
+					}
+					else {
+						canvas.drawRect(rectArr[lastRectColoured.getRow()][lastRectColoured.getColumn()], paint);
+					}
 				}
 			}
 
