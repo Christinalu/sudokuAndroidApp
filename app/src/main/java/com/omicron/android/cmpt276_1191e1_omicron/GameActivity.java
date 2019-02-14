@@ -75,15 +75,24 @@ public class GameActivity extends AppCompatActivity
 	private int[] zoomOn = { 0 }; //indicates if user activated zoom 1==true, 0==false
 	private int[] iX = { 0 }; //initial touch coordinate
 	private int[] iY = { 0 };
-	private int[] dX = { 0 }; //change in X coordinate
+	private int[] dX = { 0 }; //change in X coordinate ie 'drag'
 	private int[] dY = { 0 };
-	private int[] touchXZ = { 0 }; //stores where user would click in zoom mode
+
+	private int[] dXLcopy = { 0 }; //stores last 'drag' distance to freeze it when out of bounds
+	private int[] dXRcopy = { 0 };
+	private int[] dYBcopy = { 0 };
+	private int[] dYTcopy = { 0 };
+
+	private int[] touchXZ = { 0 }; //stores where user would click in zoom mode - reference to left top corner
 	private int[] touchYZ = { 0 };
 	private int[] touchXZclick = { 0 }; //stores where user would click in zoom mode, but when there is no drag, only click down and up
 	private int[] touchYZclick = { 0 };
-	private int drag = 0; // 1==user drags on screen
-	private final static int BIT_MAP_W = 1052;
-	private final static int BIT_MAP_H = 1055;
+
+	private final static int BIT_MAP_W = 1052; //bitmap width (see later in code how to get this number)
+	private final static int BIT_MAP_H = 1055; //bitmap height
+	private final static int PUZZLE_WIDTH = 1015; //puzzle img size (9×(105+5)+15+15−5 = 1015)
+	private int[] drag = { 0 }; // 1==user drags on screen
+	private int[] outOfBoundL = { 0 }; //1==puzzle out of bound in zoom mode
 
 
 	@Override
@@ -275,7 +284,8 @@ public class GameActivity extends AppCompatActivity
 		textOverlay = new RedrawText( txtL, txtT, sqrLO, sqrTO, puzzleLoc,
 				usrSudokuArr, canvas, paintblack, wordArray, zoomOn );
 
-		drawR = new drw( rectArr, paint, canvas, rectLayout, textOverlay, usrSudokuArr, zoomOn, touchXZclick, touchYZclick ); // class used to draw/update square matrix
+		drawR = new drw( rectArr, paint, canvas, rectLayout, textOverlay, usrSudokuArr, zoomOn, touchXZclick,
+				touchYZclick, drag, dX, dY, touchXZ, touchYZ ); // class used to draw/update square matrix
 
 		Log.d( "ERROR-2", "\nbefore call to ButtonListeners" );
 
@@ -418,11 +428,16 @@ public class GameActivity extends AppCompatActivity
 						//save click down coordinate
 						if( zoomOn[0] == 1 ) { // when zoom mode enabled
 							//change "zoomed in" coordinate
-							touchXZclick[0] = (int) (touchXZ[0] + touchX[0] / 2f);
-							touchYZclick[0] = (int) (touchYZ[0] + touchY[0] / 2f);
+							//touchXZclick[0] = (int) (touchXZ[0] + touchX[0] / 2f); //where user clicked adjusted for translation for zoom
+							//touchYZclick[0] = (int) (touchYZ[0] + touchY[0] / 2f); //ie touchXZ was reference point (where "zoom" matrix was so far), now add extra
 
-							drawR.reDraw( touchXZclick, touchYZclick, lastRectColoured, currentRectColoured, true, usrLangPref );
-							Log.d( "TAG", "click down: (" + touchXZclick[0] + ", " + touchYZclick[0] + ")" );
+							touchXZclick[0] = (int) ( touchX[0] ); //where user clicked adjusted for translation for zoom
+							touchYZclick[0] = (int) ( touchY[0] ); //ie touchXZ was reference point (where "zoom" matrix was so far), now add extra
+
+							drawR.reDrawZoom( touchXZclick, touchYZclick, lastRectColoured, currentRectColoured, true, usrLangPref );
+							Log.d( "TAG", " -- " );
+							Log.d( "TAG", "touchXZ start: (" + touchXZ[0] + ", " + touchYZ[0] + ")" );
+							Log.d( "TAG", "click down touchXZclick: (" + touchXZclick[0] + ", " + touchYZclick[0] + ")" );
 						} else {
 							iX[0] = touchX[0]; //initial coordinate
 							iY[0] = touchY[0];
@@ -430,38 +445,128 @@ public class GameActivity extends AppCompatActivity
 							drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, true, usrLangPref );
 							Log.i("TAG", "normal click: (" + touchX[0] + ", " + touchY[0] + ")");
 						}
-
 						break;
+
 					case MotionEvent.ACTION_MOVE:
-						Log.i("TAG", "moving: (" + touchX[0] + ", " + touchY[0] + ")");
+						if( zoomOn[0] == 1 ) {
+							//Log.i("TAG", "moving: (" + touchX[0] + ", " + touchY[0] + ")");
 
-						drag = 1;
+							drag[0] = 1;
 
-						//get on click up distance travelled
-						dX[0] = ( touchX[0] - iX[0] ) / 2; // final - initial
-						dY[0] = ( touchY[0] - iY[0] ) / 2; // divide by 2 to scale move to zoom
+							// legend dX = zoom  *so far none are in zoom
+							//		  touchXZclick = zoom
+							// 		  touchXZ = zoom
+							//		  touchX = non-zooom
 
-						Log.i("TAG", "moved: (" + dX[0] + ", " + dY[0] + ")");
+							//get on click up distance travelled
+							//dX[0] = (touchX[0] / 2) - touchXZclick[0]; // change = initial - final
+							//dY[0] = (touchY[0] / 2) - touchYZclick[0]; // divide by 2 to scale move to zoom
 
+							/* get 'drag' in x-axis */
+							dX[0] = (touchX[0] ) - touchXZclick[0]; // change = initial - final
+
+							//fix out of bounds: LEFT
+							if( touchXZ[0] - dX[0] < 0 ) //detect out of bounds
+							{
+								dX[0] = dXLcopy[0]; //out of bound left; preserve last
+								Log.d( "TAG", " out of bounds: LEFT" );
+							} else {
+								dXLcopy[0] = dX[0]; // save a 'inside bound' copy of drag to return to
+							}
+
+							//fix out of bounds: RIGHT
+							if( touchXZ[0] - dX[0] > BIT_MAP_W )
+							{
+								dX[0] = dXRcopy[0]; //out of bound; preserve last -- "dXRcopy[0]" important, otherwise it resets to dXLcopy[0], so must use unique var
+								Log.d( "TAG", " out of bounds: RIGHT   dXcopy: " + dXRcopy[0] );
+							} else {
+								dXRcopy[0] = dX[0]; // save a 'inside bound' copy of drag to return to
+							}
+
+
+							/* get 'drag' in y-axis */
+							dY[0] = (touchY[0] ) - touchYZclick[0];
+
+							//fix out of bounds: TOP
+							if( touchYZ[0] - dY[0] < 0 ) //detect out of bounds
+							{
+								dY[0] = dYTcopy[0]; //out of bound left; preserve last
+							} else {
+								dYTcopy[0] = dY[0]; // save a 'inside bound' copy of drag to return to
+							}
+
+							//fix out of bounds: BOTTOM
+							if( touchYZ[0] - dY[0] > BIT_MAP_H )
+							{
+								dY[0] = dYBcopy[0]; //out of bound; preserve last -- "dXRcopy[0]" important, otherwise it resets to dXLcopy[0], so must use unique var
+								Log.d( "TAG", " out of bounds: RIGHT   dXcopy: " + dYBcopy[0] );
+							} else {
+								dYBcopy[0] = dY[0]; // save a 'inside bound' copy of drag to return to
+							}
+
+
+							//update reference point
+							//touchXZ[0] = touchXZ[0] + dX[0];
+							//touchYZ[0] = touchYZ[0] + dY[0];
+
+							//touchXZclick[0] = touchXZclick[0] + dX[0];
+							//touchYZclick[0] = touchYZclick[0] + dY[0];
+
+							/////////////////
+							//
+							//	issue so may may have been having .translate after .scale
+							//
+							//////////////
+
+							//fix out of bounds
+							//if (touchXZ[0] > screenW){ touchXZ[0] = screenW; } //adapt this to stop without moving everything out of bounds
+
+							//if (touchYZ[0] > screenH){ touchYZ[0] = screenH; }
+							//else if (touchYZ[0] < 0){ touchYZ[0] = 0; }
+
+							drawR.reDrawZoom(touchX, touchY, lastRectColoured, currentRectColoured, true, usrLangPref);
+
+							//Log.i("TAG", "moved: (" + dX[0] + ", " + dY[0] + ")");
+						}
 						break;
+
 					case MotionEvent.ACTION_UP:
 						//Log.i("TAG", "-- up");
 
 						//update where "zoomed in" coordinates landed
 						if( zoomOn[0] == 1 )
 						{
-							if( drag == 1 ) {
-								touchXZ[0] = touchXZ[0] + dX[0];
-								touchYZ[0] = touchYZ[0] + dY[0];
+							if( drag[0] == 1 ) {
+								//if( outOfBoundL[0] == 1 )
+								//{ dX[0] = 0; } //if out of bounds, do not allow drag
+								touchXZ[0] = touchXZ[0] - dX[0]; //update where new touch coordinate ended up
+								touchYZ[0] = touchYZ[0] - dY[0];
+
+								//reset out of bound
+								outOfBoundL[0] = 0;
 							}
+
+							Log.i("TAG", "moved dX: (" + dX[0] + ", " + dY[0] + ")");
+							Log.d( "TAG", "click down touchXZclick after drag: (" + touchXZclick[0] + ", " + touchYZclick[0] + ")" );
+
+							// reset 'moved' coordinates
+							dX[0] = 0;
+							dY[0] = 0;
+							dXLcopy[0] = 0; //there was an issue where forgetting to reset this caused puzzle to skip
+							dXRcopy[0] = 0;
+							dYBcopy[0] = 0;
+							dYTcopy[0] = 0;
+
+
 							//fix out of bounds
-							if (touchXZ[0] > screenW){ touchXZ[0] = screenW; }
+							/*if (touchXZ[0] > screenW){ touchXZ[0] = screenW; }
 							else if (touchXZ[0] < 0){ touchXZ[0] = 0; }
 							if (touchYZ[0] > screenH){ touchYZ[0] = screenH; }
-							else if (touchYZ[0] < 0){ touchYZ[0] = 0; }
+							else if (touchYZ[0] < 0){ touchYZ[0] = 0; }*/
 
-							drag = 0; //disable drag
-							Log.d( "TAG", "click up: (" + touchXZ[0] + ", " + touchYZ[0] + ")" );
+							drag[0] = 0; //disable drag
+
+							Log.d( "TAG", "click up touchXZ: (" + touchXZ[0] + ", " + touchYZ[0] + ")" );
 						}
 
 						break;
@@ -471,6 +576,13 @@ public class GameActivity extends AppCompatActivity
 						//	deal with case when user keeps swiping in a direction out of bounds - limit touchXZ
 						//
 						/////////////////
+
+
+						////////////
+						//
+						//	fix when user presses zoom twice in a row after worked in 'zoom mode'
+						//
+						////////////
 
 				}
 
