@@ -281,6 +281,7 @@ public class drw
 		//
 		//	TODO: only use reDrawZoom for zoom, since have to draw entire array
 		//	TODO: change rectArr from only rect to objects that hold rect, + text + colour + shade + if-last-selected( red )
+		//	TODO: CONSIDER DRAWING ALL SQUARES FIRST IN ORIGINAL GREY SHADES, THEN IF RED OR DESELECT, DEAL WITH THOSE CASES AFTER
 		//
 		// 	TODO: !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!!    !!! !!!    !!! !!!
 		//

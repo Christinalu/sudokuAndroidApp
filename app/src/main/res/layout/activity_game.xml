@@ -9,10 +9,17 @@
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:layout_height="match_parent">
 
+        <RelativeLayout
+            android:id="@+id/rect_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="0dp">
+
+        </RelativeLayout>
 
         <Button
             android:id="@+id/button_dictionary"
@@ -39,23 +46,6 @@
             android:background="@drawable/hint"
             android:gravity="center"
             android:text="ZOOM" />
-
-
-        <RelativeLayout
-            android:id="@+id/rect_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="0dp">
-
-            <ImageView
-                android:id="@+id/img_view"
-                android:layout_width="match_parent"
-                android:layout_height="1000dp" />
-
-        </RelativeLayout>
 
     </RelativeLayout>
 

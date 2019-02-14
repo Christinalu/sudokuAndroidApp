@@ -88,7 +88,7 @@ public class GameActivity extends AppCompatActivity
 	private int[] touchXZclick = { 0 }; //stores where user would click in zoom mode, but when there is no drag, only click down and up
 	private int[] touchYZclick = { 0 };
 
-	private final static int BIT_MAP_W = 1052; //bitmap width (see later in code how to get this number)
+	private final static int BIT_MAP_W = 1052; //NOTE: !! this constant is also currently in .xml file - bitmap width (see later in code how to get this number)
 	private final static int BIT_MAP_H = 1055; //bitmap height
 	private final static int PUZZLE_WIDTH = 1015; //puzzle img size (9×(105+5)+15+15−5 = 1015)
 	private int[] drag = { 0 }; // 1==user drags on screen
@@ -158,11 +158,14 @@ public class GameActivity extends AppCompatActivity
 
 		// bitmap dimension: width=37+9×(105+5)+15+15−5=1052 height=40+9×(105+5)+15+15−5=1055
 		// important to keep this exactly for scaling ie "zoom mode"
-		bgMap = Bitmap.createBitmap(BIT_MAP_W, BIT_MAP_H, Bitmap.Config.ARGB_8888); // important to keep bitmap aligned!, width=37+9×(105+5)+15+15−5=1052 height=40+9×(105+5)+15+15−5=1055
+
+		//bgMap = Bitmap.createBitmap(BIT_MAP_W, BIT_MAP_H, Bitmap.Config.ARGB_8888); // important to keep bitmap aligned!, width=37+9×(105+5)+15+15−5=1052 height=40+9×(105+5)+15+15−5=1055
+		bgMap = Bitmap.createBitmap(BIT_MAP_W, BIT_MAP_H, Bitmap.Config.ARGB_8888);
 		canvas = new Canvas(bgMap);
 
 		//original coordinates of where to draw square
-		sqrLO = (int) (1052 / 2.0 - 1005 / 2.0 );  //(screenW / 2.0 - 1005 / 2.0 );
+		sqrLO = (int) (BIT_MAP_W / 2.0 - 1005 / 2.0 );  //(screenW / 2.0 - 1005 / 2.0 );
+		//sqrLO = (int) (screenW / 2.0 - BIT_MAP_W / 2.0 );  //(screenW / 2.0 - 1005 / 2.0 );
 		sqrTO = 40;
 
 		Log.d( "TAG", "--sqrLO: " + sqrLO );
@@ -307,6 +310,12 @@ public class GameActivity extends AppCompatActivity
 		//
 		///////////
 
+		//////////
+		//
+		//	note: the reason it now doesnt deselect when pressed outside is because shrinked the RelativeLayout to minimum, it doesn't have an "outside" to click on
+		//
+		//////////
+
 
 
 		/* ZOOM BUTTON */ ///// ---------------------------------------------------------------------------------------------------------------------------------------------
@@ -412,7 +421,7 @@ public class GameActivity extends AppCompatActivity
 			@Override
 			public boolean onTouch( View v, MotionEvent event )
 			{
-				touchX[0] = (int) event.getX( ); // touch coordinate on actual screen
+				touchX[0] = (int) event.getX( ); // touch coordinate on actual screen inside RelativeLayout rect_layout - starting from top left corner @ (0,0)
 				touchY[0] = (int) event.getY( );
 
 				switch( event.getAction( ) )
