@@ -23,7 +23,7 @@
 
         <Button
             android:id="@+id/button_dictionary"
-            android:layout_width="261dp"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
@@ -35,7 +35,7 @@
             android:text="HINT" />
 
         <Button
-            android:id="@+id/button_zoom"
+            android:id="@+id/button_zoom_in"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -45,7 +45,20 @@
             android:width="130dp"
             android:background="@drawable/hint"
             android:gravity="center"
-            android:text="ZOOM" />
+            android:text="IN" />
+
+        <Button
+            android:id="@+id/button_zoom_out"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="150dp"
+            android:layout_marginTop="460dp"
+            android:layout_alignParentRight="true"
+            android:width="130dp"
+            android:background="@drawable/hint"
+            android:gravity="center"
+            android:text="OUT" />
 
     </RelativeLayout>
 

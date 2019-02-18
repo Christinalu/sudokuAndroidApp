@@ -24,7 +24,7 @@ public class ButtonListener extends AppCompatActivity
 	public ButtonListener(final Pair currentRectColoured, final SudokuGenerator usrSudokuArr,
 						  final RedrawText textOverlay, final Button[] btnArr, final drw drawR,
 						  final int[] touchX, final int[] touchY, final Pair lastRectColoured,
-						  final int usrLangPref )
+						  final int usrLangPref, final int[] zoomButtonDisableUpdate )
 	{
 		// pulled out of button listeners
 		final PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
@@ -52,11 +52,14 @@ public class ButtonListener extends AppCompatActivity
 												track.track( usrSudokuArr, currentRectColoured ); //important, 'track' must occur before 'usrSudokuArr.Puzzle[][] = x'
 
 												// set the cell in the Puzzle to corresponding number based on button user input
-												usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = var;
-
+												//if( zoomButtonDisableUpdate[0] == 0 ) // do not update entry when switching modes - causes errors
+												//{
+												Log.d( "TAG", "--inside button" );
+													usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = var;
+												//}
 												// redraw square matrix and text overlay
 												drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
-												textOverlay.reDrawText( usrLangPref );
+												//textOverlay.reDrawText( usrLangPref );
 
 												//have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
 												if( track.enableCheck )

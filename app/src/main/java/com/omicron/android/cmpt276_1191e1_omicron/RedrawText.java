@@ -42,6 +42,7 @@ public class RedrawText
 		zoomOn = zoomOn2;
 		//usrLangPref = usrLangPref2;
 	}
+
 	public void reDrawText( int usrLangPref )
 	{
 		/*if( zoomOn[0] == 1 ) //if zoom on, set offset
@@ -78,61 +79,65 @@ public class RedrawText
 				}
 				puzzleLoc[i][j] = new PairF(txtT,txtL);
 
-				// choose what language to draw
+				// CHOOSE WHAT LANGUAGE TO DRAW
 				if( usrSudokuArr.Puzzle[i][j]!=0 && usrSudokuArr.PuzzleOriginal[i][j]!=0 && usrLangPref == 0 ) { // draw only if the puzzle contains a number; and draw the native translated word
-					//draw translation
-					if( zoomOn[0] == 1 )//colour on zoom mode
-					{
-						canvas.save( );
-						canvas.scale( 2.0f, 2.0f );
-						canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getTranslation(), txtL, txtT, paintblack);
-						canvas.restore( );
-					}
-					else {
+					// draw translation
+
+					//if( zoomOn[0] == 1 )//colour on zoom mode
+					//{
+					//	canvas.save( );
+					//	canvas.scale( 2.0f, 2.0f );
+					//	canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getTranslation(), txtL, txtT, paintblack);
+					//	canvas.restore( );
+					//}
+					//else {
 						canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j] - 1].getTranslation(), txtL, txtT, paintblack);
-					}
+					//}
 				}
 				else if( usrSudokuArr.Puzzle[i][j]!=0 && usrSudokuArr.PuzzleOriginal[i][j]!=0 && usrLangPref == 1)
 				{
 					//draw native
-					if( zoomOn[0] == 1 )//colour on zoom mode
-					{
-						canvas.save( );
-						canvas.scale( 2.0f, 2.0f );
-						canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getTranslation(), txtL, txtT, paintblack);
-						canvas.restore( );
-					}
-					else {
+
+					//if( zoomOn[0] == 1 )//colour on zoom mode
+					//{
+					//	canvas.save( );
+					//	canvas.scale( 2.0f, 2.0f );
+					//	canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getTranslation(), txtL, txtT, paintblack);
+					//	canvas.restore( );
+					//}
+					//else {
 						canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j] - 1].getTranslation(), txtL, txtT, paintblack);
-					}
+					//}
 				}
 				else if( usrSudokuArr.Puzzle[i][j]!=0 && usrSudokuArr.PuzzleOriginal[i][j]==0 && usrLangPref == 0)
 				{
 					//draw native
-					if( zoomOn[0] == 1 )//colour on zoom mode
-					{
-						canvas.save( );
-						canvas.scale( 2.0f, 2.0f );
-						canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getNative(), txtL, txtT, paintblack);
-						canvas.restore( );
-					}
-					else {
+
+					//if( zoomOn[0] == 1 )//colour on zoom mode
+					//{
+					//	canvas.save( );
+					//	canvas.scale( 2.0f, 2.0f );
+					//	canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getNative(), txtL, txtT, paintblack);
+					//	canvas.restore( );
+					//}
+					//else {
 						canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j] - 1].getNative(), txtL, txtT, paintblack);
-					}
+					//}
 				}
 				else if( usrSudokuArr.Puzzle[i][j]!=0 && usrSudokuArr.PuzzleOriginal[i][j]==0 && usrLangPref == 1)
 				{
 					//draw native
-					if( zoomOn[0] == 1 )//colour on zoom mode
-					{
-						canvas.save( );
-						canvas.scale( 2.0f, 2.0f );
-						canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getNative(), txtL, txtT, paintblack);
-						canvas.restore( );
-					}
-					else {
+
+					//if( zoomOn[0] == 1 )//colour on zoom mode
+					//{
+					//	canvas.save( );
+					//	canvas.scale( 2.0f, 2.0f );
+					//	canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getNative(), txtL, txtT, paintblack);
+					//	canvas.restore( );
+					//}
+					//else {
 						canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j] - 1].getNative(), txtL, txtT, paintblack);
-					}
+					//}
 				}
 			}
 		}
