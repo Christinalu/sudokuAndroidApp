@@ -23,7 +23,7 @@ public class PuzzleTrack
 			for( int j=0; j<9; j++ )
 			{
 				matrix[i][j] = matrix2[i][j];
-				//update how many squares are filled
+				//update how many squares are already filled
 				if( matrix2[i][j] != 0 )
 				{
 					sqrFilled ++;
@@ -57,7 +57,6 @@ public class PuzzleTrack
 		if (isCorrect)
 		{
 			//disable buttons
-			Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show();
 			btnArr[0].setOnClickListener(null);
 			btnArr[1].setOnClickListener(null);
 			btnArr[2].setOnClickListener(null);
@@ -67,6 +66,7 @@ public class PuzzleTrack
 			btnArr[6].setOnClickListener(null);
 			btnArr[7].setOnClickListener(null);
 			btnArr[8].setOnClickListener(null);
+			Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show( );
 		}
 		else
 		{

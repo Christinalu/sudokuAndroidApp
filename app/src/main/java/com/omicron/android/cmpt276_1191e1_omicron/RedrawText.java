@@ -9,55 +9,37 @@ public class RedrawText
 	/*
 	 * This function is called to redraw the text overlay whenever the GUI is redrawn
 	*/
+
 	private float txtL;
 	private float txtT;
-	private float sqrLO;
-	private float sqrTO;
-	private float sqrTO3; //backup
-	private float sqrLO3; //backup
-	private PairF[][] puzzleLoc;
+	private float txtLO;
+	private float txtTO;
 	private SudokuGenerator usrSudokuArr;
 	private Canvas canvas;
 	private Paint paintblack;
 	private Word[] wordArray;
-	private int[] zoomOn;
-	//private int usrLangPref;
 
-	public RedrawText( float txtL2, float txtT2, float sqrLO2, float sqrTO2, PairF[][] puzzleLoc2,
-					   SudokuGenerator usrSudokuArr2, Canvas canvas2, Paint paintblack2,
-					   Word[] wordArray2, int[] zoomOn2 )
+	public RedrawText( float sqrLO2, float sqrTO2, SudokuGenerator usrSudokuArr2, Canvas canvas2,
+					   Paint paintblack2, Word[] wordArray2 )
 	{
 		// import data on initialize
-		txtL = txtL2;
-		txtT = txtT2;
-		sqrLO = sqrLO2;
-		sqrTO = sqrTO2;
-		sqrTO3 = sqrTO2; //set backup
-		sqrLO3 = sqrLO2; //set backup
-		puzzleLoc = puzzleLoc2;
+		txtLO = sqrLO2 + 9;
+		txtTO = sqrTO2 + 105/2 + 10;
 		usrSudokuArr = usrSudokuArr2;
 		canvas = canvas2;
 		paintblack = paintblack2;
 		wordArray = wordArray2;
-		zoomOn = zoomOn2;
-		//usrLangPref = usrLangPref2;
 	}
 
 	public void reDrawText( int usrLangPref )
 	{
-		/*if( zoomOn[0] == 1 ) //if zoom on, set offset
-		{ sqrTO = 80; sqrLO = 27; }
-		else{ sqrTO = sqrTO3; sqrLO = sqrLO3; }*/
-
-		Log.d( "MATRIX", "--PASS" );
 		for( int i=0; i<9; i++ ) //row
 		{
 			for( int j=0; j<9; j++ ) //column
 			{
 				//increase square dimensions
-				txtL = sqrLO + j*(105+5);
-				txtT = sqrTO + i*(105+5);
-
+				txtL = txtLO + j*(105+5);
+				txtT = txtTO + i*(105+5);
 
 				//add padding
 				if( i>=3 ) //add extra space between rows
@@ -77,67 +59,31 @@ public class RedrawText
 				{
 					txtL = txtL + 15;
 				}
-				puzzleLoc[i][j] = new PairF(txtT,txtL);
+
 
 				// CHOOSE WHAT LANGUAGE TO DRAW
-				if( usrSudokuArr.Puzzle[i][j]!=0 && usrSudokuArr.PuzzleOriginal[i][j]!=0 && usrLangPref == 0 ) { // draw only if the puzzle contains a number; and draw the native translated word
-					// draw translation
-
-					//if( zoomOn[0] == 1 )//colour on zoom mode
-					//{
-					//	canvas.save( );
-					//	canvas.scale( 2.0f, 2.0f );
-					//	canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getTranslation(), txtL, txtT, paintblack);
-					//	canvas.restore( );
-					//}
-					//else {
-						canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j] - 1].getTranslation(), txtL, txtT, paintblack);
-					//}
+				// note: usrLangPref refers to text that the user is typing in the puzzle (ie if usrLangPref = 0 = native, then the (unchangeable) text inside puzzle is translation)
+				// matrix text: text inside matrix that cannot be modified
+				// user text: the text that the user inputs
+				if( usrSudokuArr.Puzzle[i][j]!=0 && usrSudokuArr.PuzzleOriginal[i][j]!=0 && usrLangPref == 0 ) // draw only if the puzzle contains a number; and draw the native translated word
+				{
+					// matrix text - draw translation (because user chose = 0 = native, the matrix is =1=translation)
+					canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j] - 1].getTranslation(), txtL, txtT, paintblack);
 				}
 				else if( usrSudokuArr.Puzzle[i][j]!=0 && usrSudokuArr.PuzzleOriginal[i][j]!=0 && usrLangPref == 1)
 				{
-					//draw native
-
-					//if( zoomOn[0] == 1 )//colour on zoom mode
-					//{
-					//	canvas.save( );
-					//	canvas.scale( 2.0f, 2.0f );
-					//	canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getTranslation(), txtL, txtT, paintblack);
-					//	canvas.restore( );
-					//}
-					//else {
-						canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j] - 1].getTranslation(), txtL, txtT, paintblack);
-					//}
+					// matrix text - draw native (because user chose = 1 = translation, the matrix is =0=native)
+					canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j] - 1].getNative(), txtL, txtT, paintblack);
 				}
 				else if( usrSudokuArr.Puzzle[i][j]!=0 && usrSudokuArr.PuzzleOriginal[i][j]==0 && usrLangPref == 0)
 				{
-					//draw native
-
-					//if( zoomOn[0] == 1 )//colour on zoom mode
-					//{
-					//	canvas.save( );
-					//	canvas.scale( 2.0f, 2.0f );
-					//	canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getNative(), txtL, txtT, paintblack);
-					//	canvas.restore( );
-					//}
-					//else {
-						canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j] - 1].getNative(), txtL, txtT, paintblack);
-					//}
+					// user text - draw native (because user chose = 0 = native, draw user square native)
+					canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j] - 1].getNative(), txtL, txtT, paintblack);
 				}
 				else if( usrSudokuArr.Puzzle[i][j]!=0 && usrSudokuArr.PuzzleOriginal[i][j]==0 && usrLangPref == 1)
 				{
-					//draw native
-
-					//if( zoomOn[0] == 1 )//colour on zoom mode
-					//{
-					//	canvas.save( );
-					//	canvas.scale( 2.0f, 2.0f );
-					//	canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getNative(), txtL, txtT, paintblack);
-					//	canvas.restore( );
-					//}
-					//else {
-						canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j] - 1].getNative(), txtL, txtT, paintblack);
-					//}
+					// user text - draw translation (because user chose = 1 = translation, draw user square translation)
+					canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j] - 1].getTranslation(), txtL, txtT, paintblack);
 				}
 			}
 		}

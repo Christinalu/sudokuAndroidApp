@@ -16,20 +16,16 @@ public class ButtonListener extends AppCompatActivity
 	 *	if selecting valid square, will update PuzzleOriginal
 	*/
 
-	private int[] touchX = { 0 };
-	private int[] touchY = { 0 };
-
 	private int i;
 
 	public ButtonListener(final Pair currentRectColoured, final SudokuGenerator usrSudokuArr,
 						  final RedrawText textOverlay, final Button[] btnArr, final drw drawR,
 						  final int[] touchX, final int[] touchY, final Pair lastRectColoured,
-						  final int usrLangPref, final int[] zoomButtonDisableUpdate )
+						  final int usrLangPref )
 	{
 		// pulled out of button listeners
 		final PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 		final PuzzleTrack track = new PuzzleTrack( usrSudokuArr.Puzzle );
-		final int [] arr = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 		if( textOverlay == null )
 		{
@@ -44,7 +40,6 @@ public class ButtonListener extends AppCompatActivity
 										@Override
 										public void onClick(View v)
 										{
-											Log.d( "BTN", " -- out: " + var );
 											//if current button selected is valid and is not restricted
 											if( currentRectColoured.getRow() != -1 && usrSudokuArr.PuzzleOriginal[currentRectColoured.getRow()][currentRectColoured.getColumn()	] == 0 )
 											{
@@ -53,12 +48,10 @@ public class ButtonListener extends AppCompatActivity
 
 												// set the cell in the Puzzle to corresponding number based on button user input
 												//if( zoomButtonDisableUpdate[0] == 0 ) // do not update entry when switching modes - causes errors
-												//{
-												Log.d( "TAG", "--inside button" );
-													usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = var;
-												//}
+												usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = var;
+
 												// redraw square matrix and text overlay
-												drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, false, usrLangPref );
+												drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
 												//textOverlay.reDrawText( usrLangPref );
 
 												//have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
