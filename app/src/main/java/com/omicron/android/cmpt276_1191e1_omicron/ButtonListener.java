@@ -21,7 +21,7 @@ public class ButtonListener extends AppCompatActivity
 	public ButtonListener(final Pair currentRectColoured, final SudokuGenerator usrSudokuArr,
 						  final RedrawText textOverlay, final Button[] btnArr, final drw drawR,
 						  final int[] touchX, final int[] touchY, final Pair lastRectColoured,
-						  final int usrLangPref )
+						  final int usrLangPref, final int[] btnClicked )
 	{
 		// pulled out of button listeners
 		final PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
@@ -51,7 +51,9 @@ public class ButtonListener extends AppCompatActivity
 												usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = var;
 
 												// redraw square matrix and text overlay
+												btnClicked[0] = 1; //this flag allows (for efficiency) class drw to update TextView as well in zoom mode
 												drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
+												btnClicked[0] = 0;
 												//textOverlay.reDrawText( usrLangPref );
 
 												//have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener

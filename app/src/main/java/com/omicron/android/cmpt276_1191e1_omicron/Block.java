@@ -1,6 +1,10 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
+import android.content.Context;
 import android.graphics.Rect;
+import android.text.TextUtils;
+import android.view.Gravity;
+import android.widget.TextView;
 
 public class Block
 {
@@ -10,6 +14,7 @@ public class Block
 
 	private Rect sqr; //rectangle
 	private boolean selected; //indicates if rect is the one user selected
+	private TextView textView;
 
 	public Block( int sqrL, int sqrT, int sqrR, int sqrB )
 	{
@@ -35,4 +40,5 @@ public class Block
 	{
 		return sqr;
 	}
+
 }

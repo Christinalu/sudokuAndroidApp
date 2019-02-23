@@ -18,7 +18,8 @@ public class drw
 	private Block[][] rectArr;
 	private Canvas canvas;
 	private RelativeLayout rectLayout;
-	private RedrawText textOverlay;
+	private RelativeLayout rectTextLayout;
+	private TextMatrix textMatrix;
 	private SudokuGenerator usrSudokuArr;
 
 	private int px;
@@ -32,23 +33,27 @@ public class drw
 	private int[] zoomButtonSafe;
 	private int[] zoomClickSafe;
 	private int[] zoomButtonDisableUpdate;
+	private int[] btnClicked;
+	private int bitmapSize;
+	private Word[] wordArray;
 
-	private final static int BIT_MAP_W = 1052; //NOTE: !! this constant is also currently in .xml file - bitmap width (see later in code how to get this number)
-	private final static int BIT_MAP_H = 1055; //bitmap height - hardcoded, should change to "adaptable"
+	//private final static int BIT_MAP_W = 1052; //NOTE: !! this constant is also currently in .xml file - bitmap width (see later in code how to get this number)
+	//private final static int BIT_MAP_H = 1055; //bitmap height - hardcoded, should change to "adaptable"
 
 
 
 	public drw( Block[][] rectArr2, Paint paint2, Canvas canvas2,
-			    RelativeLayout rectLayout2, RedrawText textOverlay2, SudokuGenerator usrSudokuArr2,
+			    RelativeLayout rectLayout2, RelativeLayout rectTextLayout2, TextMatrix textMatrix2, SudokuGenerator usrSudokuArr2,
 			    int[] zoomOn2, int[] drag2, int[] dX2, int[] dY2,
 			    int[] touchXZ2, int[] touchYZ2, int[] zoomButtonSafe2, int[] zoomClickSafe2,
-				int[] zoomButtonDisableUpdate2 )
+				int[] zoomButtonDisableUpdate2, int bitmapSize2, Word[] wordArray2, int[] btnClicked2 )
 	{
 		paint = paint2;
 		rectArr = rectArr2;
 		canvas = canvas2;
 		rectLayout = rectLayout2;
-		textOverlay = textOverlay2;
+		rectTextLayout = rectTextLayout2;
+		textMatrix = textMatrix2;
 		usrSudokuArr = usrSudokuArr2;
 		zoomOn = zoomOn2;
 		drag = drag2;
@@ -59,6 +64,9 @@ public class drw
 		zoomButtonSafe = zoomButtonSafe2;
 		zoomClickSafe = zoomClickSafe2;
 		zoomButtonDisableUpdate = zoomButtonDisableUpdate2;
+		bitmapSize = bitmapSize2;
+		wordArray = wordArray2;
+		btnClicked = btnClicked2;
 	}
 
 	public void reDraw( int[] touchX, int[] touchY, Pair lastRectColoured,
@@ -70,7 +78,8 @@ public class drw
 				/** DRAW ZOOM OUT MODE **/
 
 			newSqrTouched = false; //reset
-			canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR); //clear screen
+			//canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR); //clear screen
+			canvas.drawColor( Color.parseColor( "#5CDDB1" ) );
 
 
 			// loop to find selected rect
@@ -139,9 +148,19 @@ public class drw
 			}
 
 
-			// draw text overlay
-			textOverlay.reDrawText( usrLangPref );
-			rectLayout.invalidate( ); //required to update to print to screen
+			// DRAW TEXT OVERLAY
+			if( currentRectColoured.getRow() != -1 && btnClicked[0] == 1 )
+			{
+				//redraw text of currently selected square
+				//note that also having this execute only on "btnClicked[0] == 1" does not reset the sliding animation each time a square is highlighted
+				textMatrix.chooseLangAndDraw( currentRectColoured.getRow(), currentRectColoured.getColumn(), wordArray, usrSudokuArr, usrLangPref );
+			}
+
+
+			// DISABLED TEMP :: rectLayout.invalidate( ); //required to update to print to screen
+
+
+			//rectTextLayout.invalidate( );
 		}
 		else if (zoomOn[0] == 1)
 		{
@@ -152,7 +171,8 @@ public class drw
 
 			// save and reset canvas
 			canvas.save();
-			canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR); //clear screen
+			//canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR); //clear screen
+			canvas.drawColor( Color.parseColor( "#5cddb1" ) );
 
 			if( drag[0] == 0 )
 			{
@@ -165,7 +185,7 @@ public class drw
 
 			// if drag enabled, then translate matrix
 			if (drag[0] == 1) {
-				canvas.translate(-touchXZ[0] + dX[0], -touchYZ[0] + dY[0]);
+				canvas.translate( -touchXZ[0] + dX[0], -touchYZ[0] + dY[0] );
 			} else { //else user only clicked
 				Log.d( "TAG-2", "--translate on drag == 0" );
 				canvas.translate(-touchXZ[0], -touchYZ[0]);
@@ -174,7 +194,7 @@ public class drw
 			canvas.scale(2.0f, 2.0f);
 
 
-			// LOOP TO FIND IS TOUCH IS INSIDE SQUARE
+			// LOOP TO FIND IF TOUCH IS INSIDE SQUARE
 			// note: this loop must be separate; cannot be combined with colour loop (see above for reason)
 
 			if( drag[0] == 0 && zoomButtonDisableUpdate[0] == 0 ) // do not update on button click (zoomSafe == 0 means only test after going in "zoom" mode, that is, do not check the 'click coordinate' until user touches screen again because those coordinates do not count as a click)
@@ -187,7 +207,7 @@ public class drw
 						{
 							// if in "zoom", check to see if clicking outside the zoomed map
 							// before when clicked in empty space on BOTTOM side, it highlighted square because click was valid within rectLayout
-							if( touchX[0] > BIT_MAP_W || touchY[0] > BIT_MAP_H )
+							if( touchX[0] > bitmapSize || touchY[0] > bitmapSize )
 							{
 								// NOTE: this works only for hardcoded bitmap size : should change this code when adapting bitmap to screen size
 								break; // do not count click (outside bound)
@@ -244,10 +264,32 @@ public class drw
 			}
 
 
-			// draw text overlay + restore
-			textOverlay.reDrawText(usrLangPref);
-			canvas.restore();
-			rectLayout.invalidate();
+			// DRAW TEXT OVERLAY + RESTORE
+
+
+			// update text of currently selected square on button click
+			if( currentRectColoured.getRow() != -1 && btnClicked[0] == 1 )
+			{
+				//note that also having this execute only on "btnClicked[0] == 1" does not reset the sliding animation each time a square is highlighted
+				//note: animation will reset each time a button is clicked because
+				textMatrix.chooseLangAndDraw( currentRectColoured.getRow(), currentRectColoured.getColumn(), wordArray, usrSudokuArr, usrLangPref );
+			}
+
+
+			// draw text
+			if( drag[0] == 1 )
+			{
+				textMatrix.reDrawTextZoom(touchXZ, touchYZ, dX, dY);
+			}
+
+
+
+
+			canvas.restore( );
+
+			// DISABLED TEMP :: rectLayout.invalidate( );
+
+			//rectTextLayout.invalidate( );
 		}
 	}
 }

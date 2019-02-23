@@ -17,7 +17,16 @@
             android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
             android:layout_marginStart="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginBottom="0dp"
             android:layout_marginTop="0dp">
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rect_txt_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
         </RelativeLayout>
 
