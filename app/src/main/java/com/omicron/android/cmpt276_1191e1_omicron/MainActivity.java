@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity
     RadioGroup Language;
     private int usrLangPref = 0; // 0=eng_fr, 1=fr_eng
     private int usrDiffPref; //0=easy,1=medium,2=difficult
+    private int state; //0=new start, 1=resume
 
     /*
      *  This Main Activity is the activity that will act as the Start Menu
@@ -124,8 +125,10 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        // start game button; used to switch to gameActivity
+        // start and resume game button; used to switch to gameActivity
         Button btnStart = (Button) findViewById( R.id.button_start );
+        Button btnResume = (Button) findViewById(R.id.button_resume);
+        btnResume.setEnabled(false); //block Resume button unless a previous game is saved
 
         // set listener to switch to Game Activity
         btnStart.setOnClickListener( new View.OnClickListener(  )
@@ -135,18 +138,47 @@ public class MainActivity extends AppCompatActivity
                 {
 
                 	Intent gameActivity = new Intent( MainActivity.this, GameActivity.class );
+                	state = 0;
 
                 	//save wordArray for Game Activity
 
 					gameActivity.putExtra( "wordArray", wordArray );
                     gameActivity.putExtra( "usrLangPref", usrLangPref );
                     gameActivity.putExtra("usrDiffPref",usrDiffPref);
-
+                    gameActivity.putExtra("state", state);
+                    finish();
                     startActivity( gameActivity );
                 }
             }
         );
+        //check if a previous game existed. If it did, unblock resume button
+        final Intent resumeSrc = getIntent( );
+        if (resumeSrc != null) {
+            //if all necessary game preferences are written in memory, then unblock resume button
+            if (resumeSrc.hasExtra("wordArrayGA") && resumeSrc.hasExtra("usrLangPrefGA") && resumeSrc.hasExtra("SudokuArrGA") && resumeSrc.hasExtra("state")) {
+                btnResume.setEnabled(true);
+            }
+        }
+        //if resume button is unblocked and pressed, it will load previous game preferences
+        btnResume.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //load previous game preferences to prepare for export to new Game Activity
+                Word[] wordArrayResume = (Word[]) resumeSrc.getSerializableExtra("wordArrayGA");
+                int usrLangPrefResume = (int) resumeSrc.getSerializableExtra("usrLangPrefGA");
+                SudokuGenerator usrSudokuArrResume = (SudokuGenerator) resumeSrc.getSerializableExtra("SudokuArrGA");
+                state = 1;
 
+                Intent resumeActivity = new Intent( MainActivity.this, GameActivity.class );
+                //save preferences for Game Activity to read
+                resumeActivity.putExtra( "wordArrayMA", wordArrayResume );
+                resumeActivity.putExtra( "usrLangPrefMA", usrLangPrefResume );
+                resumeActivity.putExtra("SudokuArrMA", usrSudokuArrResume);
+                resumeActivity.putExtra("state", state);
+                finish();
+                startActivity( resumeActivity );
+            }
+        });
     }
 
 }

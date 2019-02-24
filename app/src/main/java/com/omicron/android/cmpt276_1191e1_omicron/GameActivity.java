@@ -31,6 +31,8 @@ public class GameActivity extends AppCompatActivity
 	public Word[] wordArray;
 	private int usrLangPref;
 	private int usrDiffPref = 0;
+	private SudokuGenerator usrSudokuArr;
+	private int state; //0=new start, 1=resume
 
 	private Paint paint = new Paint( );
 	private Bitmap bgMap;
@@ -58,27 +60,35 @@ public class GameActivity extends AppCompatActivity
 	private Button [] btnArr;
 	private ButtonListener listeners; // used to call another function to implement all button listeners, to save space in GameActivity
 
-
 	@Override
 	protected void onCreate( Bundle savedInstanceState )
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_game);
-
-		//set intent to receive word array from Main Activity
-		Intent wordArraySrc = getIntent( );
-		if (wordArraySrc != null) {
-			wordArray = (Word[]) wordArraySrc.getSerializableExtra("wordArray");
-			usrLangPref =  (int) wordArraySrc.getSerializableExtra("usrLangPref");
+		if (savedInstanceState != null) {
+			//a state had been saved, load it
+			state = 1;
+			wordArray = (Word[]) savedInstanceState.getSerializable("wordArrayGA");
+			usrLangPref = savedInstanceState.getInt("usrLangPrefGA");
+			usrSudokuArr = (SudokuGenerator) savedInstanceState.get("SudokuArrGA");
 		}
-		//set intent to receive Puzzle array from Main Activity
-		Intent usrDiffPrefSrc = getIntent( );
-		if (usrDiffPrefSrc != null) {
-			usrDiffPref =  (int) usrDiffPrefSrc.getSerializableExtra("usrDiffPref");
+		else {
+			Intent gameSrc = getIntent();
+			if (gameSrc != null) {
+				state = (int) gameSrc.getSerializableExtra("state");
+                //check state: if 1 then we are resuming a previous game, otherwise state == 0 and we are starting a new game
+				if (state == 1) {
+					wordArray = (Word[]) gameSrc.getSerializableExtra("wordArrayMA");
+					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPrefMA");
+					usrSudokuArr = (SudokuGenerator) gameSrc.getSerializableExtra("SudokuArrMA");
+				} else {
+					wordArray = (Word[]) gameSrc.getSerializableExtra("wordArray");
+					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPref");
+					usrDiffPref = (int) gameSrc.getSerializableExtra("usrDiffPref");
+					usrSudokuArr = new SudokuGenerator(usrDiffPref);
+				}
+			}
 		}
-
-        // stores the generated puzzle, including arrays of solution and user current puzzle
-        SudokuGenerator usrSudokuArr = new SudokuGenerator( usrDiffPref );
 
 		//create dictionary button
 		Button btnDictionary = (Button) findViewById(R.id.button_dictionary);
@@ -326,14 +336,15 @@ public class GameActivity extends AppCompatActivity
 				}
 				puzzleLoc[i][j] = new PairF(txtT,txtL);
 
-				if (usrSudokuArr.Puzzle[i][j]!=0) { // draw only if the original puzzle contains a number
+				if (usrSudokuArr.PuzzleOriginal[i][j]!=0) { // draw only if the original puzzle contains a number
 					canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getTranslation(), txtL, txtT, paintblack);
 				}
+                if (usrSudokuArr.Puzzle[i][j]!=0 && usrSudokuArr.PuzzleOriginal[i][j]==0) { // draw only if the Puzzle contains a number that is not a part of the original
+                    canvas.drawText(wordArray[usrSudokuArr.Puzzle[i][j]-1].getNative(), txtL, txtT, paintblack);
+                }
 			}
 		}
 	}
-
-
 	@Override
 	public void onStart( )
 	{
@@ -341,5 +352,24 @@ public class GameActivity extends AppCompatActivity
 
 		//disable slide in animation
 		overridePendingTransition(0, 0);
+	}
+	@Override
+	public void onSaveInstanceState (Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);
+		savedInstanceState.putSerializable("wordArrayGA", wordArray);
+		savedInstanceState.putInt( "usrLangPrefGA", usrLangPref );
+		savedInstanceState.putSerializable("SudokuArrGA", usrSudokuArr);
+		savedInstanceState.putInt("state", state);
+	}
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		Intent gameActivity = new Intent( GameActivity.this, MainActivity.class );
+		state = 1;
+		gameActivity.putExtra( "wordArrayGA", wordArray );
+		gameActivity.putExtra( "usrLangPrefGA", usrLangPref );
+		gameActivity.putExtra("SudokuArrGA", usrSudokuArr);
+		gameActivity.putExtra("state", state);
+		startActivity( gameActivity );
 	}
 }
