@@ -28,14 +28,14 @@ public class MainActivity extends AppCompatActivity
     //       this is required in DictionaryActivity.java
     private Word[] wordArray =new Word[]
             {
-                    new Word( "--abcdefghijkl123123123123123", "--lkjihgfedcba123123123123123" ),
+                    new Word( "Un", "Un" ),
                     new Word( "Two", "Deux" ),
-                    new Word( "Three", "Trois" ),
+                    new Word( "Threeeeeeeeee", "Troisssssssss" ),
                     new Word( "Four", "Quatre" ),
                     new Word( "Five", "Cinq" ),
                     new Word( "Six", "Six" ),
                     new Word( "Seven", "Sept" ),
-                    new Word( "Eight", "Huit" ),
+                    new Word( "Eightttttttttttttt", "Huitttttttttttttt" ),
                     new Word( "Nine", "Neuf" )
             };
 

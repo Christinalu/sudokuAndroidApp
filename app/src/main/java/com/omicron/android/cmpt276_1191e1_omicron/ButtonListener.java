@@ -18,19 +18,13 @@ public class ButtonListener extends AppCompatActivity
 
 	private int i;
 
-	public ButtonListener(final Pair currentRectColoured, final SudokuGenerator usrSudokuArr,
-						  final RedrawText textOverlay, final Button[] btnArr, final drw drawR,
+	public ButtonListener(final Pair currentRectColoured, final SudokuGenerator usrSudokuArr, final Button[] btnArr, final drw drawR,
 						  final int[] touchX, final int[] touchY, final Pair lastRectColoured,
 						  final int usrLangPref, final int[] btnClicked )
 	{
 		// pulled out of button listeners
 		final PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
 		final PuzzleTrack track = new PuzzleTrack( usrSudokuArr.Puzzle );
-
-		if( textOverlay == null )
-		{
-			Log.d( "NULL-2", "textOverlay on initialize call in ButtonListener class" );
-		}
 
 		// loop to set up all keypad buttons
 		for( i=0; i<9; i++ )

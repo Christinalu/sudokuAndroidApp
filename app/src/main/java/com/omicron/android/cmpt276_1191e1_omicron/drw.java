@@ -36,17 +36,15 @@ public class drw
 	private int[] btnClicked;
 	private int bitmapSize;
 	private Word[] wordArray;
-
-	//private final static int BIT_MAP_W = 1052; //NOTE: !! this constant is also currently in .xml file - bitmap width (see later in code how to get this number)
-	//private final static int BIT_MAP_H = 1055; //bitmap height - hardcoded, should change to "adaptable"
-
+	private float ZOOM_SCALE;
 
 
 	public drw( Block[][] rectArr2, Paint paint2, Canvas canvas2,
-			    RelativeLayout rectLayout2, RelativeLayout rectTextLayout2, TextMatrix textMatrix2, SudokuGenerator usrSudokuArr2,
-			    int[] zoomOn2, int[] drag2, int[] dX2, int[] dY2,
-			    int[] touchXZ2, int[] touchYZ2, int[] zoomButtonSafe2, int[] zoomClickSafe2,
-				int[] zoomButtonDisableUpdate2, int bitmapSize2, Word[] wordArray2, int[] btnClicked2 )
+				RelativeLayout rectLayout2, RelativeLayout rectTextLayout2, TextMatrix textMatrix2, SudokuGenerator usrSudokuArr2,
+				int[] zoomOn2, int[] drag2, int[] dX2, int[] dY2,
+				int[] touchXZ2, int[] touchYZ2, int[] zoomButtonSafe2, int[] zoomClickSafe2,
+				int[] zoomButtonDisableUpdate2, int bitmapSize2, Word[] wordArray2, int[] btnClicked2,
+				float ZOOM_SCALE2 )
 	{
 		paint = paint2;
 		rectArr = rectArr2;
@@ -67,10 +65,11 @@ public class drw
 		bitmapSize = bitmapSize2;
 		wordArray = wordArray2;
 		btnClicked = btnClicked2;
+		ZOOM_SCALE = ZOOM_SCALE2;
 	}
 
 	public void reDraw( int[] touchX, int[] touchY, Pair lastRectColoured,
-					    Pair currentRectColoured, int usrLangPref )
+						Pair currentRectColoured, int usrLangPref )
 	{
 		if (zoomOn[0] == 0)
 		{
@@ -78,8 +77,7 @@ public class drw
 				/** DRAW ZOOM OUT MODE **/
 
 			newSqrTouched = false; //reset
-			//canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR); //clear screen
-			canvas.drawColor( Color.parseColor( "#5CDDB1" ) );
+			canvas.drawColor( Color.parseColor( "#5cddb1" ) );
 
 
 			// loop to find selected rect
@@ -156,11 +154,7 @@ public class drw
 				textMatrix.chooseLangAndDraw( currentRectColoured.getRow(), currentRectColoured.getColumn(), wordArray, usrSudokuArr, usrLangPref );
 			}
 
-
-			// DISABLED TEMP :: rectLayout.invalidate( ); //required to update to print to screen
-
-
-			//rectTextLayout.invalidate( );
+			rectLayout.invalidate( ); //required to update to print to screen
 		}
 		else if (zoomOn[0] == 1)
 		{
@@ -171,14 +165,13 @@ public class drw
 
 			// save and reset canvas
 			canvas.save();
-			//canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR); //clear screen
 			canvas.drawColor( Color.parseColor( "#5cddb1" ) );
 
 			if( drag[0] == 0 )
 			{
 				//scale to find square where user clicked
-				px = ( touchXZ[0] + touchX[0] ) / 2; //divide by 2 to scale
-				py = ( touchYZ[0] + touchY[0] ) / 2;
+				px = (int)( ( touchXZ[0] + touchX[0] ) / ZOOM_SCALE ); //divide to scale
+				py = (int)( ( touchYZ[0] + touchY[0] ) / ZOOM_SCALE );
 			}
 
 			Log.d( "TAG-2", " touchXZ: " + touchXZ[0] + ", touchX: " + touchX[0] );
@@ -187,11 +180,10 @@ public class drw
 			if (drag[0] == 1) {
 				canvas.translate( -touchXZ[0] + dX[0], -touchYZ[0] + dY[0] );
 			} else { //else user only clicked
-				Log.d( "TAG-2", "--translate on drag == 0" );
 				canvas.translate(-touchXZ[0], -touchYZ[0]);
 			}
 
-			canvas.scale(2.0f, 2.0f);
+			canvas.scale(ZOOM_SCALE, ZOOM_SCALE);
 
 
 			// LOOP TO FIND IF TOUCH IS INSIDE SQUARE
@@ -276,20 +268,11 @@ public class drw
 			}
 
 
-			// draw text
-			if( drag[0] == 1 )
-			{
-				textMatrix.reDrawTextZoom(touchXZ, touchYZ, dX, dY);
-			}
-
-
-
+			textMatrix.reDrawTextZoom(touchXZ, touchYZ, dX, dY);
 
 			canvas.restore( );
 
-			// DISABLED TEMP :: rectLayout.invalidate( );
-
-			//rectTextLayout.invalidate( );
+			rectLayout.invalidate( );
 		}
 	}
 }

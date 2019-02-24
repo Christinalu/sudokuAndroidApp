@@ -1,6 +1,7 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -16,10 +17,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -45,6 +48,7 @@ public class GameActivity extends AppCompatActivity
 	private RelativeLayout rectTextLayout;
 	private View.OnTouchListener handleTouch;
 	private SudokuGenerator usrSudokuArr;
+	private FindSqrCoordToZoomInOn findSqrCoordToZoomInOn;
 
 	private int sqrLO; // original left coordinate of where puzzle starts
 	private int sqrTO; // original top coordinate of where puzzle starts
@@ -55,8 +59,6 @@ public class GameActivity extends AppCompatActivity
 
 	private Block[][] rectArr = new Block[9][9]; // stores all squares in a 2D array
 	private Paint paintblack = new Paint();
-	private Paint paintLight = new Paint( );
-	private RedrawText textOverlay; // class used to redraw GUI text overlay
 	private TextMatrix textMatrix; //stores the TextView for drawing the text
 
 	private int[] touchX = { 0 }; // hold user touch (x,y) coordinate
@@ -72,8 +74,6 @@ public class GameActivity extends AppCompatActivity
 	private int[] btnClicked = { 0 }; //flag which is activated when a button is clicked - used to let zoom drw class to update TextView (for efficiency purposes)
 
 	private int[] zoomOn = { 0 }; //indicates if user activated zoom 1==true, 0==false
-	//private int[] iX = { 0 }; //initial touch coordinate
-	//private int[] iY = { 0 };
 	private int[] dX = { 0 }; //change in X coordinate ie 'drag'
 	private int[] dY = { 0 };
 
@@ -83,11 +83,10 @@ public class GameActivity extends AppCompatActivity
 	private int[] touchYZclick = { 0 };
 	private int[] drag = { 0 }; // 1==user drags on screen
 
-	//private final static int BIT_MAP_W = 1052; //NOTE: !! this constant is also currently in .xml file - bitmap width (see later in code how to get this number)
-	//private final static int BIT_MAP_H = 1055; //bitmap height
 	private final static int SQR_INNER_DIVIDER = 5;
 	private final static int SQR_OUTER_DIVIDER = 15;
 	private final static int BOUNDARY_OFFSET = 40; //puzzle will have some offset for aesthetic reasons
+	private final static float ZOOM_SCALE = 1.5f; // zoom factor of how much to zoom in puzzle in "zoom" mode
 	private int PUZZLE_FULL_SIZE; // size of full puzzle from left most column pixel to right most column pixel
 
 	private int[] zoomButtonSafe = { 0 }; //used to prevent a 'click coordinate' from being tested if it is in a rect when switching to "zoom" mode because switching to the mode, should not test click
@@ -120,8 +119,9 @@ public class GameActivity extends AppCompatActivity
 			usrDiffPref =  (int) usrDiffPrefSrc.getSerializableExtra("usrDiffPref");
 		}
 
-        // stores the generated puzzle, including arrays of solution and user current puzzle
-        usrSudokuArr = new SudokuGenerator( usrDiffPref );
+		// stores the generated puzzle, including arrays of solution and user current puzzle
+		usrSudokuArr = new SudokuGenerator( usrDiffPref );
+
 
 		//create dictionary button
 		Button btnDictionary = (Button) findViewById(R.id.button_dictionary);
@@ -143,15 +143,22 @@ public class GameActivity extends AppCompatActivity
 			/**  INITIALIZE  **/
 
 		// get display metrics
+		int orientation = Configuration.ORIENTATION_UNDEFINED;
 		DisplayMetrics displayMetrics = new DisplayMetrics( );
-		getWindowManager( ).getDefaultDisplay( ).getMetrics( displayMetrics );
+		Display screen = getWindowManager( ).getDefaultDisplay( ); //get general display
+		screen.getMetrics( displayMetrics );
+
 		screenH = displayMetrics.heightPixels;
 		screenW = displayMetrics.widthPixels;
 
-		// create canvas and bitmap
+		//set orientation
+		if( screenH > screenW )
+		{
+			orientation = Configuration.ORIENTATION_PORTRAIT;
+		}else {
+			orientation = Configuration.ORIENTATION_LANDSCAPE;
+		}
 
-		// bitmap dimension: width=37+9×(105+5)+15+15−5=1052 height=40+9×(105+5)+15+15−5=1055
-		// important to keep this exactly for scaling ie "zoom mode"
 
 		//find minimum to create square bitmap
 		//note: in Canvas, a bitmap starts from coordinate (0,0), so a bitmap must cover the entire screen size
@@ -159,46 +166,81 @@ public class GameActivity extends AppCompatActivity
 		{ bitmapSize = screenH; }
 		else{ bitmapSize = screenW; }
 
-		/*//cap size at 1500px (do not consider screens with very small screen sizes, only large displays to limit CPU calculations)
-		if( bitmapSize > 1500 )
-		{ bitmapSize = 1500; }*/
 
-		bgMap = Bitmap.createBitmap( bitmapSize, bitmapSize, Bitmap.Config.ARGB_8888 );
-		canvas = new Canvas( bgMap );
+		rectLayout = (RelativeLayout) findViewById( R.id.rect_layout ); //used to detect user touch for matrix drw
+		rectTextLayout = (RelativeLayout) findViewById( R.id.rect_txt_layout ); //used to crop TextViews the same size as bitmap
+		imgView = new ImageView(this);
 
-		// find matrix single square size based on screen
-		sqrSize = ( bitmapSize - 2*BOUNDARY_OFFSET - 6*SQR_INNER_DIVIDER - 2*SQR_OUTER_DIVIDER ) / 9;
 
-		// find entire matrix puzzle size
-		PUZZLE_FULL_SIZE = 9*sqrSize + 6*SQR_INNER_DIVIDER + 2*SQR_OUTER_DIVIDER;
+		//status bar height
+		//this is needed as offset in landscape mode to alight rect matrix with textOverlay
+		int barH = getStatusBarHeight();
 
-		// center bitmap
+
+		// center bitmap based on orientation
 		// original coordinates of where to start to draw square (LO == Left Original)
 		// key: sqrLO/TO determines where the drawR class will start drawing from
-		sqrLO = BOUNDARY_OFFSET + (screenW-2*BOUNDARY_OFFSET)/2 - PUZZLE_FULL_SIZE/2; // if math correct, sqrLO should == BOUNDARY_OFFSET
-		sqrTO = BOUNDARY_OFFSET; // no boundary offset - note: boundary offset is already included in bitmapSize because width == height, so sqrSize calculated for sqrLO width assures the offset is included in height sqrTO
+		if( orientation == Configuration.ORIENTATION_LANDSCAPE ) //if in landscape mode, center bitmap on left side
+		{
+			sqrLO = BOUNDARY_OFFSET;
+			sqrTO = BOUNDARY_OFFSET;
 
-		Log.d( "TAG", "--sqrLO: " + sqrLO );
-		Log.d( "TAG", "--sqrTO: " + sqrTO );
+			// find matrix single square size based on screen
+			// barH needed in landscape mode
+			sqrSize = ( bitmapSize - barH - 2*BOUNDARY_OFFSET - 6*SQR_INNER_DIVIDER - 2*SQR_OUTER_DIVIDER ) / 9;
 
-		imgView = new ImageView(this);
+			// find entire matrix puzzle size
+			PUZZLE_FULL_SIZE = 9*sqrSize + 6*SQR_INNER_DIVIDER + 2*SQR_OUTER_DIVIDER;
+
+			bgMap = Bitmap.createBitmap( bitmapSize-barH, bitmapSize-barH, Bitmap.Config.ARGB_8888 );
+			canvas = new Canvas( bgMap );
+
+			//set rect_txt_layout the same size as the bitmap
+			rectTextLayout.getLayoutParams().height = bitmapSize-barH;
+			rectTextLayout.getLayoutParams().width = bitmapSize-barH;
+
+			rectLayout.getLayoutParams().height = bitmapSize-barH;
+			rectLayout.getLayoutParams().width = bitmapSize-barH;
+		}
+		else //in portrait mode
+		{
+			// find matrix single square size based on screen
+			sqrSize = ( bitmapSize - 2*BOUNDARY_OFFSET - 6*SQR_INNER_DIVIDER - 2*SQR_OUTER_DIVIDER ) / 9;
+
+			// find entire matrix puzzle size
+			PUZZLE_FULL_SIZE = 9*sqrSize + 6*SQR_INNER_DIVIDER + 2*SQR_OUTER_DIVIDER;
+
+			//if in portrait mode, center puzzle top of screen
+			sqrLO = BOUNDARY_OFFSET + (screenW - 2 * BOUNDARY_OFFSET) / 2 - PUZZLE_FULL_SIZE / 2; // if math correct, sqrLO should == BOUNDARY_OFFSET
+			sqrTO = BOUNDARY_OFFSET; // no boundary offset - note: boundary offset is already included in bitmapSize because width == height, so sqrSize calculated for sqrLO width assures the offset is included in height sqrTO
+
+			bgMap = Bitmap.createBitmap( bitmapSize, bitmapSize, Bitmap.Config.ARGB_8888 );
+			canvas = new Canvas( bgMap );
+
+			//set rect_txt_layout the same size as the bitmap
+			rectTextLayout.getLayoutParams().height = bitmapSize;
+			rectTextLayout.getLayoutParams().width = bitmapSize;
+
+			//note: limiting rectLayout to bitmap size will force a selected square to be deselected only when clicking inside the bitmap
+			//		it wont deselect when clicking outside, say near buttons
+			rectLayout.getLayoutParams().height = bitmapSize;
+			rectLayout.getLayoutParams().width = bitmapSize;
+		}
+
+
+		imgView.setImageBitmap( bgMap );
+
 		paint.setColor(Color.parseColor("#c2c2c2"));
 
-		// get the RelativeLayout rect_layout as the main layout to draw on
-		imgView.setImageBitmap( bgMap );
-		rectLayout = (RelativeLayout) findViewById( R.id.rect_layout ); //used to detect user touch for matrix drw
 		rectLayout.addView( imgView );
 
-		rectTextLayout = (RelativeLayout) findViewById( R.id.rect_txt_layout ); //used to crop TextViews the same size as bitmap
+		textMatrix = new TextMatrix( this, sqrSize, ZOOM_SCALE );
 
-		//set rect_txt_layout the same size as the bitmap
-		rectTextLayout.getLayoutParams().height = bitmapSize;
-		rectTextLayout.getLayoutParams().width = bitmapSize;
 
-		//rectTextLayout.setLayoutParams(  );
-
-		textMatrix = new TextMatrix( this, sqrSize );
-
+		// set up object to translate to selected square in "zoom" mode
+		// note: requires sqrSize be determined before call
+		findSqrCoordToZoomInOn = new FindSqrCoordToZoomInOn( touchXZ, touchYZ, currentRectColoured, bitmapSize,
+															 sqrSize, textMatrix, ZOOM_SCALE );
 
 
 
@@ -234,34 +276,17 @@ public class GameActivity extends AppCompatActivity
 		paintblack.setColor(Color.parseColor("#0000ff"));
 		paintblack.setTextSize(30);
 
-		// initialize text overlay
-		//textOverlay = new RedrawText( sqrLO, sqrTO, usrSudokuArr, canvas, paintblack, wordArray,
-		//		 					  SQR_INNER_DIVIDER, SQR_OUTER_DIVIDER, sqrSize );
-
 		drawR = new drw( rectArr, paint, canvas, rectLayout, rectTextLayout, textMatrix, usrSudokuArr, zoomOn, drag,
 						 dX, dY, touchXZ, touchYZ, zoomButtonSafe, zoomClickSafe, zoomButtonDisableUpdate,
-						 bitmapSize, wordArray, btnClicked ); // class used to draw/update square matrix
+						 bitmapSize, wordArray, btnClicked, ZOOM_SCALE ); // class used to draw/update square matrix
 
-		// call function to set all listeners - needs drawR, textOverlay
-		listeners = new ButtonListener( currentRectColoured, usrSudokuArr, textOverlay, btnArr,
+		// call function to set all listeners - needs drawR
+		listeners = new ButtonListener( currentRectColoured, usrSudokuArr, btnArr,
 										drawR, touchX, touchY, lastRectColoured, usrLangPref, btnClicked );
 
-		if( textOverlay == null )
-		{
-			Log.d( "NULL-2", "textOverlay initialized null" );
-		}
-
-
-
-		//
-		//	STATUS: trying to add individual linear layout for each textView to prevent marquee reset
-		//
 
 
 			/** CREATE RECT MATRIX **/
-
-
-		//canvas.drawColor( Color.parseColor( "#ffff00" ) );
 
 		for( int i=0; i<9; i++ ) //row
 		{
@@ -300,46 +325,16 @@ public class GameActivity extends AppCompatActivity
 				rectArr[i][j] = new Block( sqrL, sqrT, sqrR, sqrB ); // create the new square
 				//note: this loop has to be here and cannot be replaced by drw class
 
-				// add text view to relative layout
+				// add text view to relative layout matrix
 				textMatrix.newTextView( sqrL, sqrT, sqrSize, i, j, wordArray,
 												  usrSudokuArr, usrLangPref );
-				rectTextLayout.addView( textMatrix.getTextView( i, j ) );
+				rectTextLayout.addView( textMatrix.getRelativeTextView( i, j ) );
 			}
 		}
 
 
-		// test ////
-		/*TextView txtV = new TextView( this );
-		rectLayout.addView( txtV );
-		txtV.setX( -30f );
-		txtV.setText( "TEST" );*/
-		//////////
-
-
 		//draw matrix so far
 		drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
-
-
-		/////////////
-		//	note: the reason the puzzle is cut ~20px on the right hand side when dragging in 'zoom' mode
-		// 			(say when dragging in center of puzzle), the reason is because for nexus the width is 1080p
-		// 			but the bitmap is centered @(0,0) and its only 1052px, so there are 28px undrawn
-		//	note: the reason it doesnt deselect when pressed outside is because (if) shrinked
-		// 			the RelativeLayout to puzzle-size 1052p instead of "match_parent", it doesn't have an "outside" to click on
-		//	DO NOT FORGET TO ADJUST HINT POP-UP TO DISPLAY CORRECT LANGUAGES
-		///////////////////////
-
-		//////////////////////////
-		//
-		//	dont forget to also consider boundary offset at the end bounds of puzzle
-		//	see if puzzle still adapts correctly after reorienting (tilting) screen
-		//	add feature where when zooming in, it zooms to show selected (CHECK FIRST TO SEE IF SQR IS SELECTED to zoom on it, IF NOT, ie currectRect = (-1,-1) then default zoom in center
-		//	NOTE: for zoom activity to make more sense and be more effective, increase text size 1.5
-		//
-		//////////////////////////
-
-
-
 
 
 			/* ZOOM IN BUTTON */
@@ -358,6 +353,13 @@ public class GameActivity extends AppCompatActivity
 						zoomButtonDisableUpdate[0] = 1; //do not let button update coordinate when switching modes due to zoomX scaling
 
 						textMatrix.scaleTextZoomIn( );
+						textMatrix.reDrawTextZoom( touchXZ, touchYZ, dX, dY ); // call this because .scaleTextZoom() only scales Layouts, so call this to place them in correct (drag) position
+
+						touchXZ[0] = 0;
+						touchYZ[0] = 0;
+
+						// on zoom in, calculate coordinate to zoom on selected square
+						findSqrCoordToZoomInOn.findSqrCoordToZoomInOn( );
 
 						drawR.reDraw(touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref);
 
@@ -368,13 +370,6 @@ public class GameActivity extends AppCompatActivity
 				}
 			}
 		);
-
-
-
-		//////////////////////
-		//	here have to disable and re enable zoom buttons - pressing zoom in button twice redraws incorrectly
-		/////////////////
-
 
 
 			/* ZOOM OUT BUTTON */
@@ -391,8 +386,10 @@ public class GameActivity extends AppCompatActivity
 								zoomButtonSafe[0] = 1; // do not update sqr on button click
 								zoomClickSafe[0] = 1;
 								zoomButtonDisableUpdate[0] = 1; //do not let button update coordinate when switching modes due to zoomX scaling
+
 								drawR.reDraw(touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref);
 								textMatrix.scaleTextZoomOut( );
+
 								zoomButtonSafe[0] = 0;
 								zoomInBtnOn[0] = 1; //activate other zoom btn
 								zoomOutBtnOn[0] = 0; //deactivate this btn so text not scaled multiple times
@@ -428,14 +425,11 @@ public class GameActivity extends AppCompatActivity
 						zoomClickSafe[0] = 0;
 						zoomButtonDisableUpdate[0] = 0; //once user clicks, the coordinates are updated and become valid, so let button update sqr clicked
 
-						if( textOverlay == null )
-						{
-							Log.d( "NULL-2", "textOverlay null in onTouch in GameActivity" );
-						}
 
 						// SAVE ON CLICK COORDINATE
 						if( zoomOn[0] == 1 ) // when zoom mode enabled
 						{
+
 							touchXZclick[0] = (int) ( touchX[0] ); //where user clicked adjusted for translation for zoom
 							touchYZclick[0] = (int) ( touchY[0] ); //ie touchXZ was reference point (where "zoom" matrix was so far), now add extra
 
@@ -447,9 +441,6 @@ public class GameActivity extends AppCompatActivity
 						}
 						else
 						{
-							//iX[0] = touchX[0]; //initial coordinate where user touched
-							//iY[0] = touchY[0];
-
 							// call function to redraw if user touch detected
 							drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
 							Log.i("TAG", "normal click: (" + touchX[0] + ", " + touchY[0] + ")");
@@ -462,8 +453,8 @@ public class GameActivity extends AppCompatActivity
 						{
 							drag[0] = 1; //enable drag
 
-								/* GET 'DRAG' BOUND IN X-AXIS */
-							dX[0] = (touchX[0] ) - touchXZclick[0]; // change = initial - final
+								/* GET 'DRAG' BOUND IN X-AXIS AND BLOCK IF OUT-OF-BOUND */
+							dX[0] = touchX[0] - touchXZclick[0]; // change = initial - final
 
 							//fix out of bounds: LEFT
 							if( touchXZ[0] - dX[0] < 0 ) //detect out of bounds
@@ -473,21 +464,14 @@ public class GameActivity extends AppCompatActivity
 							}
 
 							//fix out of bounds: RIGHT
-							if( touchXZ[0] - dX[0] > bitmapSize )
+							if( touchXZ[0] - dX[0] > bitmapSize*ZOOM_SCALE - bitmapSize )
 							{
-								touchXZ[0] = bitmapSize; //set to max
+								touchXZ[0] = (int)(bitmapSize*ZOOM_SCALE - bitmapSize); //set to max
 								dX[0] = 0;
 							}
 
-							/////////////
-							//	here make sure to change out of bounds constants and make them adaptive
-							//	so they can adapt to screen ie change "out of bounds" to adapt to change
-							//	change to different screen resolutions
-							/////////////
-
-
-								/* GET 'DRAG' BOUND IN Y-AXIS */
-							dY[0] = (touchY[0] ) - touchYZclick[0];
+								/* GET 'DRAG' BOUND IN Y-AXIS AND BLOCK IF OUT-OF-BOUND */
+							dY[0] = touchY[0] - touchYZclick[0];
 
 							//fix out of bounds: TOP
 							if( touchYZ[0] - dY[0] < 0 ) //detect out of bounds
@@ -497,9 +481,9 @@ public class GameActivity extends AppCompatActivity
 							}
 
 							//fix out of bounds: BOTTOM
-							if( touchYZ[0] - dY[0] > bitmapSize )
+							if( touchYZ[0] - dY[0]  > bitmapSize*ZOOM_SCALE - bitmapSize )
 							{
-								touchYZ[0] = bitmapSize; //set to max
+								touchYZ[0] = (int)(bitmapSize*ZOOM_SCALE - bitmapSize); //set to max
 								dY[0] = 0;
 							}
 
@@ -524,8 +508,6 @@ public class GameActivity extends AppCompatActivity
 							drag[0] = 0; //disable drag
 
 							Log.i( "TAG", "moved dX: (" + dX[0] + ", " + dY[0] + ")" );
-							Log.d( "TAG", "click down touchXZclick after drag: (" + touchXZclick[0] + ", " + touchYZclick[0] + ")" );
-							Log.d( "TAG", "click up touchXZ: (" + touchXZ[0] + ", " + touchYZ[0] + ")" );
 						}
 						break;
 				}
@@ -534,8 +516,22 @@ public class GameActivity extends AppCompatActivity
 			}
 		};
 
+
 		// initialize onTouchListener as defined above
 		rectLayout.setOnTouchListener( handleTouch );
+	}
+
+
+	// GET TOP MENU BAR OFFSET
+	public int getStatusBarHeight( )
+	{
+		int result = 0;
+		int resourceId = getResources().getIdentifier( "status_bar_height", "dimen", "android" );
+		if( resourceId > 0 )
+		{
+			result = getResources().getDimensionPixelSize( resourceId );
+		}
+		return result;
 	}
 
 
@@ -547,5 +543,4 @@ public class GameActivity extends AppCompatActivity
 		//disable slide in animation
 		overridePendingTransition(0, 0);
 	}
-
 }
