@@ -1,10 +1,11 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 import android.util.Log;
 
+import java.io.Serializable;
 import java.util.Random;
 import static java.lang.Math.sqrt;
 
-public class SudokuGenerator {
+public class SudokuGenerator implements Serializable {
 
     /*
      *    -- IMPORTANT --

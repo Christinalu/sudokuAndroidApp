@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity
     RadioGroup Language;
     private int usrLangPref = 0; // 0=eng_fr, 1=fr_eng; 0 == native(squares that cannot be modified); 1 == translation(the words that the user inserts)
     private int usrDiffPref; //0=easy,1=medium,2=difficult
+    private int state; //0=new start, 1=resume
 
 
 	// SET UP ARRAY TO STORE WORDS
@@ -102,10 +103,42 @@ public class MainActivity extends AppCompatActivity
 					gameActivity.putExtra( "wordArray", wordArray );
                     gameActivity.putExtra( "usrLangPref", usrLangPref );
                     gameActivity.putExtra("usrDiffPref",usrDiffPref);
-
+                    gameActivity.putExtra("state", state);
+                    finish();
                     startActivity( gameActivity );
                 }
             }
         );
+        Button btnResume = (Button) findViewById(R.id.button_resume);
+        btnResume.setEnabled(false); //block Resume button unless a previous game is saved
+
+        //check if a previous game existed. If it did, unblock resume button
+        final Intent resumeSrc = getIntent( );
+        if (resumeSrc != null) {
+            //if all necessary game preferences are written in memory, then unblock resume button
+            if (resumeSrc.hasExtra("wordArrayGA") && resumeSrc.hasExtra("usrLangPrefGA") && resumeSrc.hasExtra("SudokuArrGA") && resumeSrc.hasExtra("state")) {
+                btnResume.setEnabled(true);
+            }
+        }
+        //if resume button is unblocked and pressed, it will load previous game preferences
+        btnResume.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //load previous game preferences to prepare for export to new Game Activity
+                Word[] wordArrayResume = (Word[]) resumeSrc.getSerializableExtra("wordArrayGA");
+                int usrLangPrefResume = (int) resumeSrc.getSerializableExtra("usrLangPrefGA");
+                SudokuGenerator usrSudokuArrResume = (SudokuGenerator) resumeSrc.getSerializableExtra("SudokuArrGA");
+                state = 1;
+
+                Intent resumeActivity = new Intent( MainActivity.this, GameActivity.class );
+                //save preferences for Game Activity to read
+                resumeActivity.putExtra( "wordArrayMA", wordArrayResume );
+                resumeActivity.putExtra( "usrLangPrefMA", usrLangPrefResume );
+                resumeActivity.putExtra("SudokuArrMA", usrSudokuArrResume);
+                resumeActivity.putExtra("state", state);
+                finish();
+                startActivity( resumeActivity );
+            }
+        });
     }
 }
