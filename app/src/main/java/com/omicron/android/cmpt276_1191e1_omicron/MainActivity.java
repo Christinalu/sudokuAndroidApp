@@ -34,7 +34,8 @@ public class MainActivity extends AppCompatActivity
 	private WordPackageFileIndex wordPackageFileIndexArr; //stores word packages name and internal file name
 	private String wordPackageName; //stores name of all Word Packages the user has so far
 	private int MAX_WORD_PKG = 5; //max word packages user is allowed to import
-	private int CURRENT_WORD_PKG_COUNT; //stores current number of packages the user has uploaded
+	private int[] CURRENT_WORD_PKG_COUNT = { 0 }; //stores current number of packages the user has uploaded
+	private FileCSV fileCSV; //object containing CSV functions
 	
 	
 	// SET UP ARRAY TO STORE WORDS
@@ -43,15 +44,15 @@ public class MainActivity extends AppCompatActivity
 	//       this is required in DictionaryActivity.java
 	private Word[] wordArray =new Word[]
 			{
-					new Word( "Un", "Un" ),
-					new Word( "Two", "Deux" ),
-					new Word( "Threeeeeeeeee", "Troisssssssss" ),
-					new Word( "Four", "Quatre" ),
-					new Word( "Five", "Cinq" ),
-					new Word( "Six", "Six" ),
-					new Word( "Seven", "Sept" ),
-					new Word( "Eightttttttttttttt", "Huitttttttttttttt" ),
-					new Word( "Nine", "Neuf" )
+					new Word( "Un", "Un", 1, 0 ),
+					new Word( "Two", "Deux", 2, 0 ),
+					new Word( "Threeeeeeeeee", "Troisssssssss", 3, 0 ),
+					new Word( "Four", "Quatre", 4, 0 ),
+					new Word( "Five", "Cinq", 5, 0 ),
+					new Word( "Six", "Six", 6, 0 ),
+					new Word( "Seven", "Sept", 7, 0 ),
+					new Word( "Eightttttttttttttt", "Huitttttttttttttt", 8, 0 ),
+					new Word( "Nine", "Neuf", 9, 0 )
 			};
 	
 	
@@ -62,15 +63,17 @@ public class MainActivity extends AppCompatActivity
 		super.onCreate( savedInstanceState );
 		setContentView( R.layout.activity_main );
 		
+		fileCSV = new FileCSV();
+		
 		//TEST IF USER JUST INSTALLED APP - IF USER HAS, LOAD DEFAULT FILES
-		int usrNewInstall = checkForCurrentWordPkgCountFile( ); //0==files already exist
+		int usrNewInstall = fileCSV.checkForCurrentWordPkgCountFile( this, CURRENT_WORD_PKG_COUNT ); //0==files already exist
 		
 		
 		if( usrNewInstall == 0 ) //if app was already installed and has correct files - get current_word_pkg_count
 			try {
-				CURRENT_WORD_PKG_COUNT = findCurrentPackageCount( ); //get current Packages count so far
+				CURRENT_WORD_PKG_COUNT[0] = fileCSV.findCurrentPackageCount( this ); //get current Packages count so far
 				Log.d( "upload", "---- MAX_WORD_PKG: " + MAX_WORD_PKG );
-				Log.d( "upload", "CURRENT_WORD_PKG_COUNT: " + CURRENT_WORD_PKG_COUNT );
+				Log.d( "upload", "CURRENT_WORD_PKG_COUNT: " + CURRENT_WORD_PKG_COUNT[0] );
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -78,9 +81,9 @@ public class MainActivity extends AppCompatActivity
 		{
 			try
 			{
-				importDefaultPkg( ); //load default Word Package
+				fileCSV.importDefaultPkg( this ); //load default Word Package
 				Log.d( "upload", "---- MAX_WORD_PKG :: FRESH INSTALL :: " + MAX_WORD_PKG );
-				Log.d( "upload", "CURRENT_WORD_PKG_COUNT :: FRESH INSTALL :: " + CURRENT_WORD_PKG_COUNT );
+				Log.d( "upload", "CURRENT_WORD_PKG_COUNT :: FRESH INSTALL :: " + CURRENT_WORD_PKG_COUNT[0] );
 			} catch( IOException e ) {
 				e.printStackTrace( );
 			}
@@ -183,7 +186,7 @@ public class MainActivity extends AppCompatActivity
 									@Override
 									public void onClick( View v )
 									{
-										if( CURRENT_WORD_PKG_COUNT < MAX_WORD_PKG ) //only allow if user did not reach max file upload
+										if( CURRENT_WORD_PKG_COUNT[0] < MAX_WORD_PKG ) //only allow if user did not reach max file upload
 										{
 											Intent uploadActivityIntent = new Intent(MainActivity.this, UploadActivity.class);
 											startActivity(uploadActivityIntent);
@@ -265,10 +268,13 @@ public class MainActivity extends AppCompatActivity
 		//////////////
 	
 		// TODO: dont forget to add user stories + TDD examples to cover all new features + features given as requirement
-	
+		// TODO: in user story say that "used  algorithm to automatically detect and more often select which words the user has difficulty with based on the number of times the user had to reveal a translation in Hint Pop-Up"
+		
 		// TODO: pull first +save copy, then merge
 	
 		// TODO: change SDK version in gradle back to 21
+		
+		// TODO: make sure to use onStop( ) instead of onDestroy( )
 	
 		//////////////////
 		//
@@ -282,6 +288,7 @@ public class MainActivity extends AppCompatActivity
 		// TODO: 	 files from Google Drive. However, if one may want to test by downloading from a website
 		// TODO:	 a easy way is to find a free temporary hosting website which provides a "upload" then "download" feature for a file
 		// TODO:	 One may additionally post a file on Google Drive, then upload it from there
+		// TODO:		+ let  user know the rules about csv file and other "text field" input ie Native Name <= 35 char
 		////////////////////////
 	
 		// TODO: when user inputing name of csv package ie "Chapter 1 Vocab", make sure to check such a package doesnt exist already
@@ -293,9 +300,21 @@ public class MainActivity extends AppCompatActivity
 	
 		// TODO: IMPORTANT: forbid commas when user give WordPackageName, ie analyse and remove user's input commas using str.replace(",", "");, this is necessary so that when putting data to word_pkg_name_file_name.csv, the comma does not interfere when using comma to separate pkg_name and internal_file_name;
 	
+		// TODO: make sure the "adapt text size according to sqrSize and zoom" exists in TextMatrix file
 	
+		// TODO: check that when user inputs Native lang and Translation, check and remove all commas AND limit to 35 char + non-empty (using string.replace( ",", "" );)
+		// TODO: tell user that the .csv file has to have Native langauge in 1st col and translation in 2nd column
 	
-	
+		// TODO: make sure each time the GameActivity onStop is called, save all data to file
+		// TODO: test if switching between Main and Game Activity preserves filled puzzle after implementing import
+		
+		// TODO: to test if "select words the user has difficulty with" works, use Package of ~20 words, and in hint pop-up spam ONLY a single word, check if the pkg_n.csv was correctly updated AND
+		// TODO:	+ after that restat couple of games and see if that word appears almost all the time; ie in 20 words if user used Hint on it 10 times, user should aprox see that word 50% of time, (with STATISTIC_MULTIPLE of 2)
+		
+		// TODO: use STATISTIC_MULTIPLE of two to actually double the likelyhood of word appearing (see paper note)
+		
+		// TODO: make sure when choosing words from .csv, make sure not to have Rand r choose the same word, ie loop to find word until a unused word was found + aldo limit Rand loop to ~10k for safety else, say and error occured and end activity
+		
 		// CHOOSE THE LEVEL OF DIFFICULTY
 		Difficulty = findViewById(R.id.button_level);
 		Difficulty.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -353,7 +372,7 @@ public class MainActivity extends AppCompatActivity
 					gameActivity.putExtra( "usrLangPref", usrLangPref );
 					gameActivity.putExtra("usrDiffPref",usrDiffPref);
 					gameActivity.putExtra("state", state);
-					finish();
+					finish( );
 					startActivity( gameActivity );
 				}
 			}
@@ -393,135 +412,10 @@ public class MainActivity extends AppCompatActivity
 	
 	
 	
-	private int findCurrentPackageCount( ) throws IOException
-	{
-		/*
-		 * This reads raw file resource, finds and returns an int representing how many WordPackages the user has uploaded so far
-		 */
-
-		/*InputStream inStream = getResources().openRawResource( R.raw.current_word_pkg_count ); //from RAW resource, get the current_count file
-		BufferedReader buffRead = new BufferedReader( new InputStreamReader( inStream ) ); //get bytes of file
-
-		String count = ""; //stores the count as from file as string
-
-		count = buffRead.readLine( );
-
-		return Integer.parseInt( count ); //convert string count to int
-		*/
-		
-		FileInputStream fileInStream = this.openFileInput( "current_word_pkg_count.txt" ); //open file from internal storage
-		InputStreamReader inStreamRead = new InputStreamReader( fileInStream );
-		BufferedReader buffRead = new BufferedReader( inStreamRead );
-		String countStr = buffRead.readLine( ); //get count int as string
-		
-		return Integer.parseInt( countStr ); //convert string count to int
-	}
 	
-	
-	private void importDefaultPkg( ) throws IOException
-	{
-		/*
-		 * This function is called when the user first installs the app to import a default package from resource file
-		 * Note: this is different from URI in Upload Activity
-		 */
-		
-		/* READ FILE */
-		InputStream inStream = getResources().openRawResource( R.raw.pkg_1 ); //from RAW resource, get the default pkg_1,csv file
-		BufferedReader buffRead = new BufferedReader( new InputStreamReader( inStream ) ); //get bytes of file
-		
-		String str; //store each line from .csv file
-		
-		StringBuilder strBuild = new StringBuilder( ); //used to concatinate all lines into single String Stream
-		
-		while( ( str = buffRead.readLine( ) ) != null ) //read lines from buffer until EOF
-		{
-			strBuild.append( str ); //append all lines to builder
-			strBuild.append( "\n" ); //"new line" char important to separate rows (because it is discarded when reading line by line
-		}
-		
-		String content = strBuild.toString( ); //get all content from file so far in a string
-		
-		//String localPath = Environment.getExternalStorageDirectory().toString( ); //get local phone storage path and go to Downloads folder
-		
-		String fileName = "pkg_1.csv";
-		
-		FileOutputStream outStream;
-		
-		try
-		{
-			outStream = openFileOutput( fileName, this.MODE_PRIVATE ); //open private output stream
-			outStream.write( content.getBytes( ) ); //convert string to bytes and write to file
-			outStream.close( ); //close and save file
-		}
-		catch( Exception e ) //in case of error
-		{
-			e.printStackTrace( );
-		}
-		
-	}
-	
-	
-	private int checkForCurrentWordPkgCountFile( )
-	{
-		/*
-		 * This function attempts to access wordPkgCount file
-		 * If file does not exist, it means user just downloaded the app and this function creates the wordPkgCount file
-		 * returns 0 if file already existed
-		 */
-		
-		String dirPath = getFilesDir().getAbsolutePath( ); //get path to local internal storage
-		
-		File dir = new File( dirPath ); //get File object storing all file names
-		File[] file = dir.listFiles( ); //save all file names (path) in an array
-		
-		
-		for( int i=0; i<file.length; i++ ) //for debugging
-		{
-			Log.d("upload", "file-name: " + file[i].getName( ) );
-			
-			if( file[i].getName().contentEquals( "current_word_pkg_count.txt" ) ) //check if such a file name already exists
-			{
-				//if it does exist - do nothing
-				return 0;
-			}
-		}
-		
-		// NO CURRENT_WORD_PKG DETECTED - CREATE NEW FILE (storing how many packages user has uploaded)
-		
-		String fileName = "current_word_pkg_count.txt";
-		
-		FileOutputStream outStream;
-		
-		try
-		{
-			outStream = openFileOutput( fileName, this.MODE_PRIVATE ); //open private output stream
-			outStream.write( ("1").getBytes( ) ); //convert string to bytes and write to file DEFAULT 1
-			outStream.close( ); //close and save file
-			CURRENT_WORD_PKG_COUNT = 1;
-		}
-		catch( Exception e ) //in case of error
-		{
-			e.printStackTrace( );
-		}
-		
-		// NO word_pkg_name_and_file_name.csv DETECTED - CREATE NEW FILE (storing csv database relating user defined WorkPackageName with corresponding internal file name)
-		
-		fileName = "word_pkg_name_and_file_name.csv";
-		
-		try
-		{
-			outStream = openFileOutput( fileName, this.MODE_PRIVATE ); //open private output stream
-			outStream.write( ("0-30 Numbers,pkg_1.csv\n").getBytes( ) ); //convert string to bytes and write to file DEFAULT 1
-			outStream.close( ); //close and save file
-		}
-		catch( Exception e ) //in case of error
-		{
-			e.printStackTrace( );
-		}
-		
-		return 1;
-	}
 }
+
+
 
 
 

@@ -574,4 +574,14 @@ public class GameActivity extends AppCompatActivity
 		//disable slide in animation
 		overridePendingTransition(0, 0);
 	}
+	
+	@Override
+	public void onStop( )
+	{
+		super.onStop( );
+	
+		//save all data
+		
+		Log.d( "upload", "onStop called for GameActivity" );
+	}
 }

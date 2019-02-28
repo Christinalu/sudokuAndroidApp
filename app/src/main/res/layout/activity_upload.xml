@@ -21,11 +21,30 @@
 	</ScrollView>
 
 	<EditText
-		android:id="@+id/editText"
+		android:id="@+id/editText_pkg_name"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:ems="10"
 		android:hint="Type Name of Word Package"
+		android:textSize="15dp"
+		android:inputType="textPersonName" />
+
+	<EditText
+		android:id="@+id/editText_native_name"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:ems="10"
+		android:hint="Type Name of Native Language"
+		android:textSize="15dp"
+		android:inputType="textPersonName" />
+
+	<EditText
+		android:id="@+id/editText_translation_name"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:ems="10"
+		android:hint="Type Name of Translation Language"
+		android:textSize="15dp"
 		android:inputType="textPersonName" />
 
     <Button

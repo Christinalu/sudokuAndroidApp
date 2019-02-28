@@ -7,10 +7,10 @@ public class WordPackageFileIndex
 	 */
 	
 	private int MAX_WORD_PKG;
-	private int CURRENT_WORD_PKG_COUNT;
+	private int[] CURRENT_WORD_PKG_COUNT;
 	private PackageFile[] packageFileArr; //stores pairs of Word Package name and internal file name
 	
-	public WordPackageFileIndex( int MAX_WORD_PKG2, int CURRENT_WORD_PKG_COUNT2 )
+	public WordPackageFileIndex( int MAX_WORD_PKG2, int[] CURRENT_WORD_PKG_COUNT2 )
 	{
 		String pkgName; //used to store wordPackageName
 		String fileName; //used to store internalFileName
@@ -18,11 +18,11 @@ public class WordPackageFileIndex
 		MAX_WORD_PKG = MAX_WORD_PKG2;
 		CURRENT_WORD_PKG_COUNT = CURRENT_WORD_PKG_COUNT2;
 
-		packageFileArr = new PackageFile[CURRENT_WORD_PKG_COUNT+1]; //as many as user has now +1 for new
+		packageFileArr = new PackageFile[CURRENT_WORD_PKG_COUNT[0]+1]; //as many as user has now +1 for new
 		
 		//warining: test if PackageFile line above should have size MAX_PKG_COUNT instead if activity nor re-craeted
 		
-		for( int i=0; i<CURRENT_WORD_PKG_COUNT+1; i++ )
+		for( int i=0; i<CURRENT_WORD_PKG_COUNT[0]+1; i++ )
 		{
 			/////////////
 			//
@@ -30,7 +30,7 @@ public class WordPackageFileIndex
 			//
 			//////////////
 			
-			packageFileArr[i] = new PackageFile( pkgName, fileName ); //add pair of WordPackageName and internal_storage_file_name
+			//packageFileArr[i] = new PackageFile( pkgName, fileName ); //add pair of WordPackageName and internal_storage_file_name
 		}
 	}
 	
