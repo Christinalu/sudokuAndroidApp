@@ -1,6 +1,7 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
 import android.content.Intent;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,6 +9,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 
 public class MainActivity extends AppCompatActivity
@@ -21,8 +31,12 @@ public class MainActivity extends AppCompatActivity
 	private int usrLangPref = 0; // 0=eng_fr, 1=fr_eng; 0 == native(squares that cannot be modified); 1 == translation(the words that the user inserts)
 	private int usrDiffPref; //0=easy,1=medium,2=difficult
 	private int state; //0=new start, 1=resume
-
-
+	private WordPackageFileIndex wordPackageFileIndexArr; //stores word packages name and internal file name
+	private String wordPackageName; //stores name of all Word Packages the user has so far
+	private int MAX_WORD_PKG = 5; //max word packages user is allowed to import
+	private int CURRENT_WORD_PKG_COUNT; //stores current number of packages the user has uploaded
+	
+	
 	// SET UP ARRAY TO STORE WORDS
 	// a Word (pair) contains the word in native language, and its translation
 	// note: this array will remain of size 9, and only changed when modes are switched
@@ -39,16 +53,54 @@ public class MainActivity extends AppCompatActivity
 					new Word( "Eightttttttttttttt", "Huitttttttttttttt" ),
 					new Word( "Nine", "Neuf" )
 			};
+	
+	
 
 	@Override
 	protected void onCreate( Bundle savedInstanceState )
 	{
 		super.onCreate( savedInstanceState );
 		setContentView( R.layout.activity_main );
-	
-	
-	
-	
+		
+		//TEST IF USER JUST INSTALLED APP - IF USER HAS, LOAD DEFAULT FILES
+		int usrNewInstall = checkForCurrentWordPkgCountFile( ); //0==files already exist
+		
+		
+		if( usrNewInstall == 0 ) //if app was already installed and has correct files - get current_word_pkg_count
+			try {
+				CURRENT_WORD_PKG_COUNT = findCurrentPackageCount( ); //get current Packages count so far
+				Log.d( "upload", "---- MAX_WORD_PKG: " + MAX_WORD_PKG );
+				Log.d( "upload", "CURRENT_WORD_PKG_COUNT: " + CURRENT_WORD_PKG_COUNT );
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		else
+		{
+			try
+			{
+				importDefaultPkg( ); //load default Word Package
+				Log.d( "upload", "---- MAX_WORD_PKG :: FRESH INSTALL :: " + MAX_WORD_PKG );
+				Log.d( "upload", "CURRENT_WORD_PKG_COUNT :: FRESH INSTALL :: " + CURRENT_WORD_PKG_COUNT );
+			} catch( IOException e ) {
+				e.printStackTrace( );
+			}
+		}
+		
+		
+		
+		wordPackageFileIndexArr = new WordPackageFileIndex( MAX_WORD_PKG, CURRENT_WORD_PKG_COUNT ); //allow a maximum of X packages
+		
+		
+		// TODO: dont forget to check is wordPackageFileIndexArr is full
+		// TODO: dont forget to update raw file "current_word_pgk_count.txt" when user uploads new file
+		
+		// TODO: dont forget to update raw file "current_word_pgk_count.txt" when user REMOVES file
+		// TODO: test if MAX_WORD_PKG limit is reached, that user cannot upload file
+		
+		// TODO: test user uploading multiple files in the same game
+		// TODO: test when user comes back from UploadActivity that the file was added in ScrollView ie pass intent back
+		// TODO: when user already has reached MAX_WORD_PKG, block user from pressing to import new file
+		
 		////////// APPLICATION storage
 		//String path = Environment.getExternalStorageDirectory().toString()+"";
 
@@ -118,13 +170,21 @@ public class MainActivity extends AppCompatActivity
 		//create button which will start new UploadActivity to upload and process .csv file
 		Button btn_upload = findViewById( R.id.btn_upload );
 		btn_upload.setOnClickListener(new View.OnClickListener( )
-									  {
-										  @Override
-										  public void onClick( View v ){
-											  Intent uploadActivityIntent = new Intent( MainActivity.this, UploadActivity.class );
-											  startActivity( uploadActivityIntent );
-										  }
-									  }
+								{
+									@Override
+									public void onClick( View v )
+									{
+										if( CURRENT_WORD_PKG_COUNT < MAX_WORD_PKG ) //only allow if user did not reach max file upload
+										{
+											Intent uploadActivityIntent = new Intent(MainActivity.this, UploadActivity.class);
+											startActivity(uploadActivityIntent);
+										}
+										else
+										{
+											Toast.makeText(MainActivity.this, "Maximum Upload Number of " + MAX_WORD_PKG  + " reached. Please delete a file first.", Toast.LENGTH_LONG).show( );
+										}
+									}
+								}
 		);
 	
 	
@@ -168,7 +228,7 @@ public class MainActivity extends AppCompatActivity
 	
 		////////////
 		//
-		//	TODO: import file from external /Downloads storage, validate file, and store in internal storage (which is private)
+		//	TODO: import file from external /Downloads storage, VALIDATE CSV file, and store in internal storage (which is private)
 		//	TODO: have a sql database that stores "Title of these pairs (ie Chapter 1)" and all file names (ie eng_fr.csv, eng_de.csv) and also the languages and word count
 		//	TODO: first deal with .csv file already inside app internal storage until prof answers questions
 		//
@@ -218,6 +278,9 @@ public class MainActivity extends AppCompatActivity
 		// TODO: when user inputing name of csv package ie "Chapter 1 Vocab", make sure to check such a package doesnt exist already
 		// TODO: add instruction to tell user to insert what to call the Word Package ie "Vocab 1"
 	
+		
+		// TODO: test app by uploading a file, selecting it, then playing game a little, then going back to main menu, then resume game - see if imported wordArray works
+		// TODO: test if CURRENT_WORD_PKG_COUNT is preserved when going to GameAct and back to MainAct
 	
 	
 	
@@ -317,4 +380,154 @@ public class MainActivity extends AppCompatActivity
 			}
 		});
 	}
+	
+	private int findCurrentPackageCount( ) throws IOException
+	{
+		/*
+		 * This reads raw file resource, finds and returns an int representing how many WordPackages the user has uploaded so far
+		 */
+
+		/*InputStream inStream = getResources().openRawResource( R.raw.current_word_pkg_count ); //from RAW resource, get the current_count file
+		BufferedReader buffRead = new BufferedReader( new InputStreamReader( inStream ) ); //get bytes of file
+
+		String count = ""; //stores the count as from file as string
+
+		count = buffRead.readLine( );
+
+		return Integer.parseInt( count ); //convert string count to int
+		*/
+		
+		FileInputStream fileInStream = this.openFileInput( "current_word_pkg_count.txt" ); //open file from internal storage
+		InputStreamReader inStreamRead = new InputStreamReader( fileInStream );
+		BufferedReader buffRead = new BufferedReader( inStreamRead );
+		String countStr = buffRead.readLine( ); //get count int as string
+		
+		return Integer.parseInt( countStr ); //convert string count to int
+	}
+	
+	
+	private void importDefaultPkg( ) throws IOException
+	{
+		/*
+		 * This function is called when the user first installs the app to import a default package from resource file
+		 * Note: this is different from URI in Upload Activity
+		 */
+		
+		/* READ FILE */
+		InputStream inStream = getResources().openRawResource( R.raw.pkg_1 ); //from RAW resource, get the default pkg_1,csv file
+		BufferedReader buffRead = new BufferedReader( new InputStreamReader( inStream ) ); //get bytes of file
+		
+		String str; //store each line from .csv file
+		
+		StringBuilder strBuild = new StringBuilder( ); //used to concatinate all lines into single String Stream
+		
+		while( ( str = buffRead.readLine( ) ) != null ) //read lines from buffer until EOF
+		{
+			strBuild.append( str ); //append all lines to builder
+			strBuild.append( "\n" ); //"new line" char important to separate rows (because it is discarded when reading line by line
+		}
+		
+		String content = strBuild.toString( ); //get all content from file so far in a string
+		
+		//String localPath = Environment.getExternalStorageDirectory().toString( ); //get local phone storage path and go to Downloads folder
+		
+		String fileName = "pkg_1.csv";
+		
+		FileOutputStream outStream;
+		
+		try
+		{
+			outStream = openFileOutput( fileName, this.MODE_PRIVATE ); //open private output stream
+			outStream.write( content.getBytes( ) ); //convert string to bytes and write to file
+			outStream.close( ); //close and save file
+		}
+		catch( Exception e ) //in case of error
+		{
+			e.printStackTrace( );
+		}
+		
+	}
+	
+	
+	private int checkForCurrentWordPkgCountFile( )
+	{
+		/*
+		 * This function attempts to access wordPkgCount file
+		 * If file does not exist, it means user just downloaded the app and this function creates the wordPkgCount file
+		 * returns 0 if file already existed
+		 */
+		
+		String dirPath = getFilesDir().getAbsolutePath( ); //get path to local internal storage
+		
+		File dir = new File( dirPath ); //get File object storing all file names
+		File[] file = dir.listFiles( ); //save all file names (path) in an array
+		
+		
+		for( int i=0; i<file.length; i++ ) //for debugging
+		{
+			Log.d("upload", "file-name: " + file[i].getName( ) );
+			
+			if( file[i].getName().contentEquals( "current_word_pkg_count.txt" ) ) //check if such a file name already exists
+			{
+				//if it does exist - do nothing
+				return 0;
+			}
+		}
+		
+		// NO CURRENT_WORD_PKG DETECTED - CREATE NEW FILE
+		
+		String fileName = "current_word_pkg_count.txt";
+		
+		FileOutputStream outStream;
+		
+		try
+		{
+			outStream = openFileOutput( fileName, this.MODE_PRIVATE ); //open private output stream
+			outStream.write( ("1").getBytes( ) ); //convert string to bytes and write to file DEFAULT 1
+			outStream.close( ); //close and save file
+			CURRENT_WORD_PKG_COUNT = 1;
+		}
+		catch( Exception e ) //in case of error
+		{
+			e.printStackTrace( );
+		}
+		return 1;
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

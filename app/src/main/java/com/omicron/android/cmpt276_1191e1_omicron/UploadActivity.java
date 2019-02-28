@@ -32,6 +32,7 @@ public class UploadActivity extends AppCompatActivity
 	int SAVE_REQUEST_CODE = 4;
 	Uri uri2;
 	private int[] fileSaved = { 0 }; //0 means there was an error - file not loaded
+	private int CURRENT_WORD_PKG_COUNT; //stores current number of packages the user has uploaded
 	
 	
 	@Override
@@ -55,9 +56,13 @@ public class UploadActivity extends AppCompatActivity
 					@Override
 					public void onClick( View v )
 					{
-						
+						//here check WordPackage name is not empty and <= 35 char
 						
 						findFileCSV( );
+						
+						
+						// TODO: also check that a internal file does not exist with same name, otherwise overwrite
+						// TODO: 	use scheme: package_1.csv package_2.csv... reason being can use loop to increment file name until a non-duplicate name found
 					}
 				}
 		);
@@ -182,6 +187,8 @@ public class UploadActivity extends AppCompatActivity
 		}
 		
 	}
+	
+	
 	
 	
 	

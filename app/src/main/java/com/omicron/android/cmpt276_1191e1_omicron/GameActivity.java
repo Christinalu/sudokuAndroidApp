@@ -546,14 +546,7 @@ public class GameActivity extends AppCompatActivity
 	}
 
 
-	@Override
-	public void onStart( )
-	{
-		super.onStart( );
-
-		//disable slide in animation
-		overridePendingTransition(0, 0);
-	}
+	
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
@@ -572,5 +565,13 @@ public class GameActivity extends AppCompatActivity
 		gameActivity.putExtra("SudokuArrGA", usrSudokuArr);
 		gameActivity.putExtra("state", state);
 		startActivity( gameActivity );
+	}
+	
+	@Override
+	public void onStart( )
+	{
+		super.onStart( );
+		//disable slide in animation
+		overridePendingTransition(0, 0);
 	}
 }
