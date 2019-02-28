@@ -30,7 +30,7 @@ public class WordPackageFileIndex
 			//
 			//////////////
 			
-			//packageFileArr[i] = new PackageFile( pkgName, fileName ); //add pair of WordPackageName and internal_storage_file_name
+			packageFileArr[i] = new PackageFile( pkgName, fileName ); //add pair of WordPackageName and internal_storage_file_name
 		}
 	}
 	

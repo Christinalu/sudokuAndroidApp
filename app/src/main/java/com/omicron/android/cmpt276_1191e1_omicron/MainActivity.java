@@ -86,6 +86,15 @@ public class MainActivity extends AppCompatActivity
 			}
 		}
 		
+		///////////
+		//
+		//	## NEXT: finish WordPackageFileIndex( ) creating array that stores WordPkgName and internal_storage_name
+		//   		 	+ add these as a .csv file in internal storage (see already created "word_pkg_name_and_file_name.csv")
+		//				+ if user just installed app, create
+		//
+		///////////
+		
+		
 		
 		
 		wordPackageFileIndexArr = new WordPackageFileIndex( MAX_WORD_PKG, CURRENT_WORD_PKG_COUNT ); //allow a maximum of X packages
@@ -282,6 +291,7 @@ public class MainActivity extends AppCompatActivity
 		// TODO: test app by uploading a file, selecting it, then playing game a little, then going back to main menu, then resume game - see if imported wordArray works
 		// TODO: test if CURRENT_WORD_PKG_COUNT is preserved when going to GameAct and back to MainAct
 	
+		// TODO: IMPORTANT: forbid commas when user give WordPackageName, ie analyse and remove user's input commas using str.replace(",", "");, this is necessary so that when putting data to word_pkg_name_file_name.csv, the comma does not interfere when using comma to separate pkg_name and internal_file_name;
 	
 	
 	
@@ -381,6 +391,8 @@ public class MainActivity extends AppCompatActivity
 		});
 	}
 	
+	
+	
 	private int findCurrentPackageCount( ) throws IOException
 	{
 		/*
@@ -474,7 +486,7 @@ public class MainActivity extends AppCompatActivity
 			}
 		}
 		
-		// NO CURRENT_WORD_PKG DETECTED - CREATE NEW FILE
+		// NO CURRENT_WORD_PKG DETECTED - CREATE NEW FILE (storing how many packages user has uploaded)
 		
 		String fileName = "current_word_pkg_count.txt";
 		
@@ -491,6 +503,22 @@ public class MainActivity extends AppCompatActivity
 		{
 			e.printStackTrace( );
 		}
+		
+		// NO word_pkg_name_and_file_name.csv DETECTED - CREATE NEW FILE (storing csv database relating user defined WorkPackageName with corresponding internal file name)
+		
+		fileName = "word_pkg_name_and_file_name.csv";
+		
+		try
+		{
+			outStream = openFileOutput( fileName, this.MODE_PRIVATE ); //open private output stream
+			outStream.write( ("0-30 Numbers,pkg_1.csv\n").getBytes( ) ); //convert string to bytes and write to file DEFAULT 1
+			outStream.close( ); //close and save file
+		}
+		catch( Exception e ) //in case of error
+		{
+			e.printStackTrace( );
+		}
+		
 		return 1;
 	}
 }

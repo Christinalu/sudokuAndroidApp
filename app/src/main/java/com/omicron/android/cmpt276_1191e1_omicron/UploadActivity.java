@@ -175,6 +175,9 @@ public class UploadActivity extends AppCompatActivity
 		
 		FileOutputStream outStream;
 		
+		// TODO: make sure no file with same name is overwritten
+		// TODO: update current_word_pkg_count.txt
+		
 		try
 		{
 			outStream = openFileOutput( fileName, this.MODE_PRIVATE ); //open private output stream
