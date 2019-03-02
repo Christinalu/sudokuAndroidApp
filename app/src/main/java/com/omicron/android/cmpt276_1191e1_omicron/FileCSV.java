@@ -9,10 +9,12 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 public class FileCSV
 {
@@ -20,7 +22,9 @@ public class FileCSV
 	 * This method validates if the provided file is valid CSV file
 	 */
 	
-	
+	private int MAX_CSV_ROW = 150; //allow up to 150 pairs per package
+	private int MAX_WORD_LEN = 35; //only allow words with max 35 char
+	private int MAX_LANG_LEN = 25; //only allow language names up to 25 char
 	
 	public FileCSV( )
 	{
@@ -52,11 +56,11 @@ public class FileCSV
 	}
 	
 	
-	public int checkForCurrentWordPkgCountFile( Context context, int[] CURRENT_WORD_PKG_COUNT )
+	public int checkIfCurrentWordPkgCountFileExists( Context context, int[] CURRENT_WORD_PKG_COUNT )
 	{
 		/*
 		 * This function attempts to access wordPkgCount file
-		 * If file does not exist, it means user just downloaded the app and this function creates the wordPkgCount file
+		 * If file does not exist, it means user just downloaded the app and this function creates the current_WordPkgCount and word_pkg_name_and_file file
 		 * returns 0 if file already existed
 		 */
 		
@@ -127,7 +131,7 @@ public class FileCSV
 		
 		String str; //store each line from .csv file
 		
-		StringBuilder strBuild = new StringBuilder( ); //used to concatinate all lines into single String Stream
+		StringBuilder strBuild = new StringBuilder( ); //used to concatenate all lines into single String Stream
 		
 		while( ( str = buffRead.readLine( ) ) != null ) //read lines from buffer until EOF
 		{
@@ -173,12 +177,22 @@ public class FileCSV
 		
 		// TODO: make sure no file with same name is overwritten
 		// TODO: update current_word_pkg_count.txt
+		// TODO: use naming scheme pkg_n.csv
+		// TODO:	- IMPORTANT: here loop through all pkg_ names so far and find a number k that was not used so far and use that as pkg_k.csv
+		// TODO:		- create valNumArr array of size PKG_MAX_COUNT = 50 and loop through csv file and extract _n by ignoring "pkg_" and mark that 'n-1' (has to be n-1 because arr start @0) as used
+		// TODO:			- then loop through valNumArr and find first 'n' that was no used and use that as pkg name
+		// TODO: 			- BUT MAKE SURE when reading from valNumArr which 'n' is available, remember to increase that count +1 back when saving to word_pkg_name_file
+		// TODO:			- ie if n=15 was not used, then in numValArr n=14 and then when saving to word_pkg_name_file n=15 again
+		// TODO:		- dont forget to add this file name  + user WordPackage name in the word_pkg_name data file
 		
 		try
 		{
 			outStream = context.openFileOutput( fileName, context.MODE_PRIVATE ); //open private output stream
 			outStream.write( str.getBytes( ) ); //convert string to bytes and write to file
 			outStream.close( ); //close and save file
+			
+			//increase pkg count in file
+			increaseCurrentWordPkgCount( context );
 		}
 		catch( Exception e ) //in case of error
 		{
@@ -188,10 +202,11 @@ public class FileCSV
 	}
 	
 	
-	public String readCSVUri( Context context, Uri uri )throws IOException
+	public String readCSVUri( Context context, Uri uri ) throws IOException //
 	{
 		/*
 		 * Returns a string containing the .csv data
+		 * Returns empty string if file does not have proper formatting
 		 */
 		InputStream inStream = context.getContentResolver().openInputStream( uri ); //create a InputStream by reading bytes
 		
@@ -201,18 +216,86 @@ public class FileCSV
 		String strLine; //store each line from .csv file
 		StringBuilder strBuild = new StringBuilder( ); //used to concatinate all lines into single String Stream
 		
+		// TODO: when implementing feature to allow user to upload audio files, it may not be necessary to change code below; just dont add a 3rd cell in the first line, ie only the word pairs have 3 cells to include audio
+		
+		// read first line and extract native and translation language //
+		// first line must have two cells, so check if only one "comma" is present, other wise the line does not contain both language, or contains too many cells or contains commas, which are no allowed
+		// also check if any parsed strings are null, ie if the cell is empty
+		// and check if language <= MAX_LANG_LEN
+		
+		String[] splitLine; //array to store the strings parsed from line by comma
+		strLine = buffRead.readLine( ); //get first line
+		splitLine = strLine.split( "," ); //split by comma
+		
+		int commaCount = countChar( strLine, ',' ); //find how many commas there are in string
+		
+		if( splitLine.length == 2 && splitLine[0].length() > 0 && splitLine[1].length() > 0 && commaCount == 1 && //also check that if 2 attributes then there should be 1 comma
+			splitLine[0].length() <= MAX_LANG_LEN && splitLine[1].length() <= MAX_LANG_LEN ) //check for correct formatting; ie if not null, all cells filled, if not enough or too many cells
+		{
+			strBuild.append( splitLine[0] + "," + splitLine[1] + "\n" ); //if correct format add the lang to file
+		}
+		else //file has improper formatting
+		{ return ""; }
+		
+		
 		while( ( strLine = buffRead.readLine( ) ) != null ) //read lines from buffer until EOF
 		{
-			// TODO: here have to scheck if .csv file has correct format (2 attribute); use "String[] splitArr = strLine.split( "," )" and test if splitArr.size == 2, for all string lines
-			// TODO:	+ check each of splitArr[i] if each string.size is NOT 0, and <=35
-			// TODO:	+ check if files have at most 150 word pairs - when testing, dont forget to change LIMIT back to 150
+			// TODO: here have to check if .csv file has correct format (2 attribute); use "String[] splitArr = strLine.split( "," )" and test if splitArr.size == 2, for all string lines
+			// TODO:	+ check each of splitArr[i] if each string.size is NOT 0, and <=MAX_WORD_LEN
+			// TODO:	+ check if files have at most MAX_CSV_ROW word pairs - when testing, dont forget to change LIMIT back to 150
 			// TODO:	+ if test arrived until here, check there should ONLY BE 1 comma per line : test this
+			// TODO:	+ fix case where last col is empty ie csv file line is "one,", the second word is missing so fix this case by saying (after parsing the line in lineSplit[]) "if( lineSplit[0].length() > 0 ie not null AND lineSplit.length == 2 ie only 2 columns ){ }else{ say that file has incorrect format ie missing or extra cell/col }
+			// TODO:		- check this by giving invalid csv files WITH ONLY ONE INVALID THING, because multipe invalid things in a single file may not catch all errors, so always test if single error is caught
+			// NOTE: leave the pkg, lang and trans name in XML because its easier to check valid input
+			// TODO: if csv file is improper then return null
+			// TODO: add languages from first row to word_pkg_name_file
+			
+			// here check if line is valid, then if valid add to strBuild
+			
 			
 			strBuild.append( strLine ); //append all lines to builder
 			strBuild.append( "\n" ); //"new line" char important to separate rows (because it is discarded when reading line by line
 		}
 		
 		return strBuild.toString( ); //return StringBuilder as String
+	}
+	
+	
+	public void increaseCurrentWordPkgCount( Context context ) throws IOException //
+	{
+		/*
+		 * This method is called when a word_pkg was added, so current_word_pkg_count needs to be increased
+		 */
+		
+		// READ THE NUMBER OF PKG SO FAR //
+		FileInputStream fileInStream = context.openFileInput( "current_word_pkg_count.txt" ); //open file from internal storage
+		InputStreamReader inStreamRead = new InputStreamReader( fileInStream );
+		BufferedReader buffRead = new BufferedReader( inStreamRead );
+		
+		String countStr = buffRead.readLine( ); //get pkg count so far int as string
+		
+		// INCREASE AND SAVE TO FILE //
+		try {
+			OutputStreamWriter outStreamWrite = new OutputStreamWriter( context.openFileOutput( "current_word_pkg_count.txt", Context.MODE_PRIVATE ) );
+			outStreamWrite.write( Integer.toString( Integer.parseInt( countStr ) + 1 ) ); //write new count to file
+			outStreamWrite.close( );
+		}
+		catch( IOException e ){
+			Log.d("upload", "ERROR: increaseCurrentWordPkgCount( ) file write failed" );
+		}
+	}
+	
+	
+	private int countChar( String str, char c ) //count how many times a char is contained in string
+	{
+		int count = 0;
+		
+		for( int i=0; i<str.length(); i++ )
+		{
+			if( str.charAt(i) == c )
+			{ count++; }
+		}
+		return count;
 	}
 	
 	

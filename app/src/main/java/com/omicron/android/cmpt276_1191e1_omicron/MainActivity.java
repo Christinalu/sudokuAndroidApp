@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -65,9 +67,13 @@ public class MainActivity extends AppCompatActivity
 		
 		fileCSV = new FileCSV();
 		
-		//TEST IF USER JUST INSTALLED APP - IF USER HAS, LOAD DEFAULT FILES
-		int usrNewInstall = fileCSV.checkForCurrentWordPkgCountFile( this, CURRENT_WORD_PKG_COUNT ); //0==files already exist
+		//long testLong = Long.parseLong( "123456789123451" );
+		//Log.d( "upload", "long: " + testLong );
 		
+		//TEST IF USER JUST INSTALLED APP - IF USER HAS, LOAD DEFAULT FILES
+		int usrNewInstall = fileCSV.checkIfCurrentWordPkgCountFileExists( this, CURRENT_WORD_PKG_COUNT ); //0==files already exist
+		
+		Log.d( "upload", "-------------------------------" );
 		
 		if( usrNewInstall == 0 ) //if app was already installed and has correct files - get current_word_pkg_count
 			try {
@@ -91,6 +97,8 @@ public class MainActivity extends AppCompatActivity
 		
 		///////////
 		//
+		//	## NEXT: work on readCSVFile( ) to check if csv file is valid (format)
+		//
 		//	## NEXT: finish WordPackageFileIndex( ) creating array that stores WordPkgName and internal_storage_name
 		//   		 	+ add these as a .csv file in internal storage (see already created "word_pkg_name_and_file_name.csv")
 		//				+ if user just installed app, create
@@ -99,8 +107,22 @@ public class MainActivity extends AppCompatActivity
 		
 		
 		
+		// read all packages the user has uploaded so far, and get an array with name and file
+		try {
+			wordPackageFileIndexArr = new WordPackageFileIndex( this, MAX_WORD_PKG, CURRENT_WORD_PKG_COUNT ); //allow a maximum of X packages
+		} catch( IOException e ){
+			e.printStackTrace( );
+		}
 		
-		wordPackageFileIndexArr = new WordPackageFileIndex( MAX_WORD_PKG, CURRENT_WORD_PKG_COUNT ); //allow a maximum of X packages
+		if( wordPackageFileIndexArr.length( ) > 0 ) //boundary check -redundant since if it were empty, by now the default would have been loaded
+		{
+			Log.d("upload", "[0] filename: " + wordPackageFileIndexArr.getPackageFileAtIndex(0).getInternalFileName());
+			Log.d("upload", "[0] pkg name: " + wordPackageFileIndexArr.getPackageFileAtIndex(0).getWordPackageName());
+			Log.d("upload", "[0] native: " + wordPackageFileIndexArr.getPackageFileAtIndex(0).getNativeLang());
+			Log.d("upload", "[0] trans: " + wordPackageFileIndexArr.getPackageFileAtIndex(0).getTranslateLang());
+		}
+		else
+		{ Log.d( "upload", "wordPackageFileIndexArr is empty" ); }
 		
 		
 		// TODO: dont forget to check is wordPackageFileIndexArr is full
@@ -112,6 +134,15 @@ public class MainActivity extends AppCompatActivity
 		// TODO: test user uploading multiple files in the same game
 		// TODO: test when user comes back from UploadActivity that the file was added in ScrollView ie pass intent back
 		// TODO: when user already has reached MAX_WORD_PKG, block user from pressing to import new file
+		
+		// TODO: dont forget that whenever user switches packages, also switch the langauges in the mode "radio group" ie change "English to French" to "English to Spanish"
+		// TODO: capitalize the first letter of the Langauge input
+		
+		// TODO: implement feature to allow user to delete a package
+		// TODO: however, DO NOT allow user to delete default packages
+		// TODO: change MAX_WORD_PKG back to 50
+		
+		// TODO: also mention that first row of CSV file must contain languages
 		
 		////////// APPLICATION storage
 		//String path = Environment.getExternalStorageDirectory().toString()+"";
@@ -177,8 +208,9 @@ public class MainActivity extends AppCompatActivity
 	
 	
 		//////// SD download
-	
-	
+		
+		
+		
 		//create button which will start new UploadActivity to upload and process .csv file
 		Button btn_upload = findViewById( R.id.btn_upload );
 		btn_upload.setOnClickListener(new View.OnClickListener( )
@@ -188,12 +220,12 @@ public class MainActivity extends AppCompatActivity
 									{
 										if( CURRENT_WORD_PKG_COUNT[0] < MAX_WORD_PKG ) //only allow if user did not reach max file upload
 										{
-											Intent uploadActivityIntent = new Intent(MainActivity.this, UploadActivity.class);
-											startActivity(uploadActivityIntent);
+											Intent uploadActivityIntent = new Intent( MainActivity.this, UploadActivity.class );
+											startActivity( uploadActivityIntent );
 										}
 										else
 										{
-											Toast.makeText(MainActivity.this, "Maximum Upload Number of " + MAX_WORD_PKG  + " reached. Please delete a file first.", Toast.LENGTH_LONG).show( );
+											Toast.makeText( MainActivity.this, "Maximum Upload Number of " + MAX_WORD_PKG  + " reached. Please delete a file first.", Toast.LENGTH_LONG ).show( );
 										}
 									}
 								}
@@ -293,16 +325,15 @@ public class MainActivity extends AppCompatActivity
 	
 		// TODO: when user inputing name of csv package ie "Chapter 1 Vocab", make sure to check such a package doesnt exist already
 		// TODO: add instruction to tell user to insert what to call the Word Package ie "Vocab 1"
-	
 		
 		// TODO: test app by uploading a file, selecting it, then playing game a little, then going back to main menu, then resume game - see if imported wordArray works
 		// TODO: test if CURRENT_WORD_PKG_COUNT is preserved when going to GameAct and back to MainAct
 	
-		// TODO: IMPORTANT: forbid commas when user give WordPackageName, ie analyse and remove user's input commas using str.replace(",", "");, this is necessary so that when putting data to word_pkg_name_file_name.csv, the comma does not interfere when using comma to separate pkg_name and internal_file_name;
+		// TODO: IMPORTANT: (already implemented in XML EditText) forbid commas when user give WordPackageName, ie analyse and remove user's input commas using str.replace(",", "");, this is necessary so that when putting data to word_pkg_name_file_name.csv, the comma does not interfere when using comma to separate pkg_name and internal_file_name;
 	
 		// TODO: make sure the "adapt text size according to sqrSize and zoom" exists in TextMatrix file
 	
-		// TODO: check that when user inputs Native lang and Translation, check and remove all commas AND limit to 35 char + non-empty (using string.replace( ",", "" );)
+		// TODO:  (already implemented in XML EditText) limit to 35 char + non-empty (using string.replace( ",", "" );)
 		// TODO: tell user that the .csv file has to have Native langauge in 1st col and translation in 2nd column
 	
 		// TODO: make sure each time the GameActivity onStop is called, save all data to file
@@ -313,7 +344,15 @@ public class MainActivity extends AppCompatActivity
 		
 		// TODO: use STATISTIC_MULTIPLE of two to actually double the likelyhood of word appearing (see paper note)
 		
-		// TODO: make sure when choosing words from .csv, make sure not to have Rand r choose the same word, ie loop to find word until a unused word was found + aldo limit Rand loop to ~10k for safety else, say and error occured and end activity
+		// TODO: make sure when choosing words from .csv, make sure not to have Rand r choose the same word, ie loop to find word until a unused word was found + also limit Rand loop to ~10k for safety else, say and error occured and end activity
+		// TODO: check when user inserts package name if such a package already exists, if it does, exit and show msg
+		
+		// # # # NOTE: switched language named from xml to inside file so user does not have to know which column is which, ie language will have corresponding word under it
+		
+		// TODO: make sure to let user know that first row in CSV has to contain language
+		
+		
+		
 		
 		// CHOOSE THE LEVEL OF DIFFICULTY
 		Difficulty = findViewById(R.id.button_level);

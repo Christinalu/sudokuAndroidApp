@@ -10,10 +10,10 @@ public class Word implements Serializable
 	private String mNative;
 	private String mTranslation;
 	private int mInFileLineNum; //stores on which line in .csv this word is found
-	private int mHintClick; //stores the number of times the user had difficulty with a word
+	private long mHintClick; //stores the number of times the user had difficulty with a word
 
 	//create a word
-	public Word( String wordNative, String wordTranslation, int inFileLineNum, int hintClick )
+	public Word( String wordNative, String wordTranslation, int inFileLineNum, long hintClick )
 	{
 		mNative = wordNative;
 		mTranslation = wordTranslation;
@@ -31,5 +31,5 @@ public class Word implements Serializable
 	
 	public void updateHintClick( int newHintClick ){ mHintClick = newHintClick; }
 	
-	public int getHintClick(  ){ return mHintClick; }
+	public long getHintClick(  ){ return mHintClick; }
 }

@@ -22,30 +22,41 @@
 
 	<EditText
 		android:id="@+id/editText_pkg_name"
-		android:layout_width="match_parent"
+		android:layout_width="220dp"
 		android:layout_height="wrap_content"
+		android:layout_gravity="center"
 		android:ems="10"
-		android:hint="Type Name of Word Package"
+		android:hint="Name of Word Package"
 		android:textSize="15dp"
-		android:inputType="textPersonName" />
+		android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -_!/()'0123456789"
+		android:maxLength="35"
+		android:inputType="textCapSentences" />
 
+	<!--
 	<EditText
 		android:id="@+id/editText_native_name"
-		android:layout_width="match_parent"
+		android:layout_width="220dp"
 		android:layout_height="wrap_content"
+		android:layout_gravity="center"
 		android:ems="10"
-		android:hint="Type Name of Native Language"
+		android:hint="Language of first column"
 		android:textSize="15dp"
-		android:inputType="textPersonName" />
+		android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		android:maxLength="25"
+		android:inputType="textCapSentences" />
 
 	<EditText
 		android:id="@+id/editText_translation_name"
-		android:layout_width="match_parent"
+		android:layout_width="220dp"
 		android:layout_height="wrap_content"
+		android:layout_gravity="center"
 		android:ems="10"
-		android:hint="Type Name of Translation Language"
+		android:hint="Language of second column"
 		android:textSize="15dp"
-		android:inputType="textPersonName" />
+		android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		android:maxLength="25"
+		android:inputType="textCapSentences" />
+	-->
 
     <Button
 		android:id="@+id/upload_file"

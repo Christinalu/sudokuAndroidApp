@@ -11,9 +11,11 @@ import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,9 +55,20 @@ public class UploadActivity extends AppCompatActivity
 		//	IN THIS ACTIVITY ADD INSTRUCTIONS TO USER
 		//
 		
+		// NOTE: xml EditText fields have restricted characters
+		// 		notably commas are restricted especially in "Word Package Name" not to interfier with CSV format
+		
 		// TODO: 	## IMPORTANT ##
 		// TODO: dont forget to use STATISTIC_MULTIPLE of 2, to double the chances of word appearing
 		// TODO:	- ie if "Hint clicks" was 8 in a game, then double it to 16 when saving to file to make it more likely for word to reappear
+		
+		
+		
+		//get text field id
+		final EditText editTextPkgName = (EditText) findViewById( R.id.editText_pkg_name );
+		//final EditText editTextNative = (EditText) findViewById( R.id.editText_native_name );
+		//final EditText editTextTranslation = (EditText) findViewById( R.id.editText_translation_name );
+		
 		
 			/* UPLOAD CSV FILE BUTTON */
 		Button uploadFileBtn = findViewById( R.id.upload_file );
@@ -66,14 +79,30 @@ public class UploadActivity extends AppCompatActivity
 					{
 						//here check WordPackage name is not empty and <= 35 char
 						
-						findFileCSV( );
+						// NOTE: is the above done in readCSVUri( ), so no need to do it here ????
 						
+						
+						//check if fields are not empty
+						if( TextUtils.isEmpty( editTextPkgName.getText( ) ) //||
+								//TextUtils.isEmpty( editTextNative.getText( ) ) ||
+								//TextUtils.isEmpty( editTextTranslation.getText( ) )
+							) //if any field empty
+						{
+							Toast.makeText( UploadActivity.this, "All text fields must not be empty", Toast.LENGTH_LONG ).show( );
+							
+						}
+						else //fields contain at least 1 char
+						{
+							findFileCSV( );
+						}
 						
 						// TODO: also check that a internal file does not exist with same name, otherwise overwrite
 						// TODO: 	use scheme: package_1.csv package_2.csv... reason being can use loop to increment file name until a non-duplicate name found
 					
 						// TODO: dont forget to check when user provides Native and Translation Language names, remove all commas AND limit to 35 char + non-empty
 						// TODO:	- check if EditText (in xml) fields are filled
+						
+						// TODO: use "long" instead of "int" to store total 'n' "Hint clicks" ie:  long index = Rand r % (long) n; (here n is total "hint" clicks)
 					}
 				}
 		);
@@ -103,6 +132,15 @@ public class UploadActivity extends AppCompatActivity
 					// get .csv file content as a String
 					String contentCSV = fileCSV.readCSVUri( this, uri );
 					
+					Log.d( "upload", "contentCSV: " + contentCSV );
+					
+					//if readCSVUri( ) returns empty string, it means the CSV is not properly formatted
+					if( contentCSV.contentEquals( "" ) ){
+						Toast.makeText(UploadActivity.this, "CSV file has incorrect formatting. File not uploaded", Toast.LENGTH_LONG).show( );
+						Log.d( "upload", "incorrect CSV format" );
+						return;
+					}
+					
 					fileCSV.saveCSVFile( this, contentCSV ); //write data to new file in internal storage
 					Toast.makeText(UploadActivity.this, "File stored in app internal storage", Toast.LENGTH_LONG).show( );
 				}
@@ -123,13 +161,6 @@ public class UploadActivity extends AppCompatActivity
 		 * NOTE: this function must be called from this Activity
 		 */
 		
-		final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
-		
-		//checkStoragePermission( );
-		
-		
-		//if( permissionStorage ==  PackageManager.PERMISSION_GRANTED ) // import only if permission granted
-		//{
 		Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT); //use intent to ask OS to import a file
 		//Intent intent = new Intent( Intent.ACTION_GET_CONTENT );
 		
@@ -140,20 +171,11 @@ public class UploadActivity extends AppCompatActivity
 		
 		startActivityForResult( intent, READ_REQUEST_CODE ); //call OS intent to import file from storage framework
 		
-		
-			/*
-			if( fileSaved[0] == 1 ) //if file successfully loaded
-			{
-				Toast.makeText(UploadActivity.this, "File stored in app internal storage", Toast.LENGTH_LONG).show( );
-				fileSaved[0] = 0;
-			}
-			else {
-				Toast.makeText( UploadActivity.this, "ERROR: FILE UPLOAD FAIL", Toast.LENGTH_LONG ).show( );
-			}*/
-		
-		//}
-		
+		// NOTE: the code continues once the intent returns so go to see onActivityResult
 	}
+	
+	
+	
 	
 	
 	
