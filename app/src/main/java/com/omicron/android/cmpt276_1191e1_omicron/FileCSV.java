@@ -29,16 +29,17 @@ public class FileCSV
 	 * This method validates if the provided file is valid CSV file
 	 */
 	
-	private int MAX_CSV_ROW = 150; //allow up to 150 pairs per package
+	private int MAX_CSV_ROW; //allow up to 150 pairs per package
 	private int MAX_WORD_LEN = 35; //only allow words with max 35 char
 	private int MAX_LANG_LEN = 25; //only allow language names up to 25 char
 	private int MAX_WORD_PKG; //max word packages user is allowed to import
 	private int LIMIT_TITLE = 1000;
 	private int LIMIT_LOOP = 10000;
 	
-	public FileCSV( int MAX_WORD_PKG2 )
+	public FileCSV( int MAX_WORD_PKG2, int MAX_CSV_ROW2 )
 	{
 		MAX_WORD_PKG = MAX_WORD_PKG2;
+		MAX_CSV_ROW = MAX_CSV_ROW2;
 	}
 	
 	public int findCurrentPackageCount( Context context ) throws IOException

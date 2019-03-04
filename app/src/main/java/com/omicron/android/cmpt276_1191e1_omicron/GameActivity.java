@@ -613,11 +613,11 @@ public class GameActivity extends AppCompatActivity
 		//
 		//	THESE ARE FOR TESTING - REMOVE
 		
-		//wordArray[0].updateHintClick( 2 );
-		//wordArray[1].updateHintClick( 0 );
-		//wordArray[3].updateHintClick( 0 );
-		//wordArray[5].updateHintClick( 0 );
-		//wordArray[8].updateHintClick( 10 );
+		//wordArray[0].updateHintClick( 10 );
+		//wordArray[1].updateHintClick( 1 );
+		//wordArray[3].updateHintClick( 1 );
+		//wordArray[5].updateHintClick( 10 );
+		//wordArray[8].updateHintClick( 3 );
 		
 		//
 		//////////////////////////////////
