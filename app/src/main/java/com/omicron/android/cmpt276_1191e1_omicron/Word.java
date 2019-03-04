@@ -31,5 +31,7 @@ public class Word implements Serializable
 	
 	public void updateHintClick( int newHintClick ){ mHintClick = newHintClick; }
 	
+	public void incrementHintClick( ){ mHintClick++; }
+	
 	public long getHintClick(  ){ return mHintClick; }
 }

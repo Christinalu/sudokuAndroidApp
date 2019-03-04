@@ -94,11 +94,9 @@ public class RemoveActivity extends AppCompatActivity
 			int i = 0; //index to keep track of row index in file
 			while( (line = buffRead.readLine()) != null ) //
 			{
-				strSplit = line.split(","); //get all attribute
-				
-				
 				if( i == indexOfRadBtnToRemove ) //if on line that the user wants to delete
 				{
+					strSplit = line.split(","); //get all attribute
 					if (strSplit[4].contentEquals("0")) //if removing allowed (usr installed) pkg
 					{
 						//do not add this line (remove it)

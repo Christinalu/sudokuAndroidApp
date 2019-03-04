@@ -455,6 +455,11 @@ public class MainActivity extends AppCompatActivity
 		// TODO: 	- idea: ctr+f to find all "btnResume.setEnabled()" and when RESUME is set to false, then set REMOVE_BTN to TRUE, and other way around as well
 		// TODO: test upload pkg, start game with default pkg, the get back to main menu, (REMOVE should be disabled) then click STOP GAME, then press to remove a file BUT DO NOT REMOVE A FILE, go back and see if RESUME is disabled, it should be
 		
+		// TODO: shrink buttons in MainActivity to fit everything
+		// TODO: mention that maybe instead add an icon where usr can click "this is a hard word" to increment "Hint Click"
+		
+		// TODO: once Hint Click is implemented by other team member, try it to see if csv file is actually updating
+		
 		
 		
 		// CHOOSE THE LEVEL OF DIFFICULTY
@@ -738,8 +743,9 @@ public class MainActivity extends AppCompatActivity
 			else
 			{
 				strSplit = line.split( "," );
-				wordArray[i-1] = new Word( strSplit[0], strSplit[1], i, Long.parseLong( strSplit[2] ) ); //set new word based on csv file
-				Log.d( "upload","wordArr[" + (i-1) + "]: " + strSplit[0] + "," + strSplit[1] + "," + i + "," + Long.parseLong( strSplit[2] ) );
+				//note: hintClick in wordArray is set to 0, because hintClick only stores how many times user had difficulty in a specific game
+				wordArray[i-1] = new Word( strSplit[0], strSplit[1], i, 0 ); //set new word based on csv file
+				Log.d( "upload","wordArr[" + (i-1) + "]: " + strSplit[0] + "," + strSplit[1] + "," + i + "," + 0 );
 			}
 			i++;
 		}
