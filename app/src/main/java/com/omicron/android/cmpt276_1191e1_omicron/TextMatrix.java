@@ -10,8 +10,8 @@ import android.widget.TextView;
 
 public class TextMatrix
 {
-	private static final float TXT_SIZE_NORMAL = 15;
-	private static final float TXT_SIZE_ZOOM = 21;
+	private float TXT_SIZE_NORMAL;
+	private float TXT_SIZE_ZOOM;
 	private float ZOOM_SCALE;
 
 	private RelativeAndPos[][] textViewArr; //holds all text views
@@ -40,6 +40,12 @@ public class TextMatrix
 		gameActivity = context;
 		sqrSize = sqrSize2;
 		ZOOM_SCALE = ZOOM_SCALE2;
+		
+		Log.d( "screen", "sqrSize: " + sqrSize );
+		
+		//adapt text size depending on screen (square) size
+		TXT_SIZE_NORMAL = sqrSize / 7f; // 7 is arbitrary scaling factors
+		TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * ( ZOOM_SCALE * 0.8f ); //0.8 means as screen gets bigger so will the text but at a slower rate
 	}
 
 

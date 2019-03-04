@@ -4,8 +4,8 @@
     <string name="sudoku">Sudoku Vocabulary</string>
     <string name="languages">English to French</string>
     <string name="language_selection">Language</string>
-    <string name="french_english">French-English</string>
-    <string name="english_french">English-French</string>
+    <string name="french_english">Translation-Native</string>
+    <string name="english_french">Native-Translation</string>
     <string name="difficulty_level">Level</string>
     <string name="easy_level">Easy</string>
     <string name="medium_level">Medium</string>

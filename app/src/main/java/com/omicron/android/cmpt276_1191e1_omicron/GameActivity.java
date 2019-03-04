@@ -29,6 +29,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 public class GameActivity extends AppCompatActivity
 {
 	/*
@@ -36,7 +43,7 @@ public class GameActivity extends AppCompatActivity
 		It will be activated from the Main (Menu) Activity
 	*/
 
-	public Word[] wordArray;
+	private Word[] wordArray;
 	private int usrLangPref;
 	private int usrDiffPref = 0;
 	private int state; //0=new start, 1=resume
@@ -89,7 +96,8 @@ public class GameActivity extends AppCompatActivity
 	private final static int BOUNDARY_OFFSET = 40; //puzzle will have some offset for aesthetic reasons
 	private final static float ZOOM_SCALE = 1.5f; // zoom factor of how much to zoom in puzzle in "zoom" mode
 	private int PUZZLE_FULL_SIZE; // size of full puzzle from left most column pixel to right most column pixel
-
+	private long STATISTIC_MULTIPLE = 2; //used to multiply by factor the number of "Hint Clicks" a user used, to more likely show these words
+	
 	private int[] zoomButtonSafe = { 0 }; //used to prevent a 'click coordinate' from being tested if it is in a rect when switching to "zoom" mode because switching to the mode, should not test click
 	private int[] zoomClickSafe = { 0 }; //used to block touchX update when user switches mode
 	private int[] zoomButtonDisableUpdate = { 0 }; //do not let button update entry right after changing "zoom" mode - because zoomX is incorrect and must be updated first by having user click somewhere first
@@ -116,6 +124,7 @@ public class GameActivity extends AppCompatActivity
 			wordArray = (Word[]) savedInstanceState.getSerializable("wordArrayGA");
 			usrLangPref = savedInstanceState.getInt("usrLangPrefGA");
 			usrSudokuArr = (SudokuGenerator) savedInstanceState.get("SudokuArrGA");
+			
 		}
 		else {
 			Intent gameSrc = getIntent();
@@ -131,6 +140,13 @@ public class GameActivity extends AppCompatActivity
 					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPref");
 					usrDiffPref = (int) gameSrc.getSerializableExtra("usrDiffPref");
 					usrSudokuArr = new SudokuGenerator(usrDiffPref);
+				}
+				
+				//debug wordArray
+				Log.d( "upload", " @ WORD_ARRAY ON RESUME GAME:" );
+				for( int i=0; i<9; i++ )
+				{
+					Log.d( "upload","wordArr[" + i + "]: " + wordArray[i].getNative() + "," + wordArray[i].getTranslation() + "," + wordArray[i].getInFileLineNum() + "," + wordArray[i].getHintClick() );
 				}
 			}
 		}
@@ -546,14 +562,7 @@ public class GameActivity extends AppCompatActivity
 	}
 
 
-	@Override
-	public void onStart( )
-	{
-		super.onStart( );
-
-		//disable slide in animation
-		overridePendingTransition(0, 0);
-	}
+	
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
@@ -573,4 +582,135 @@ public class GameActivity extends AppCompatActivity
 		gameActivity.putExtra("state", state);
 		startActivity( gameActivity );
 	}
+	
+	@Override
+	public void onStart( )
+	{
+		super.onStart( );
+		//disable slide in animation
+		overridePendingTransition(0, 0);
+		Log.d( "TAG", "onStart( ) in GameActivity" );
+		
+		// RESET wordArray HINT COUNT
+		for( int i=0; i<9; i++ )
+		{
+			wordArray[i].updateHintClick( 0 );
+		}
+	}
+	
+	@Override
+	public void onStop( )
+	{
+		super.onStop( );
+	
+			/** SAVE ALL DATA **/
+			
+		//	THESE ARE FOR TESTING
+		
+		//wordArray[0].updateHintClick( 10 );
+		//wordArray[1].updateHintClick( 1 );
+		//wordArray[3].updateHintClick( 1 );
+		//wordArray[5].updateHintClick( 10 );
+		//wordArray[8].updateHintClick( 3 );
+		
+		
+		FileInputStream fileInStream = null; //open file from internal storage
+		try {
+			fileInStream = this.openFileInput( wordArray[10].getNative( ) ); //get internal file name, contained in 10th index of wordArray
+			
+			
+			// READ ALL CONTENT
+			FileOutputStream outStream;
+			InputStreamReader inStreamRead = new InputStreamReader( fileInStream );
+			BufferedReader buffRead = new BufferedReader( inStreamRead );
+			StringBuilder strBuild = new StringBuilder( );
+			String[] strSplit = null; //holds all attributes from relation instance (ie row)
+			
+			String line;
+			long newHintClick = 0;
+			int i = 0; //index to keep track of row index in file
+			boolean lineFound;
+			while( (line = buffRead.readLine()) != null ) //
+			{
+				lineFound = false; //reset
+				
+				// FIND LINE OF WORD IN CSV (based on wordArr[i].getInFileLineNum() //
+				for( int k=0; k<9; k++ )
+				{
+					if( i == wordArray[k].getInFileLineNum() ) //if updating line with word that was used in wordArray
+					{
+						strSplit = line.split(","); //get all attribute
+						long hintClickSoFar = Long.parseLong(strSplit[2]); //get original click count from file
+						
+						//to what hintClickSoFar was so far originally in the file, add wordArray.getHintClick() from the current game
+						newHintClick = hintClickSoFar + wordArray[k].getHintClick()*STATISTIC_MULTIPLE;
+						lineFound = true; //csv file line matches a word in wordArray[]
+						
+						break; //do not consider the rest
+					}
+				}
+				
+				if( lineFound == false ) //not a line to update, keep the same
+				{
+					strBuild.append( line );
+					strBuild.append( "\n" );
+				}
+				else //line found, update in file
+				{
+					strBuild.append( strSplit[0] + "," + strSplit[1] +  "," + newHintClick );
+					strBuild.append(  "\n");
+				}
+				
+				i++;
+			}
+			
+			buffRead.close( );
+			
+			// WRITE TO FILE //
+			outStream = this.openFileOutput( wordArray[10].getNative( ), this.MODE_PRIVATE ); //open private output stream for re-write
+			outStream.write( strBuild.toString().getBytes( ) ); //convert string to bytes and write to file
+			outStream.close( ); //close and save file
+		
+		
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+		Log.d( "upload", "onStop called for GameActivity" );
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

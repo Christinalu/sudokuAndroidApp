@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:gravity="center"
+	android:background="@color/mediumaquamarine"
+	tools:context=".UploadActivity"
+	android:orientation="vertical">
+
+	<ScrollView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content">
+
+		<TextView
+			android:id="@+id/upload_txt_view"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding = "10dp"
+			android:text="instructions here \n \n \n ............................................"/>
+
+	</ScrollView>
+
+	<EditText
+		android:id="@+id/editText_pkg_name"
+		android:layout_width="220dp"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:ems="10"
+		android:hint="Name of Word Package"
+		android:textSize="15dp"
+		android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -_!/()'0123456789"
+		android:maxLength="35"
+		android:inputType="textCapSentences" />
+
+	<!--
+	<EditText
+		android:id="@+id/editText_native_name"
+		android:layout_width="220dp"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:ems="10"
+		android:hint="Language of first column"
+		android:textSize="15dp"
+		android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		android:maxLength="25"
+		android:inputType="textCapSentences" />
+
+	<EditText
+		android:id="@+id/editText_translation_name"
+		android:layout_width="220dp"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:ems="10"
+		android:hint="Language of second column"
+		android:textSize="15dp"
+		android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		android:maxLength="25"
+		android:inputType="textCapSentences" />
+	-->
+
+    <Button
+		android:id="@+id/upload_file"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:background="@drawable/hint"
+		android:padding="20dp"
+		android:layout_gravity="center"
+		android:text="UPLOAD CSV FILE"/>
+
+	<!--
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Selected File:"/>
+	-->
+
+	<TextView
+		android:id="@+id/selected_file"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:paddingLeft="25dp"/>
+
+	<ScrollView
+		android:id="@+id/upload_scrollView"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:padding="20dp">
+
+		<RadioGroup
+			android:id="@+id/upload_scroll_RadioGroup"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
+
+
+		</RadioGroup>
+
+	</ScrollView>
+
+</LinearLayout>
