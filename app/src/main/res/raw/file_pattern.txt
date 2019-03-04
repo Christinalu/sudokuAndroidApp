@@ -1,0 +1,29 @@
+This file describes how each file is represented:
+
+ - word_pkg_name_and_file_name.csv
+
+line example: 0-30 Numbers,pkg_0.csv,English,French,1
+
+attribute   1: user defined pkg name
+			2: internal file name of pkg
+			3: native language
+			4: translation language
+			5: 1 == this is a default protected file and user cannot delete
+
+ - current_word_pkg_count.txt
+
+this simply stores an integer saying how many pkg are installed in the app, including default
+
+ - pkg_n.csv
+
+these are the files that store the word pairs
+these must follow th format
+
+first line:     native lang, translation lang
+other line:     word in native, word in translation, click hint
+
+(click hint means how many times user clicked to see the word in Dictionary, default == 1)
+
+note: all user imported files must follow format
+first line:     native lang, translation lang
+other line:     word in native, word in translation

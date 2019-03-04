@@ -119,9 +119,20 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:background="@drawable/hint"
-			android:layout_marginTop="10dp"
+			android:layout_marginTop="5dp"
 			android:width="200dp"
 			android:text="@string/resume"
+			tools:layout_editor_absoluteX="147dp"
+			tools:layout_editor_absoluteY="326dp"/>
+
+		<Button
+			android:id="@+id/button_stop"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:background="@drawable/hint"
+			android:layout_marginTop="5dp"
+			android:width="200dp"
+			android:text="STOP GAME"
 			tools:layout_editor_absoluteX="147dp"
 			tools:layout_editor_absoluteY="326dp"/>
 
@@ -130,104 +141,35 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/hint"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="5dp"
             android:width="200dp"
-            android:text="MANAGE PACKAGES"/>
+            android:text="UPLOAD PACKAGE"/>
 
+
+		<Button
+			android:id="@+id/btn_remove"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:background="@drawable/hint"
+			android:layout_marginTop="5dp"
+			android:layout_marginBottom="5dp"
+			android:width="200dp"
+			android:text="REMOVE SELECTED PACKAGE"/>
 
         <ScrollView
             android:id="@+id/radio_scroll_view"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="wrap_content"
             android:padding="20dp"
             android:background="@color/cadetblue">
 
             <RadioGroup
-                android:id="@+id/vocab_radio_group"
+                android:id="@+id/pkg_radio_group"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="btn-1"/>
 
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="btn-2"/>
-
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="btn-3"/>
-
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="btn-4"/>
-
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="btn-5"/>
-
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="btn-6"/>
-
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="btn-7"/>
-
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="btn-8"/>
-
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="btn-9"/>
-
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="btn-10"/>
-
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="btn-11"/>
-
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="btn-12"/>
-
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="btn-13"/>
-
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="btn-14"/>
-
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="btn-15"/>
-
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="btn-16"/>
 
             </RadioGroup>
 

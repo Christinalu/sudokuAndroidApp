@@ -20,11 +20,11 @@ public class WordPackageFileIndex
 	 */
 	
 	private int MAX_WORD_PKG;
-	private int[] CURRENT_WORD_PKG_COUNT;
+	private int CURRENT_WORD_PKG_COUNT;
 	private int WORD_PKG_ATTR_NUM = 4;
 	private PackageFile[] packageFileArr; //stores pairs of Word Package name and internal file name
 	
-	public WordPackageFileIndex( Context context, int MAX_WORD_PKG2, int[] CURRENT_WORD_PKG_COUNT2 ) throws IOException //construct
+	public WordPackageFileIndex( Context context, int MAX_WORD_PKG2, int CURRENT_WORD_PKG_COUNT2 ) throws IOException //construct
 	{
 		String pkgName; //used to store wordPackageName
 		String fileName; //used to store internalFileName
@@ -34,8 +34,8 @@ public class WordPackageFileIndex
 		
 		MAX_WORD_PKG = MAX_WORD_PKG2;
 		CURRENT_WORD_PKG_COUNT = CURRENT_WORD_PKG_COUNT2;
-
-		packageFileArr = new PackageFile[CURRENT_WORD_PKG_COUNT[0]]; //as many as user has now; this array need not be initialized max size because each time the user uploads a file and returns back to MainActivity, this will be re-created
+		
+		packageFileArr = new PackageFile[CURRENT_WORD_PKG_COUNT]; //as many as user has now; this array need not be initialized max size because each time the user uploads a file and returns back to MainActivity, this will be re-created
 		
 		//warning: test if PackageFile line above should have size MAX_PKG_COUNT instead if activity nor re-created
 		
@@ -45,7 +45,7 @@ public class WordPackageFileIndex
 		InputStreamReader inStreamRead = new InputStreamReader( fileInStream );
 		BufferedReader buffRead = new BufferedReader( inStreamRead );
 		
-		for( int i=0; i<CURRENT_WORD_PKG_COUNT[0]; i++ )
+		for( int i=0; i<CURRENT_WORD_PKG_COUNT; i++ )
 		{
 			// READ THE DATA FROM THE DATA FILE //
 			line = buffRead.readLine( ); //get one line at a time
@@ -55,6 +55,8 @@ public class WordPackageFileIndex
 			fileName = linePart[1];
 			nativeLang = linePart[2];
 			translateLang = linePart[3];
+			
+			// TODO: finished? -yes
 			
 			//add all data into a PackageFile object
 			packageFileArr[i] = new PackageFile( pkgName, fileName, nativeLang, translateLang );
@@ -67,7 +69,7 @@ public class WordPackageFileIndex
 		//get the PackageFile at a certain index
 		
 		PackageFile pf = null;
-		if( index < CURRENT_WORD_PKG_COUNT[0] ) //check for out of bounds
+		if( index < CURRENT_WORD_PKG_COUNT ) //check for out of bounds
 		{
 			pf = packageFileArr[index];
 		}
@@ -81,7 +83,4 @@ public class WordPackageFileIndex
 		//get the length of the PackageFile array
 		return packageFileArr.length;
 	}
-	
-	
-	
 }

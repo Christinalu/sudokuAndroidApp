@@ -29,6 +29,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
+
 public class GameActivity extends AppCompatActivity
 {
 	/*
@@ -36,7 +41,7 @@ public class GameActivity extends AppCompatActivity
 		It will be activated from the Main (Menu) Activity
 	*/
 
-	public Word[] wordArray;
+	private Word[] wordArray;
 	private int usrLangPref;
 	private int usrDiffPref = 0;
 	private int state; //0=new start, 1=resume
@@ -116,6 +121,7 @@ public class GameActivity extends AppCompatActivity
 			wordArray = (Word[]) savedInstanceState.getSerializable("wordArrayGA");
 			usrLangPref = savedInstanceState.getInt("usrLangPrefGA");
 			usrSudokuArr = (SudokuGenerator) savedInstanceState.get("SudokuArrGA");
+			
 		}
 		else {
 			Intent gameSrc = getIntent();
@@ -131,6 +137,13 @@ public class GameActivity extends AppCompatActivity
 					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPref");
 					usrDiffPref = (int) gameSrc.getSerializableExtra("usrDiffPref");
 					usrSudokuArr = new SudokuGenerator(usrDiffPref);
+				}
+				
+				//debug wordArray
+				Log.d( "upload", " @ WORD_ARRAY ON RESUME GAME:" );
+				for( int i=0; i<9; i++ )
+				{
+					Log.d( "upload","wordArr[" + i + "]: " + wordArray[i].getNative() + "," + wordArray[i].getTranslation() + "," + wordArray[i].getInFileLineNum() + "," + wordArray[i].getHintClick() );
 				}
 			}
 		}
@@ -573,6 +586,8 @@ public class GameActivity extends AppCompatActivity
 		super.onStart( );
 		//disable slide in animation
 		overridePendingTransition(0, 0);
+		Log.d( "TAG", "onStart( ) in GameActivity called with animation" );
+		
 	}
 	
 	@Override
@@ -580,8 +595,65 @@ public class GameActivity extends AppCompatActivity
 	{
 		super.onStop( );
 	
-		//save all data
+			/** SAVE ALL DATA **/
+		
+		
+		Log.d( "upload", "PASS" );
+		
+		
+		FileInputStream fileInStream = null; //open file from internal storage
+		try {
+			fileInStream = this.openFileInput( wordArray[10].getNative( ) ); //get internal file name, contained in 10th index of wordArray
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		// TODO: here try to modify "Hint Click" and see if is save in file word_pkg_name_file
+		// TODO:	+ after that resume game and print in GameAct to see if click hint preserved; (print func already set up)
+		
+		InputStreamReader inStreamRead = new InputStreamReader( fileInStream );
+		BufferedReader buffRead = new BufferedReader( inStreamRead );
+		
+		//  -- --  IDEA : copy all data: take line, if it is a line from wordArr 2nd index, then add the
+		//						modified line, else add the line as it was before
+		//						after that then take the StringBuiler and rewrite the file
+		
+		// TODO:
+		// TODO: here have to save all data to file
+		// TODO:
 		
 		Log.d( "upload", "onStop called for GameActivity" );
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
