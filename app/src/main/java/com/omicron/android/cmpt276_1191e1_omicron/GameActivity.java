@@ -589,7 +589,7 @@ public class GameActivity extends AppCompatActivity
 		super.onStart( );
 		//disable slide in animation
 		overridePendingTransition(0, 0);
-		Log.d( "TAG", "onStart( ) in GameActivity called with animation" );
+		Log.d( "TAG", "onStart( ) in GameActivity" );
 		
 		// RESET wordArray HINT COUNT
 		for( int i=0; i<9; i++ )
@@ -604,14 +604,8 @@ public class GameActivity extends AppCompatActivity
 		super.onStop( );
 	
 			/** SAVE ALL DATA **/
-		
-		
-		Log.d( "upload", "PASS" );
-		
-		
-		//////////////////////////////////
-		//
-		//	THESE ARE FOR TESTING - REMOVE
+			
+		//	THESE ARE FOR TESTING
 		
 		//wordArray[0].updateHintClick( 10 );
 		//wordArray[1].updateHintClick( 1 );
@@ -619,21 +613,11 @@ public class GameActivity extends AppCompatActivity
 		//wordArray[5].updateHintClick( 10 );
 		//wordArray[8].updateHintClick( 3 );
 		
-		//
-		//////////////////////////////////
-		
-		
 		
 		FileInputStream fileInStream = null; //open file from internal storage
 		try {
 			fileInStream = this.openFileInput( wordArray[10].getNative( ) ); //get internal file name, contained in 10th index of wordArray
 			
-			// TODO: here try to modify "Hint Click" and see if is save in file word_pkg_name_file
-			// TODO:	+ after that resume game and print in GameAct to see if click hint preserved; (print func already set up)
-			
-			//  -- --  IDEA : copy all data: take line, if it is any line from wordArr 2nd index, then add the
-			//						modified line, else add the line as it was before
-			//						after that then take the StringBuiler and rewrite the file
 			
 			// READ ALL CONTENT
 			FileOutputStream outStream;

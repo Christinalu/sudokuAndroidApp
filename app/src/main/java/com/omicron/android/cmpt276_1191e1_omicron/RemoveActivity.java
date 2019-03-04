@@ -37,9 +37,6 @@ public class RemoveActivity extends AppCompatActivity
 		Log.d( "upload", "radio btn index to remove: " + indexOfRadBtnToRemove );
 		Log.d( "upload", "pkg internal name to remove: " + pkgInternalFileName );
 		
-		// TODO: use above indexOfRadBtnToRemove to find from line in word_pkg_name_file to remove
-		// TODO:	+ use pkgInternalFileName to find which file to remove
-		
 		
 		Button btn_delete = findViewById( R.id.button_delete );
 		btn_delete.setOnClickListener( new View.OnClickListener( ) {
@@ -59,10 +56,6 @@ public class RemoveActivity extends AppCompatActivity
 									   }
 		);
 		
-	
-	
-	
-	
 	}
 	
 	
@@ -76,8 +69,6 @@ public class RemoveActivity extends AppCompatActivity
 		// NOTE: CAN ONLY REMOVE A PKG AT ONCE (otherwise change onStart( ) in MainActivity)
 		//		 to delete multiple files at one, have to delete and re-create all radio buttons (see onStop() in MainActivity)
 		
-		// TODO: DONE check if allowed to remove pkg ie cannot remove default pkg
-		// TODO: DONE also remove actual pkg_n file
 		
 			// DELETE LINE FROM word_pkg_file_name //
 		
