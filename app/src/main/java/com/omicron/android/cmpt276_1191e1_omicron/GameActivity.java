@@ -9,7 +9,9 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -35,6 +37,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Locale;
 
 public class GameActivity extends AppCompatActivity
 {
@@ -47,6 +50,15 @@ public class GameActivity extends AppCompatActivity
 	private int usrLangPref;
 	private int usrDiffPref = 0;
 	private int state; //0=new start, 1=resume
+	private int usrModePref; //0=standard, 1=speech
+
+	private TextToSpeech mTTS;
+	private String theWord;
+	private Word wordPair;
+	private String language;
+	private int row;
+	private int col;
+	private int val;
 
 	private Paint paint = new Paint( );
 	private Bitmap bgMap;
@@ -119,12 +131,12 @@ public class GameActivity extends AppCompatActivity
 		//set intent to receive word array from Main Activity
 		if (savedInstanceState != null) {
 			//a state had been saved, load it
-
 			state = 1;
 			wordArray = (Word[]) savedInstanceState.getSerializable("wordArrayGA");
 			usrLangPref = savedInstanceState.getInt("usrLangPrefGA");
 			usrSudokuArr = (SudokuGenerator) savedInstanceState.get("SudokuArrGA");
-			
+			usrModePref = (int) savedInstanceState.getSerializable("usrModeGA");
+			language = (String) savedInstanceState.getSerializable("languageGA");
 		}
 		else {
 			Intent gameSrc = getIntent();
@@ -135,11 +147,32 @@ public class GameActivity extends AppCompatActivity
 					wordArray = (Word[]) gameSrc.getSerializableExtra("wordArrayMA");
 					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPrefMA");
 					usrSudokuArr = (SudokuGenerator) gameSrc.getSerializableExtra("SudokuArrMA");
+					usrModePref = (int) gameSrc.getSerializableExtra("usrModeMA");
+					language = (String) gameSrc.getSerializableExtra("languageMA");
 				} else {
 					wordArray = (Word[]) gameSrc.getSerializableExtra("wordArray");
 					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPref");
 					usrDiffPref = (int) gameSrc.getSerializableExtra("usrDiffPref");
+					usrModePref = (int) gameSrc.getSerializableExtra("usrModeMA");
 					usrSudokuArr = new SudokuGenerator(usrDiffPref);
+					language = (String) gameSrc.getSerializableExtra("languageMA");
+				}
+
+				if (usrModePref == 1) {
+					mTTS = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+						@Override
+						public void onInit(int status) {
+							if (status == TextToSpeech.SUCCESS) {
+								Locale locale = new Locale(language);
+								int result = mTTS.setLanguage(locale);
+								if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+									Log.e("mTTS", "ERROR: language initialization failed. Language = "+language);
+								}
+							} else {
+								Log.e("mTTS", "ERROR: TextToSpeech FAILED");
+							}
+						}
+					});
 				}
 				
 				//debug wordArray
@@ -472,6 +505,29 @@ public class GameActivity extends AppCompatActivity
 							drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
 							Log.i("TAG", "normal click: (" + touchX[0] + ", " + touchY[0] + ")");
 						}
+						if (usrModePref == 1) {
+							// when originalPuzzle squares clicked, the voice of our lord and savior will bless them with the translated word
+							row = currentRectColoured.getRow();
+							col = currentRectColoured.getColumn();
+							if (row < 9 && col < 9 && row > -1 && col > -1) {
+								val = usrSudokuArr.PuzzleOriginal[row][col];
+								if (val != 0) {
+									Log.i("TAG", "mode 1 enabled and button clicked");
+									wordPair = wordArray[val-1];
+									if (usrLangPref == 0) {
+										theWord = wordPair.getTranslation();
+									}
+									else {
+										theWord = wordPair.getNative();
+									}
+									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+										mTTS.speak(theWord, TextToSpeech.QUEUE_FLUSH, null, null);
+									} else {
+										mTTS.speak(theWord, TextToSpeech.QUEUE_FLUSH, null);
+									}
+								}
+							}
+						}
 						break;
 
 					case MotionEvent.ACTION_MOVE:
@@ -561,8 +617,6 @@ public class GameActivity extends AppCompatActivity
 		return result;
 	}
 
-
-	
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
@@ -570,32 +624,32 @@ public class GameActivity extends AppCompatActivity
 		savedInstanceState.putInt( "usrLangPrefGA", usrLangPref );
 		savedInstanceState.putSerializable("SudokuArrGA", usrSudokuArr);
 		savedInstanceState.putInt("state", state);
+		savedInstanceState.putInt("usrModeGA", usrModePref);
+		savedInstanceState.putString("languageGA", language);
 	}
 	@Override
 	public void onBackPressed() {
-		super.onBackPressed();
-		Intent gameActivity = new Intent( GameActivity.this, MainActivity.class );
+		Intent resumeSrc = new Intent( GameActivity.this, MainActivity.class );
 		state = 1;
-		gameActivity.putExtra( "wordArrayGA", wordArray );
-		gameActivity.putExtra( "usrLangPrefGA", usrLangPref );
-		gameActivity.putExtra("SudokuArrGA", usrSudokuArr);
-		gameActivity.putExtra("state", state);
-		startActivity( gameActivity );
+		resumeSrc.putExtra( "wordArrayGA", wordArray );
+		resumeSrc.putExtra( "usrLangPrefGA", usrLangPref );
+		resumeSrc.putExtra("SudokuArrGA", usrSudokuArr);
+		resumeSrc.putExtra("state", state);
+		resumeSrc.putExtra("usrModeGA", usrModePref);
+		resumeSrc.putExtra("languageGA", language);
+		//resumeSrc.putExtra("countryGA", country);
+		Log.i("TAG", "Result about to be stored");
+		setResult(RESULT_OK,resumeSrc);
+		finish();
+		super.onBackPressed();
 	}
-	
 	@Override
-	public void onStart( )
-	{
-		super.onStart( );
-		//disable slide in animation
-		overridePendingTransition(0, 0);
-		Log.d( "TAG", "onStart( ) in GameActivity" );
-		
-		// RESET wordArray HINT COUNT
-		for( int i=0; i<9; i++ )
-		{
-			wordArray[i].updateHintClick( 0 );
+	public void onDestroy() {
+		if (mTTS != null) {
+			mTTS.stop();
+			mTTS.shutdown();
 		}
+		super.onDestroy();
 	}
 	
 	@Override
