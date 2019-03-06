@@ -609,7 +609,7 @@ public class MainActivity extends AppCompatActivity
 			state = 1;
 			Button btnResume = (Button) findViewById(R.id.button_resume);
 			btnResume.setEnabled(true);
-			Button btnRemove = (Button) findViewById(R.id.button_delete); //block user from deleting pkg while playing game
+			Button btnRemove = (Button) findViewById(R.id.btn_remove); //block user from deleting pkg while playing game
 			btnRemove.setEnabled(false);
 			removeBtnEnable[0] = false;
 		}
