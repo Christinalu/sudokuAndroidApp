@@ -13,4 +13,10 @@
     <string name="share">logo</string>
     <string name="start">START NEW GAME</string>
     <string name="resume">RESUME</string>
+    <string name="no_resume">No previous game played!</string>
+    <string name="no_language">Language not supported!</string>
+    <string name="languageselect">Supported Languages</string>
+    <string name="mode_selection">Mode</string>
+    <string name="mStandard">Standard</string>
+    <string name="mSpeech">Listening Comprehension</string>
 </resources>
