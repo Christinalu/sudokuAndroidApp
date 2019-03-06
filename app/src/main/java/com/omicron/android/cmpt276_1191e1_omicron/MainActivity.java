@@ -609,6 +609,8 @@ public class MainActivity extends AppCompatActivity
 			state = 1;
 			Button btnResume = (Button) findViewById(R.id.button_resume);
 			btnResume.setEnabled(true);
+			Button btnRemove = (Button) findViewById(R.id.button_delete); //block user from deleting pkg while playing game
+			btnRemove.setEnabled(false);
 			removeBtnEnable[0] = false;
 		}
 	}
@@ -711,8 +713,8 @@ public class MainActivity extends AppCompatActivity
 						}
 						else //word not previously selected for wordArray
 						{
-							//use this word
-							wordArray[k] = new Word( rangeArr[c].getStrNative(), rangeArr[c].getStrTranslation(), c+1, rangeArr[c].getHintClick() );
+							//USE THIS WORD AS NEW wordArr[k]
+							wordArray[k] = new Word( rangeArr[c].getStrNative(), rangeArr[c].getStrTranslation(), c+1, 0 );
 							wordUsed[c] = 1; //mark word as used
 							//break out of loop
 							breakOut = true;
