@@ -18,7 +18,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:padding = "10dp"
-			android:text="instructions here \n \n \n ............................................"/>
+			android:text="Sudoku Word allows you to import CSV files with your own vocabulary to practice. "/>
 
 	</ScrollView>
 

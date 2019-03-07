@@ -187,7 +187,7 @@ public class UploadActivity extends AppCompatActivity
 		Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT); //use intent to ask OS to import a file
 		
 		intent.addCategory( Intent.CATEGORY_OPENABLE ); //only include files that are openable
-		intent.setType("text/comma-separated-values"); //only allow .csv files; use "*/*" for all files
+		intent.setType("*/*"); //only allow .csv files; use "*/*" for all files; "text/comma-separated-values" for CSV
 		intent.putExtra( "pkgName", pkgName ); //add pkg name inserted by user
 		
 		startActivityForResult( intent, READ_REQUEST_CODE ); //call OS intent to import file from storage framework
