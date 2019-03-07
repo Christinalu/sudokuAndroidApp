@@ -126,50 +126,6 @@ public class MainActivity extends AppCompatActivity
 		}
 		
 		
-		// TODO: FIX LANDCAPE MODE IN MAIN ACTIVITY
-		// TODO: move all "Canvas" stuff to drw.class but leave all "new declarations" in GameActivity
-		// TODO: FIX so that btn REMOVE is disabled when RESUME is active
-		// TODO: dont forget to add user stories + TDD examples to cover all new features + features given as requirement
-		// TODO: in user story say that "used  algorithm to automatically detect and more often select which words the user has difficulty with based on the number of times the user had to reveal a translation in Hint Pop-Up"
-		
-		// TODO: add note in app that the files are shown directly if they were downloaded
-		// TODO:	 from a website (on the phone) they would automatically be displayed
-		// TODO		 however for testing purposes, these "Word Pair" files are not downloadable for our class
-		// TODO:	 so it may be faster to import file from storage (via USB). Sometimes this feature is not
-		// TODO:	 enabled by default, so user may need to click on top right corner on "settings/options"
-		// TODO:	 in android 5.0 this looks like 3 vertical dots, and then click "show SD card" or "show internal storage"
-		// TODO:	 or similar depending on SDK version. If google drive is set up, user may also import .csv
-		// TODO: 	 files from Google Drive. However, if one may want to test by downloading from a website
-		// TODO:	 a easy way is to find a free temporary hosting website which provides a "upload" then "download" feature for a file
-		// TODO:	 One may additionally post a file on Google Drive, then upload it from there
-		// TODO:		+ let  user know the rules about csv file and other "text field" input ie Native Name <= 35 char
-		
-		// TODO: make sure the "adapt text size according to sqrSize and zoom" exists in TextMatrix file
-		// TODO: make sure to let user know that first row in CSV has to contain language
-		// TODO: test file with not utf-8 char
-		
-		// TODO: FINISH INSTRUCTIONS IN UPLOAD CSV
-		
-		// TODO: test if "hint click" are preserved when resuming game
-		// TODO: also explain what csv file is: no empty line, only separated by comma, no comma within a cell, no string delimiter (")
-		// TODO:	+ show an example
-		// TODO: in tdd example also mention that user can upload / remove pkg
-		
-		// TODO: test app by randomly starting game, then go back to main menu, then upload a pkg, then resume game , then remove pkg and resume game ...
-		// TODO: test: user uploads a package, starts a new game with that package, then comes back to main menu
-		// TODO:		then removes that package AND them RESUME the game AND then go back to main menu (previous error was if file deleted then GameActivity cannot open file to save "Hint Click")
-		
-		// TODO: see if when merging entire project with everybody, see if "REMOVE PKG" button is still disabled
-		// TODO: 	- idea: ctr+f to find all "btnResume.setEnabled()" and when RESUME is set to false, then set REMOVE_BTN to TRUE, and other way around as well
-		// TODO: test upload pkg, start game with default pkg, the get back to main menu, (REMOVE should be disabled) then click STOP GAME, then press to remove a file BUT DO NOT REMOVE A FILE, go back and see if RESUME is disabled, it should be
-		
-		// TODO: shrink buttons in MainActivity to fit everything
-		// TODO: once "Hint Click" is implemented by other team member, try it to see if csv file is actually updating
-		// TODO: check if switching modes switches languages
-		// TODO: in mode_btn actually show language instead of "Native-Translation"
-		
-		
-		
 		// UPDATE THE WORD PKG SCROLL //
 		
 		RadioButton radBtn;
