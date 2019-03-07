@@ -129,7 +129,8 @@ public class FileCSV
 		
 		/** NOTE: default CSV files should not contain any empty lines **/
 		
-		/* READ FILE */
+			/* READ FILE */
+		
 		InputStream inStream = context.getResources().openRawResource( R.raw.pkg_0 ); //from RAW resource, get the default pkg_1,csv file
 		BufferedReader buffRead = new BufferedReader( new InputStreamReader( inStream ) ); //get bytes of file
 		
@@ -179,13 +180,13 @@ public class FileCSV
 		// NOTE: this function is called after the CSV file  has been checked for validity, so this function assumes CSV file is valid
 		
 		
-		String fileName = "file-name-TEST";
-		String fileNoStart; //stores file name without the "pkg_"
-		String fileNoExtension; //stores file name without the ".csv"
+		String fileName;
+		String[] fileNoStart; //stores file name without the "pkg_"
+		String[] fileNoExtension; //stores file name without the ".csv"
 		
 		FileOutputStream outStream;
 		
-		// FIND WHAT "FILE NAME" SHOULD BE (to not overwrite files with the same same) //
+			/* FIND WHAT "FILE NAME" SHOULD BE (to not overwrite files with the same same) */
 		
 		int[] fileNameUsedArr = new int[MAX_WORD_PKG]; //create array to be used to determine which number represents that a file already exists; ie pkg_5 would have fileNameUsedArr[4] == 1
 		int invalidPkgNameSoFar = 0; //each time fileNameUsedArr has something set to "1" this is increased to represent how many "1" are in array
@@ -242,7 +243,7 @@ public class FileCSV
 		}
 		
 		
-		// FIND WHICH FILE NAME IS AVAILABLE
+			// FIND WHICH FILE NAME IS AVAILABLE
 		
 		int validIndex = -1;
 		for( int i=0; i<MAX_WORD_PKG; i++ ) //loop and find an index == 0, meaning that this number was not used yet

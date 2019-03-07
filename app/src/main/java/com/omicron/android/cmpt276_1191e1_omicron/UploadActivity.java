@@ -192,7 +192,7 @@ public class UploadActivity extends AppCompatActivity
 		
 		startActivityForResult( intent, READ_REQUEST_CODE ); //call OS intent to import file from storage framework
 		
-		// NOTE: the code continues once the intent returns so go to see onActivityResult
+		// NOTE: the code continues once the intent returns, so go see onActivityResult( )
 	}
 	
 	
