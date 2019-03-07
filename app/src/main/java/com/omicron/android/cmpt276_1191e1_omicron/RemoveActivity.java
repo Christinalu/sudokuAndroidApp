@@ -64,7 +64,9 @@ public class RemoveActivity extends AppCompatActivity
 		/*
 		 * This function removes an entire pkg from internal memory and data
 		 * Returns 1 if user attempts to remove default pkg - not allowed
+		 * This function deals with calls to OS to access storage and is needed in this Activity
 		 */
+		
 		
 		// NOTE: CAN ONLY REMOVE A PKG AT ONCE (otherwise change onStart( ) in MainActivity)
 		//		 to delete multiple files at one, have to delete and re-create all radio buttons (see onStop() in MainActivity)
