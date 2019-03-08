@@ -14,6 +14,7 @@ public class Select9Word
 	 * returns 1 on failure
 	 */
 	
+	
 	private int MAX_CSV_ROW;
 	
 	public Select9Word( int MAX_CSV_ROW2 )
