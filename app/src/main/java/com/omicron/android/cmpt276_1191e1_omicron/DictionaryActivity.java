@@ -8,9 +8,6 @@ import android.util.DisplayMetrics;
 import android.view.Window;
 import android.widget.TextView;
 
-import com.omicron.android.cmpt276_1191e1_omicron.R;
-import com.omicron.android.cmpt276_1191e1_omicron.Word;
-
 public class DictionaryActivity extends AppCompatActivity
 {
 	/*

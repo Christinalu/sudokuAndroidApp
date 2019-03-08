@@ -1,16 +1,15 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.util.Log;
+import android.view.View;
 import android.widget.RelativeLayout;
-
-import com.omicron.android.cmpt276_1191e1_omicron.Block;
-import com.omicron.android.cmpt276_1191e1_omicron.Pair;
-import com.omicron.android.cmpt276_1191e1_omicron.SudokuGenerator;
-import com.omicron.android.cmpt276_1191e1_omicron.TextMatrix;
-import com.omicron.android.cmpt276_1191e1_omicron.Word;
+import android.widget.Toast;
 
 public class drw
 {
