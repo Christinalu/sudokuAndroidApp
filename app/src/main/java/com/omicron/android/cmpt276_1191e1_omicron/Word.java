@@ -26,7 +26,19 @@ public class Word implements Serializable
 
 	//get translation word
 	public String getTranslation(  ){ return mTranslation; }
-	
+
+	//set native word
+	public void setNative(String s) {
+		mNative = s;
+		return;
+	}
+	//set translation word
+	public void setTranslation(String s) {
+		mTranslation = s;
+		return;
+	}
+
+
 	public int getInFileLineNum(  ){ return mInFileLineNum; }
 	
 	public void updateHintClick( int newHintClick ){ mHintClick = newHintClick; }
