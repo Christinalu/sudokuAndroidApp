@@ -142,6 +142,10 @@ public class TextMatrix
 			//note: not adding "empty string" causes error
 			( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setText( " " );
 		}
+		
+		Log.d( "tag-1", "draw text");
+		
+		textViewArr[i][j].getRelativeLayout().getChildAt(0).invalidate();
 	}
 
 
@@ -180,6 +184,7 @@ public class TextMatrix
 
 		// set the text according to user language preference
 		chooseLangAndDraw( i, j, wordArray, usrSudokuArr, usrLangPref );
+		textViewArr[i][j].getRelativeLayout().getChildAt(0).
 	}
 
 
