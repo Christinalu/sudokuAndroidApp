@@ -25,6 +25,7 @@ public class Select9Word
 	public int select(Word[] wordArray, String fileNameSelected, BufferedReader buffRead ) throws IOException
 	{
 		
+		
 			/** STATISTICALLY CHOOSE 9 MOST DIFFICULT WORD BASED ON HINT CLICK**/
 		
 		String line;

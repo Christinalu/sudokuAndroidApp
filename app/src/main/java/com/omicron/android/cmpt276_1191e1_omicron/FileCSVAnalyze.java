@@ -34,6 +34,8 @@ public class FileCSVAnalyze
 		int arrIndex;
 		int[] fileNameUsedArr = new int[MAX_WORD_PKG]; //create array to be used to determine which number represents that a file already exists; ie pkg_5 would have fileNameUsedArr[4] == 1
 		
+		
+		
 		/* FIND WHAT "FILE NAME" SHOULD BE (to not overwrite files with the same same) */
 		
 		
