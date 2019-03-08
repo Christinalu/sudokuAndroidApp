@@ -90,6 +90,8 @@ public class FileCSV
 		
 		FileOutputStream outStream;
 		
+		
+		
 		try
 		{
 			outStream = context.openFileOutput( fileName, context.MODE_PRIVATE ); //open private output stream
