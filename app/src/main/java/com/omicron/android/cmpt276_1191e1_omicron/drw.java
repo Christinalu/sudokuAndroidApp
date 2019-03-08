@@ -155,7 +155,6 @@ public class drw
 			}
 
 			rectLayout.invalidate( ); //required to update to print to screen
-			rectTextLayout.invalidate( );
 		}
 		else if (zoomOn[0] == 1)
 		{
