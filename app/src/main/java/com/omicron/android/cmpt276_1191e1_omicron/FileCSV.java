@@ -129,8 +129,7 @@ public class FileCSV
 		
 		/** NOTE: default CSV files should not contain any empty lines **/
 		
-			/* READ FILE */
-		
+		/* READ FILE */
 		InputStream inStream = context.getResources().openRawResource( R.raw.pkg_0 ); //from RAW resource, get the default pkg_1,csv file
 		BufferedReader buffRead = new BufferedReader( new InputStreamReader( inStream ) ); //get bytes of file
 		
@@ -173,38 +172,93 @@ public class FileCSV
 	{
 		/*
 		 * This function saves the content read from .csv file imported from user to local private app storage
-		 * Returns 0 if everything ok, -1 if error
+		 * Returns 0 if everything ok
 		 */
 		
 		// NOTE: file naming system "pkg_n.csv" where 'n' is an integer >= 0
 		// NOTE: this function is called after the CSV file  has been checked for validity, so this function assumes CSV file is valid
 		
+		
+		String fileName = "file-name-TEST";
+		String fileNoStart; //stores file name without the "pkg_"
+		String fileNoExtension; //stores file name without the ".csv"
+		
 		FileOutputStream outStream;
 		
-			/* FIND WHAT "FILE NAME" SHOULD BE (to not overwrite files with the same same) */
+		// FIND WHAT "FILE NAME" SHOULD BE (to not overwrite files with the same same) //
 		
+		int[] fileNameUsedArr = new int[MAX_WORD_PKG]; //create array to be used to determine which number represents that a file already exists; ie pkg_5 would have fileNameUsedArr[4] == 1
+		int invalidPkgNameSoFar = 0; //each time fileNameUsedArr has something set to "1" this is increased to represent how many "1" are in array
+		int arrIndex;
 		
-		//get all file name
 		String dirPath = context.getFilesDir().getAbsolutePath( ); //get path to local internal storage
 		File dir = new File( dirPath ); //get File object storing all file names
 		File[] file = dir.listFiles( ); //save all file names (path) in an array
 		
+		// loop through all pkg_n files and mark which names already exist
+		for( int i=0; i<file.length; i++ )
+		{
+			Log.d("upload", "file-name-CSV: " + file[i].getName( ) );
+			
+			fileName = file[i].getName( ); //get file name
+			
+			// VALIDATE FILE NAME OF FORM "pkg_n.csv" //
+			
+			if( fileName.length() < 9 ) //if name <9 means its too short to be valid file name
+			{ continue; }
+			
+			if( (fileName.substring( 0, 4 )).contentEquals( "pkg_" ) ) //check if file starts with "pkg_"
+			{
+				fileNoStart = fileName.substring( 4 ); //remove "pkg_"
+				fileNoExtension = fileNoStart.substring(0, fileNoStart.length()-4 ); //remove ".csv" extension
+				
+				try{
+					arrIndex = Integer.parseInt( fileNoExtension ); //get 'n' from "pkg_n.csv"
+				}
+				catch(Exception e){
+					Log.d( "upload", "ERROR: could not convert to int :file: " + fileName );
+					continue;
+				}
+				
+				if( 0 <= arrIndex && arrIndex < MAX_WORD_PKG ){
+					fileNameUsedArr[arrIndex] = 1; //mark file name as taken
+				}
+				else
+				{ Log.d( "upload", "ERROR: integer but out of bound" ); }
+			}
+			
+		}
 		
-		FileCSVAnalyze analyzeCSV = new FileCSVAnalyze( MAX_WORD_PKG );
 		
-		//call function to find available file number
-		int validIndex = analyzeCSV.analyseSaveFileNameNum( file );
+		for( int i=0; i<MAX_WORD_PKG; i++ ) //loop and find how many file names are invalid
+		{
+			if( fileNameUsedArr[i] == 1 )
+			{ invalidPkgNameSoFar++; }
+		}
 		
-		if( validIndex == -1 )
-		{ return -1; } //error occured
+		if( invalidPkgNameSoFar >= MAX_WORD_PKG ) //if array full with 1
+		{
+			return 1; //error: no available name to use, this should not occur unless incorrect extra internal files were added
+		}
 		
-		String fileNameFinal = "pkg_" + Integer.toString( validIndex ) + ".csv"; //set new valid name
+		
+		// FIND WHICH FILE NAME IS AVAILABLE
+		
+		int validIndex = -1;
+		for( int i=0; i<MAX_WORD_PKG; i++ ) //loop and find an index == 0, meaning that this number was not used yet
+		{
+			if( fileNameUsedArr[i] == 0 )
+			{ validIndex = i; break; }
+		}
 		
 		
-			/* WRITE TO pkg_n FILE */
+		fileName = "pkg_" + Integer.toString( validIndex ) + ".csv"; //set new valid name
+		
+		
+			// WRITE TO pkg_n FILE
 		try
 		{
-			outStream = context.openFileOutput( fileNameFinal, context.MODE_PRIVATE ); //open private output stream
+			outStream = context.openFileOutput( fileName, context.MODE_PRIVATE ); //open private output stream
 			outStream.write( strContent[0].getBytes( ) ); //convert string to bytes and write to file
 			outStream.close( ); //close and save file
 			
@@ -218,7 +272,7 @@ public class FileCSV
 		
 		
 		
-			/* APPEND TO word_pkg_name_file_name.csv FILE THE NEW ADDED FILE */
+			// APPEND TO word_pkg_name_file_name.csv FILE THE NEW ADDED FILE
 		
 		try {
 			// read all content
@@ -236,7 +290,7 @@ public class FileCSV
 			
 			// re-write content
 			outStream = context.openFileOutput( "word_pkg_name_and_file_name.csv", context.MODE_PRIVATE ); //open private output stream for re-write
-			outStream.write( (strBuild.toString() + pkgName + "," + fileNameFinal + "," + strContent[1].replace( "\n", "") + ",0\n" ).getBytes( ) ); //convert string to bytes and write to file
+			outStream.write( (strBuild.toString() + pkgName + "," + fileName + "," + strContent[1].replace( "\n", "") + ",0\n" ).getBytes( ) ); //convert string to bytes and write to file
 			outStream.close( ); //close and save file
 			
 			
@@ -261,11 +315,64 @@ public class FileCSV
 		InputStreamReader inStreamRead = new InputStreamReader( inStream ); //convert the bytes from InputStream to encoded char
 		BufferedReader buffRead = new BufferedReader( inStreamRead ); //store string in buffer (memory) after bytes were converted to char using InputStreamReader (from InputStream)
 		
+		String strLine; //store each line from .csv file
+		StringBuilder strBuild = new StringBuilder( ); //used to concatinate all lines into single String Stream
 		
-		FileCSVAnalyze fileAnalyseReadCSV = new FileCSVAnalyze( MAX_WORD_PKG );
 		
-		//analyse .csv data and get string[] with [0] .csv data and [1] with line
-		String [] res = fileAnalyseReadCSV.analyseReadCSVFile( buffRead, MAX_LANG_LEN, MAX_CSV_ROW, MAX_WORD_LEN );
+		String[] splitLine; //array to store the strings parsed from line by comma
+		String lang;
+		String[] res = { "", "" };
+		strLine = buffRead.readLine( ); //required if file empty to prevent crash on accessing .split() on null pointer
+		
+		if( strLine == null ) //test if file is empty by testing first line
+		{ return res; }
+		
+		 //get first valid line containing the language
+		splitLine = strLine.split( "," ); //split by comma
+		
+		int commaCount = countChar( strLine, ',' ); //find how many commas there are in string
+		
+		if( splitLine.length == 2 && splitLine[0].length() > 0 && splitLine[1].length() > 0 && commaCount == 1 && //also check that if 2 attributes then there should be 1 comma
+			splitLine[0].length() <= MAX_LANG_LEN && splitLine[1].length() <= MAX_LANG_LEN ) //check for correct formatting; ie if not null, all cells filled, if not enough or too many cells
+		{
+			strBuild.append( splitLine[0] + "," + splitLine[1] + "\n" ); //if correct format add the lang to file
+			lang = splitLine[0] + "," + splitLine[1] + "\n"; //this will be sent to saveCSVFile
+		}
+		else //file has improper formatting
+		{ return res; }
+		
+		int totalLineCnt = 0; //stores the number of word pairs in the file
+		
+		int loopLimit = 0; //only loop to MAX, looping any more is irrelevant since file does not meet size requirement
+		while( ( strLine = buffRead.readLine( ) ) != null && loopLimit <= MAX_CSV_ROW ) //read lines from buffer until EOF
+		{
+			// here check if line is valid, then if valid add to strBuild
+			splitLine = strLine.split( "," ); //split by comma
+			commaCount = countChar( strLine, ',' ); //find how many commas there are in string
+			
+			if( splitLine.length == 2 && splitLine[0].length() > 0 && splitLine[1].length() > 0 && commaCount == 1 && //also check that if 2 attributes then there should be 1 comma
+					splitLine[0].length() <= MAX_WORD_LEN && splitLine[1].length() <= MAX_WORD_LEN ) //check for correct formatting; ie if not null, all cells filled, if not enough or too many cells
+			{
+				strBuild.append(strLine); //append all lines to builder
+				strBuild.append( ",1" ); //add a third "hint click" attribute to represent how many times a user has clicked in Dictionary to reveal translation (used to find which words the user is having difficulty with); "1" must be default, NOT "0" because later in code "1" is needed
+				strBuild.append("\n"); //"new line" char important to separate rows (because it is discarded when reading line by line
+				totalLineCnt++; //increase count of valid word pair
+			}
+			else
+			{ return res; } //invalid word pair
+			
+			loopLimit ++;
+		}
+		if( loopLimit > MAX_CSV_ROW ){ return res; }
+		
+		if( totalLineCnt < 9 || totalLineCnt > MAX_CSV_ROW ){ //9 word pairs is a minimum and has to be  <= MAX_CSV_ROW as requirement
+			Log.d( "upload", "ERROR: incorrect number of word pairs" );
+			return res;
+		}
+		
+		//return valid String[]
+		res[0] = strBuild.toString( );
+		res[1] = lang;
 		
 		return res;
 	}
@@ -325,7 +432,17 @@ public class FileCSV
 	}
 	
 	
-	
+	private int countChar( String str, char c ) //count how many times a char is contained in string
+	{
+		int count = 0;
+		
+		for( int i=0; i<str.length(); i++ )
+		{
+			if( str.charAt(i) == c )
+			{ count++; }
+		}
+		return count;
+	}
 }
 
 
