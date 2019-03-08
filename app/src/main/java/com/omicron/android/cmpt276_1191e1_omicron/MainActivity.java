@@ -1,32 +1,25 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
 import android.content.Intent;
-import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Random;
 
 
 public class MainActivity extends AppCompatActivity
@@ -115,7 +108,9 @@ public class MainActivity extends AppCompatActivity
 		
 		fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW );
 		
-		//TEST IF USER JUST INSTALLED APP - IF USER HAS, LOAD DEFAULT FILES
+		
+			/* TEST IF USER JUST INSTALLED APP - IF USER HAS, LOAD DEFAULT FILES */
+		
 		int usrNewInstall = fileCSV.checkIfCurrentWordPkgCountFileExists( this ); //0==files already exist
 		
 		if( usrNewInstall == 0 ) //if app was already installed and has correct files - get current_word_pkg_count
@@ -165,7 +160,6 @@ public class MainActivity extends AppCompatActivity
 		}
 		
 		
-		
 			// SET LISTENERS TO WHICH PKG IS SELECTED //
 		
 		pkgRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
@@ -178,10 +172,6 @@ public class MainActivity extends AppCompatActivity
 				}
 			}
 		});
-		
-		
-		
-		
 		
 		
 		//create button which will start new UploadActivity to upload and process .csv file
@@ -603,7 +593,6 @@ public class MainActivity extends AppCompatActivity
 		 * Returns 1 if could not generate an array
 		 */
 		
-		
 			/* OPEN PKG FILE TO READ */
 		
 		FileInputStream fileInStream = null; //open file from internal storage
@@ -616,115 +605,12 @@ public class MainActivity extends AppCompatActivity
 		InputStreamReader inStreamRead = new InputStreamReader( fileInStream );
 		BufferedReader buffRead = new BufferedReader( inStreamRead );
 		
+		Select9Word select9Word = new Select9Word( MAX_CSV_ROW );
 		
-			/** STATISTICALLY CHOOSE 9 MOST DIFFICULT WORD BASED ON HINT CLICK**/
+		//call function to modify wordArray[]
+		int res = select9Word.select( wordArray, fileNameSelected, buffRead );
 		
-		String line;
-		String[] strSplit;
-		
-		int lineCount = 0;
-		int i = 0;
-		long total = 0; //stores total number of Click Count
-		long totalBk = 0; //back up for "total"
-		Range[] rangeArr = new Range[MAX_CSV_ROW]; //array for each word pair, storing the range of "hint clicks"
-		
-		Log.d( "upload", " @ WORD_ARRAY ON START GAME BTN CLICK:" );
-		
-		//set pkg name
-		wordArray[10] = new Word( fileNameSelected, "", -1, -1 );
-		
-		
-		while( (line = buffRead.readLine( )) != null ) //loop and get all lines
-		{
-			if( i == 0 ) //get language from file
-			{
-				strSplit = line.split( "," );
-				wordArray[9] = new Word( strSplit[0], strSplit[1], -1, -1 );
-				i = 1;
-			}
-			else
-			{
-				strSplit = line.split( "," );
-				totalBk = total;
-				total = total + Long.parseLong( strSplit[2] ); //add Click Count for each word
-				
-				//note: in Range( 0,0 ), it means only 0th index; Range( 1,5 ) means from 1 to 5 inclusive
-				rangeArr[lineCount] = new Range( totalBk, total-1, strSplit[0], strSplit[1], Integer.parseInt( strSplit[2] ) );
-				
-				lineCount++;
-			}
-		}
-		
-		
-		//// debug /////////////
-		Log.d( "upload", "# of line: " + lineCount );
-		Log.d( "upload", "# TOTAL: " + total );
-		for( int j=0; j<lineCount; j++ ) //print rangeArr[]
-		{
-			Log.d( "upload", "RANGE :: line " + (j+1) + ": ( " + rangeArr[j].getNumLeft() + ", " + rangeArr[j].getNumRight() + " )" );
-		}
-		///////////////////////
-		
-		
-			// RANDOMLY CHOOSE 9 WORDS (based on difficulty) //
-		
-		// NOTE: Random Number generator does not return all range for "long"
-		Random rand = new Random( );
-		long randPos; //random position to choose
-		int n = 0; //used to prevent run-on random generator
-		boolean breakOut = false;
-		int[] wordUsed = new int[lineCount]; //array for all words used to mark if a word was selected for wordArray
-		
-		for( int k=0; k<9; k++ ) //loop to find 9 words
-		{
-			n = 0; //reset
-			breakOut = false; //reset
-			while( n < 500000 )
-			{
-				randPos = rand.nextLong( ) % total; //random position to choose
-				
-				//loop through rangeArr and find which word range has this value
-				for( int c=0; c<lineCount; c++ )
-				{
-					if( rangeArr[c].getNumLeft() <= randPos && randPos <= rangeArr[c].getNumRight() ) //if within range of word
-					{
-						if( wordUsed[c] == 1 ) //if word already used
-						{
-							continue;
-						}
-						else //word not previously selected for wordArray
-						{
-							//USE THIS WORD AS NEW wordArr[k]
-							wordArray[k] = new Word( rangeArr[c].getStrNative(), rangeArr[c].getStrTranslation(), c+1, 0 );
-							wordUsed[c] = 1; //mark word as used
-							//break out of loop
-							breakOut = true;
-							break; //do not look for more words
-						}
-					}
-				}
-				
-				if( breakOut == true )//breaked after found valid word
-				{ break; } //so break out of while loop
-				
-				n++;
-			}
-			
-			if( n >= 500000 ) //exhausted all tries
-			{ return 1; }
-		}
-		
-		
-		
-		//// debug //////
-		for( int j=0; j<lineCount; j++ ) //print rangeArr[]
-		{
-			Log.d( "upload", "wordUsed[" + (j+1) + "] :: " + wordUsed[j] );
-		}
-		/////////////////
-		
-		
-		return 0;
+		return res;
 	}
 }
 

@@ -1,15 +1,9 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
-import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -19,13 +13,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 public class UploadActivity extends AppCompatActivity
 {
@@ -33,7 +22,7 @@ public class UploadActivity extends AppCompatActivity
 	private int MAX_CSV_ROW;
 	private int READ_REQUEST_CODE = 0;
 	private int CURRENT_WORD_PKG_COUNT = 0; //stores current number of packages the user has uploaded
-	private  FileCSV fileCSV; //object for using CSV functions
+	private FileCSV fileCSV; //object for using CSV functions
 	private int STATISTIC_MULTIPLE = 2; //double user Hint clicks to make it more likely for word to be shown
 	
 	@Override
@@ -192,7 +181,7 @@ public class UploadActivity extends AppCompatActivity
 		
 		startActivityForResult( intent, READ_REQUEST_CODE ); //call OS intent to import file from storage framework
 		
-		// NOTE: the code continues once the intent returns so go to see onActivityResult
+		// NOTE: the code continues once the intent returns, so go see onActivityResult( )
 	}
 	
 	
