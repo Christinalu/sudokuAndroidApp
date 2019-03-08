@@ -3,8 +3,6 @@ package com.omicron.android.cmpt276_1191e1_omicron;
 import android.content.Context;
 import android.util.Log;
 
-import com.omicron.android.cmpt276_1191e1_omicron.PackageFile;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
