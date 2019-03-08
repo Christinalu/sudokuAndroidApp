@@ -41,11 +41,12 @@ public class MainActivity extends AppCompatActivity
 	private int usrModePref = 0; // 0=standard, 1=speech
 	private int usrLangPref = 0; // 0=eng_fr, 1=fr_eng; 0 == native(squares that cannot be modified); 1 == translation(the words that the user inserts)
 	private int usrDiffPref; //0=easy,1=medium,2=difficult
-	private int state; //0=new start, 1=resume
+	private int state = 0; //0=new start, 1=resume
 	private String language;
 	private boolean canStart = true;
 
 	Word[] wordArrayResume;
+	String[] numArrayResume;
 	private int usrLangPrefResume;
 	private SudokuGenerator usrSudokuArrResume;
 	int usrModePrefResume;
@@ -53,8 +54,10 @@ public class MainActivity extends AppCompatActivity
 
 	//used only for user entering language check//convert to appropriate tag
 	private TextToSpeech lTTS;
-	private List<String> langCountries = new ArrayList<String>();
-	private List<String> langTags = new ArrayList<String>();
+	Locale[] thelocale;
+	private List<String> lTTSlanguage = new ArrayList<String>();
+	private List<String> lTTScountry = new ArrayList<String>();
+	private List<String> lTTSlangTags = new ArrayList<String>();
 	private List<Locale> localeList = new ArrayList<Locale>();
 	Locale usrlangchoice;
 
@@ -94,6 +97,21 @@ public class MainActivity extends AppCompatActivity
 	{
 		super.onCreate( savedInstanceState );
 		setContentView( R.layout.activity_main );
+
+		if (savedInstanceState != null) {
+			//a state had been saved, load it. if state == 0, there is nothing to load.
+			state = (int) savedInstanceState.getSerializable("state");
+			if (state == 1) {
+				wordArrayResume = (Word[]) savedInstanceState.getSerializable("wordArrayMA");
+				usrLangPrefResume = savedInstanceState.getInt("usrLangPrefMA");
+				usrSudokuArrResume = (SudokuGenerator) savedInstanceState.get("SudokuArrMA");
+				usrModePrefResume = (int) savedInstanceState.getSerializable("usrModeMA");
+				languageResume = (String) savedInstanceState.getSerializable("languageMA");
+				if (usrModePrefResume == 1) {
+					numArrayResume = (String[]) savedInstanceState.getSerializable("numArrayMA");
+				}
+			}
+		}
 		
 		fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW );
 		
@@ -273,9 +291,10 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onInit(int status) {
 				if (status == TextToSpeech.SUCCESS) {
-					Locale[] thelocale = Locale.getAvailableLocales();
+					thelocale = Locale.getAvailableLocales();
 					//For optional implementations
-					String langCountry;
+					String TTSlanguage;
+					String TTScountry;
 					int counter = 0;
 					for (Locale LO : thelocale) {
 						int res = lTTS.isLanguageAvailable(LO);
@@ -283,18 +302,16 @@ public class MainActivity extends AppCompatActivity
 							//store all available locales as Locale type
 							localeList.add(LO);
 							//store all available language tag (String)
-							langTags.add(LO.toLanguageTag());
-							Log.e("lTTS", langTags.get(counter));
-							//counter++;
-                            /*
-                            //For optional implementations
-                            langCountry = langTags.get(counter);
-                            Log.e("lTTS", langCountry);
-                            langCountry = LO.getDisplayLanguage() + " - " + LO.getDisplayCountry();
-                            Log.e("lTTS", langCountry);
-                            //store all available locales in language - country format (strings)
-                            langCountries.add(langCountry);
-                            */
+							lTTSlangTags.add(LO.toLanguageTag());
+							//Log.e("lTTS", "LanguageTag is: "+lTTSlangTags.get(counter));
+							//For optional implementations
+							//store all available locales in language - country format (strings)
+							TTSlanguage = LO.getDisplayLanguage();
+							lTTSlanguage.add(TTSlanguage);
+							TTScountry = LO.getDisplayCountry();
+							lTTScountry.add(TTScountry);
+							//Log.e("lTTS", "Language and Country is: "+lTTSlanguage.get(counter)+" - "+lTTScountry.get(counter));
+							counter++;
 						}
 					}
 				}
@@ -329,25 +346,24 @@ public class MainActivity extends AppCompatActivity
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					
+
 					Intent gameActivity = new Intent( MainActivity.this, GameActivity.class );
 					state = 0;
 					//check to see for language format is correct and available
 					if (usrModePref == 1) {
 						if (usrLangPref == 0) {
-							language = "en-US";
-							//language = wordArray[9].getTranslation();
+							language = wordArray[9].getTranslation();
 							Log.e("lTTSs", "language is: "+language);
 						}
 						else {
-							language = "fr-FR";
-							//language = wordArray[9].getNative();
+							language = wordArray[9].getNative();
 							Log.e("lTTSs", "language is: "+language);
 						}
 						canStart = false;
-						for (int i=0; i<langTags.size(); i++) {
+						for (int i=0; i<lTTSlangTags.size(); i++) {
 							//Log.e("lTTS", "language is: "+language+" langTag is: "+langTags.get(i));
-							if (Objects.equals(language,langTags.get(i))) {
+							if (Objects.equals(language,lTTSlanguage.get(i))) {
+								language = lTTSlangTags.get(i);
 								canStart = true;
 								if (canStart) {
 									break;
@@ -378,24 +394,6 @@ public class MainActivity extends AppCompatActivity
 						gameActivity.putExtra("languageMA", language);
 						startActivityForResult(gameActivity,0);
 					}
-                                             /*
-                                             //Assume proper language formatting in CSV file
-                                             if (usrModePref == 1) {
-                                                 if (usrLangPref == 0) {
-                                                     language = wordArray[9].getTranslation();
-                                                 } else {
-                                                     language = wordArray[9].getNative();
-                                                 }
-                                             }
-                                             //unconditional game start: save wordArray for Game Activity
-                                             gameActivity.putExtra("wordArray", wordArray);
-                                             gameActivity.putExtra("usrLangPref", usrLangPref);
-                                             gameActivity.putExtra("usrDiffPref", usrDiffPref);
-                                             gameActivity.putExtra("state", state);
-                                             gameActivity.putExtra("usrModeMA", usrModePref);
-                                             gameActivity.putExtra("languageMA", language);
-                                             startActivityForResult(gameActivity, 0);
-                                             */
 				}
 			}
 		);
@@ -408,6 +406,7 @@ public class MainActivity extends AppCompatActivity
 										@Override
 										public void onClick( View v )
 										{
+											state = 0;
 											btn_remove.setEnabled( true ); //allow user to remove pkg
 											removeBtnEnable[0] = true;
 											Button btnResume = findViewById( R.id.button_resume );
@@ -421,9 +420,15 @@ public class MainActivity extends AppCompatActivity
 		
 		
 		Button btnResume = (Button) findViewById(R.id.button_resume);
-		btnResume.setEnabled(false); //block Resume button unless a previous game is saved
-		//DISABLE "REMOVE PKG" button when game is started
-		removeBtnEnable[0] = true;
+		if (state == 0) {
+			btnResume.setEnabled(false); //block Resume button unless a previous game is saved
+			//DISABLE "REMOVE PKG" button when game is started
+			removeBtnEnable[0] = true;
+		}
+		else {
+			removeBtnEnable[0] = false;
+		}
+
 		/*
 		
 		//check if a previous game existed. If it did, unblock resume button
@@ -453,7 +458,10 @@ public class MainActivity extends AppCompatActivity
 					resumeActivity.putExtra("SudokuArrMA", usrSudokuArrResume);
 					resumeActivity.putExtra("state", state);
 					resumeActivity.putExtra("usrModeMA", usrModePrefResume);
-					resumeActivity.putExtra("languageMA", language);
+					if (usrModePrefResume == 1) {
+						resumeActivity.putExtra("numArrayMA", numArrayResume);
+					}
+					resumeActivity.putExtra("languageMA", languageResume);
 					startActivityForResult(resumeActivity, 0);
 				}
 				else {
@@ -546,28 +554,45 @@ public class MainActivity extends AppCompatActivity
 	}
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent resumeSrc) {
-		if (resumeSrc == null) {
-			Log.i("TAG", "resumeSrc == null");
-			return;
-		}
-		//if all necessary game preferences are written in memory, then unblock resume button
-		Log.i("TAG", "resumeSrc != null");
-		if (resumeSrc.hasExtra("wordArrayGA") && resumeSrc.hasExtra("usrLangPrefGA") && resumeSrc.hasExtra("SudokuArrGA") && resumeSrc.hasExtra("state") && resumeSrc.hasExtra("languageGA")) {
-			Log.i("TAG", "resumeSrc has all elements");
-			wordArrayResume = (Word[]) resumeSrc.getSerializableExtra("wordArrayGA");
-			usrLangPrefResume = (int) resumeSrc.getSerializableExtra("usrLangPrefGA");
-			usrSudokuArrResume = (SudokuGenerator) resumeSrc.getSerializableExtra("SudokuArrGA");
-			usrModePrefResume = (int) resumeSrc.getSerializableExtra("usrModeGA");
-			languageResume = (String) resumeSrc.getSerializableExtra("languageGA");
-			state = 1;
-			Button btnResume = (Button) findViewById(R.id.button_resume);
-			btnResume.setEnabled(true);
-			Button btnRemove = (Button) findViewById(R.id.btn_remove); //block user from deleting pkg while playing game
-			btnRemove.setEnabled(false);
-			removeBtnEnable[0] = false;
+		if (resumeSrc != null) {
+			//if all necessary game preferences are written in memory, then unblock resume button
+			if (resumeSrc.hasExtra("wordArrayGA") && resumeSrc.hasExtra("usrLangPrefGA") && resumeSrc.hasExtra("SudokuArrGA") && resumeSrc.hasExtra("usrModeGA") && resumeSrc.hasExtra("languageGA")) {
+				Log.i("TAG", "resumeSrc has all elements");
+				wordArrayResume = (Word[]) resumeSrc.getSerializableExtra("wordArrayGA");
+				usrLangPrefResume = (int) resumeSrc.getSerializableExtra("usrLangPrefGA");
+				usrSudokuArrResume = (SudokuGenerator) resumeSrc.getSerializableExtra("SudokuArrGA");
+				usrModePrefResume = (int) resumeSrc.getSerializableExtra("usrModeGA");
+				if (usrModePrefResume == 1) {
+					numArrayResume = (String[]) resumeSrc.getStringArrayExtra("numArrayGA");
+				}
+				languageResume = (String) resumeSrc.getSerializableExtra("languageGA");
+				state = 1;
+				Button btnResume = (Button) findViewById(R.id.button_resume);
+				btnResume.setEnabled(true);
+				Button btnRemove = (Button) findViewById(R.id.btn_remove); //block user from deleting pkg while playing game
+				btnRemove.setEnabled(false);
+				removeBtnEnable[0] = false;
+			}
 		}
 	}
-	
+
+	@Override
+	public void onSaveInstanceState (Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);
+		savedInstanceState.putInt("state", state);
+		if (state == 1) {
+			savedInstanceState.putSerializable("wordArrayMA", wordArrayResume);
+			savedInstanceState.putInt("usrLangPrefMA", usrLangPrefResume);
+			savedInstanceState.putSerializable("SudokuArrMA", usrSudokuArrResume);
+			savedInstanceState.putInt("usrModeMA", usrModePrefResume);
+			savedInstanceState.putString("languageMA", languageResume);
+			if (usrModePrefResume == 1) {
+				savedInstanceState.putStringArray("numArrayMA", numArrayResume);
+			}
+		}
+	}
+
+
 	private int initializeWordArray( String fileNameSelected ) throws IOException //
 	{
 		/*
