@@ -546,7 +546,6 @@ public class GameActivity extends AppCompatActivity
 							Log.i("TAG", "normal click: (" + touchX[0] + ", " + touchY[0] + ")");
 						}
 						if (usrModePref == 1) {
-							// when originalPuzzle squares clicked, the voice of our lord and savior will bless them with the translated word
 							row = currentRectColoured.getRow();
 							col = currentRectColoured.getColumn();
 							if (row < 9 && col < 9 && row > -1 && col > -1) {
