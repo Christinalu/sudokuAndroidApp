@@ -777,7 +777,21 @@ public class GameActivity extends AppCompatActivity
 		
 		Log.d( "upload", "onStop called for GameActivity" );
 	}
+
+
+	@Override
+	public void onStart( )
+	{
+		super.onStart( );
+		
+		//reset all "HintClick"
+		for( int i=0; i<9; i++ )
+		{
+			wordArray[i].updateHintClick( 0 );
+		}
+	}
 }
+
 
 
 
