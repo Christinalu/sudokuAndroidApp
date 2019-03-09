@@ -7,7 +7,8 @@
     android:background="@color/mediumaquamarine"
     tools:context=".GameActivity">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -17,121 +18,143 @@
             android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
             android:layout_marginStart="0dp"
+            android:layout_marginTop="0dp"
             android:layout_marginRight="0dp"
-            android:layout_marginBottom="0dp"
-            android:layout_marginTop="0dp">
-
-        </RelativeLayout>
+            android:layout_marginBottom="0dp"/>
 
         <RelativeLayout
             android:id="@+id/rect_txt_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"/>
 
-        </RelativeLayout>
-
-        <Button
-            android:id="@+id/button_dictionary"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="460dp"
-            android:width="390dp"
-            android:background="@drawable/hint"
-            android:gravity="center"
-            android:text="HINT" />
-
-        <Button
-            android:id="@+id/button_zoom_in"
+        <!--<ImageButton-->
+            <!--android:id="@+id/button_dictionary"-->
+            <!--android:layout_width="45dp"-->
+            <!--android:layout_height="60dp"-->
+            <!--android:layout_alignParentStart="true"-->
+            <!--android:layout_alignParentBottom="true"-->
+            <!--android:layout_marginStart="26dp"-->
+            <!--android:layout_marginLeft="20dp"-->
+            <!--android:layout_marginBottom="150dp"-->
+            <!--android:background="@color/mediumaquamarine"-->
+            <!--android:contentDescription="@string/hint"-->
+            <!--android:scaleType="fitXY"-->
+            <!--android:src="@drawable/light_bulb" />-->
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginTop="460dp"
-            android:layout_alignParentRight="true"
-            android:width="130dp"
-            android:background="@drawable/hint"
-            android:gravity="center"
-            android:text="IN" />
+            android:id="@+id/hint_content"
+            android:textSize="25sp"
+            android:text="@android:string/untitled"
+            android:textColor="@color/white"
+            android:layout_alignBottom="@id/keypad"
+            android:layout_marginBottom="160dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="50dp"
+            android:layout_toStartOf="@id/button_zoom_out" />
 
-        <Button
+        <ImageButton
             android:id="@+id/button_zoom_out"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="150dp"
-            android:layout_marginTop="460dp"
-            android:layout_alignParentRight="true"
-            android:width="130dp"
-            android:background="@drawable/hint"
-            android:gravity="center"
-            android:text="OUT" />
+            android:layout_alignBottom="@id/keypad"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="153dp"
+            android:layout_toStartOf="@id/button_zoom_in"
+            android:background="@color/mediumaquamarine"
+            android:contentDescription="@string/zoom_out"
+            android:scaleType="fitXY"
+            app:srcCompat="@android:drawable/btn_minus" />
 
-    </RelativeLayout>
+        <ImageButton
+            android:id="@+id/button_zoom_in"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignBottom="@id/keypad"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="153dp"
+            android:background="@color/mediumaquamarine"
+            android:contentDescription="@string/zoom_in"
+            android:scaleType="fitXY"
+            app:srcCompat="@android:drawable/btn_plus" />
 
 
-    <TableLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/keypad"
-        android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:orientation="vertical"
         android:stretchColumns="*">
         <TableRow>
-            <Button android:id="@+id/keypad_1"
+
+            <Button
+                android:id="@+id/keypad_1"
                 android:background="@drawable/buttons"
-                android:textColor="@android:color/white"
-                android:text="un">
-            </Button>
-            <Button android:id="@+id/keypad_2"
+                android:text="@string/keypads"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/keypad_2"
                 android:background="@drawable/buttons"
-                android:textColor="@android:color/white"
-                android:text="deux">
-            </Button>
-            <Button android:id="@+id/keypad_3"
+                android:text="@string/keypads"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/keypad_3"
                 android:background="@drawable/buttons"
-                android:textColor="@android:color/white"
-                android:text="trois">
-            </Button>
+                android:text="@string/keypads"
+                android:textColor="@android:color/white" />
+
         </TableRow>
+
         <TableRow>
-            <Button android:id="@+id/keypad_4"
+
+            <Button
+                android:id="@+id/keypad_4"
                 android:background="@drawable/buttons"
-                android:textColor="@android:color/white"
-                android:text="quatre">
-            </Button>
-            <Button android:id="@+id/keypad_5"
+                android:text="@string/keypads"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/keypad_5"
                 android:background="@drawable/buttons"
-                android:textColor="@android:color/white"
-                android:text="cinq">
-            </Button>
-            <Button android:id="@+id/keypad_6"
+                android:text="@string/keypads"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/keypad_6"
                 android:background="@drawable/buttons"
-                android:textColor="@android:color/white"
-                android:text="six">
-            </Button>
+                android:text="@string/keypads"
+                android:textColor="@android:color/white" />
+
         </TableRow>
+
         <TableRow>
-            <Button android:id="@+id/keypad_7"
+
+            <Button
+                android:id="@+id/keypad_7"
                 android:background="@drawable/buttons"
-                android:textColor="@android:color/white"
-                android:text="sept">
-            </Button>
-            <Button android:id="@+id/keypad_8"
+                android:text="@string/keypads"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/keypad_8"
                 android:background="@drawable/buttons"
-                android:textColor="@android:color/white"
-                android:text="huit">
-            </Button>
-            <Button android:id="@+id/keypad_9"
+                android:text="@string/keypads"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/keypad_9"
                 android:background="@drawable/buttons"
-                android:textColor="@android:color/white"
-                android:text="neuf">
-            </Button>
+                android:text="@string/keypads"
+                android:textColor="@android:color/white" />
+
         </TableRow>
     </TableLayout>
-
+    </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

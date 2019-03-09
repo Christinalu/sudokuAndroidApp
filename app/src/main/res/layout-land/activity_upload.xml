@@ -11,32 +11,31 @@
 
 	<EditText
 		android:id="@+id/editText_pkg_name"
-		android:layout_width="220dp"
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_gravity="center"
 		android:layout_marginTop="10dp"
 		android:ems="10"
 		android:hint="@string/package_name"
-		android:textSize="15sp"
+		android:textSize="20sp"
 		android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -_!/()'0123456789"
 		android:maxLength="35"
 		android:inputType="textCapSentences" />
-
-    <Button
-		android:id="@+id/upload_file"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:background="@drawable/hint"
-		android:padding="10dp"
-		android:layout_marginTop="10dp"
-		android:layout_gravity="center"
-		android:text="@string/upload_csv"/>
 
 	<TextView
 		android:id="@+id/selected_file"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:paddingLeft="25dp"/>
+		android:paddingLeft="25sp"/>
+
+	<Button
+		android:id="@+id/upload_file"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:background="@drawable/hint"
+		android:padding="10dp"
+		android:text="@string/upload_csv" />
 
 	<ScrollView
 		android:layout_width="wrap_content"
@@ -47,8 +46,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:padding = "10dp"
-			android:textSize="20sp"
-			android:text="@string/uploadInstruction"/>
+			android:text="@string/uploadInstruction" />
 
 	</ScrollView>
 

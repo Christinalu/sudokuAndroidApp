@@ -1,139 +1,181 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/mediumaquamarine">
-
-
-
+    android:background="@color/mediumaquamarine"
+    tools:context=".GameActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/imgView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-
         <RelativeLayout
             android:id="@+id/rect_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-
-
-        </RelativeLayout>
+            android:layout_height="match_parent"
+            android:layout_marginStart="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginBottom="0dp" />
 
         <RelativeLayout
             android:id="@+id/rect_txt_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-        </RelativeLayout>
-
-        <Button
-            android:id="@+id/button_dictionary"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="460dp"
-            android:width="390dp"
-            android:background="@drawable/hint"
-            android:gravity="center"
-            android:text="HINT" />
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="0dp" />
 
-        <Button
+        <!--<ImageButton-->
+            <!--android:id="@+id/button_dictionary"-->
+            <!--android:layout_width="45dp"-->
+            <!--android:layout_height="60dp"-->
+            <!--android:layout_alignParentEnd="true"-->
+            <!--android:layout_marginTop="5dp"-->
+            <!--android:layout_marginEnd="239dp"-->
+            <!--android:background="@color/mediumaquamarine"-->
+            <!--android:baselineAlignBottom="true"-->
+            <!--android:contentDescription="@string/hint"-->
+            <!--android:scaleType="fitXY"-->
+            <!--android:src="@drawable/light_bulb" />-->
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/hint_content"
+                android:text="@android:string/untitled"
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                android:layout_toStartOf="@id/keypad"
+                android:layout_marginEnd="40dp"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="30dp"/>
+
+        <ImageButton
             android:id="@+id/button_zoom_in"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="160dp"
-            android:layout_marginEnd="5dp"
-            android:width="130dp"
-            android:background="@drawable/hint"
-            android:gravity="center"
-            android:text="IN" />
+            android:layout_alignBottom="@+id/button_zoom_out"
+            android:layout_marginBottom="50dp"
+            android:layout_toStartOf="@id/keypad"
+            android:background="@color/mediumaquamarine"
+            android:contentDescription="@string/zoom_in"
+            android:scaleType="fitXY"
+            app:srcCompat="@android:drawable/btn_plus" />
 
-        <Button
+        <ImageButton
             android:id="@+id/button_zoom_out"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="150dp"
-            android:layout_marginTop="160dp"
-            android:layout_alignParentRight="true"
-            android:width="130dp"
-            android:background="@drawable/hint"
-            android:gravity="center"
-            android:text="OUT" />
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="30dp"
+            android:layout_toStartOf="@id/keypad"
+            android:background="@color/mediumaquamarine"
+            android:contentDescription="@string/zoom_out"
+            android:scaleType="fitXY"
+            app:srcCompat="@android:drawable/btn_minus" />
 
+        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/keypad"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:layout_alignParentEnd="true"
+            android:orientation="vertical"
+            android:useDefaultMargins="true">
+
+                <Button
+                    android:id="@+id/keypad_1"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttons"
+                    android:text="@string/keypads"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/keypad_2"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttons"
+                    android:text="@string/keypads"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/keypad_3"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
+                    android:background="@drawable/buttons"
+                    android:layout_weight="1"
+                    android:text="@string/keypads"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/keypad_4"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttons"
+                    android:text="@string/keypads"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/keypad_5"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttons"
+                    android:text="@string/keypads"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/keypad_6"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttons"
+                    android:text="@string/keypads"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/keypad_7"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttons"
+                    android:text="@string/keypads"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/keypad_8"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttons"
+                    android:text="@string/keypads"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/keypad_9"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttons"
+                    android:text="@string/keypads"
+                    android:textColor="@android:color/white" />
+
+            </TableLayout>
+        </RelativeLayout>
     </RelativeLayout>
 
-
-    <TableLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/keypad"
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:stretchColumns="*">
-        <TableRow>
-            <Button android:id="@+id/keypad_1"
-                android:background="@drawable/buttons"
-                android:textColor="@android:color/white"
-                android:text="un">
-            </Button>
-            <Button android:id="@+id/keypad_2"
-                android:background="@drawable/buttons"
-                android:textColor="@android:color/white"
-                android:text="deux">
-            </Button>
-            <Button android:id="@+id/keypad_3"
-                android:background="@drawable/buttons"
-                android:textColor="@android:color/white"
-                android:text="trois">
-            </Button>
-        </TableRow>
-        <TableRow>
-            <Button android:id="@+id/keypad_4"
-                android:background="@drawable/buttons"
-                android:textColor="@android:color/white"
-                android:text="quatre">
-            </Button>
-            <Button android:id="@+id/keypad_5"
-                android:background="@drawable/buttons"
-                android:textColor="@android:color/white"
-                android:text="cinq">
-            </Button>
-            <Button android:id="@+id/keypad_6"
-                android:background="@drawable/buttons"
-                android:textColor="@android:color/white"
-                android:text="six">
-            </Button>
-        </TableRow>
-        <TableRow>
-            <Button android:id="@+id/keypad_7"
-                android:background="@drawable/buttons"
-                android:textColor="@android:color/white"
-                android:text="sept">
-            </Button>
-            <Button android:id="@+id/keypad_8"
-                android:background="@drawable/buttons"
-                android:textColor="@android:color/white"
-                android:text="huit">
-            </Button>
-            <Button android:id="@+id/keypad_9"
-                android:background="@drawable/buttons"
-                android:textColor="@android:color/white"
-                android:text="neuf">
-            </Button>
-        </TableRow>
-    </TableLayout>
-
-
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>
