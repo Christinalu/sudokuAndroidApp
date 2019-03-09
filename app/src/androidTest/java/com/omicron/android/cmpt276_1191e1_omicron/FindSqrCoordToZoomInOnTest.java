@@ -110,15 +110,13 @@ public class FindSqrCoordToZoomInOnTest {
 																			   sqrSize, textMatrix, ZOOM_SCALE );
 		
 		textMatrix.scaleTextZoomIn( );
-		//textMatrix.reDrawTextZoom( touchXZ, touchYZ, dX, dY ); // call this because .scaleTextZoom() only scales Layouts, so call this to place them in correct (drag) position
 		
 		
 		
-		/** TEST CASES **/
+			/** TEST CASES **/
 		
 			/* TEST TOP LEFT SQUARE, SHOULD ZOOM PUZZLE-VIEW TO TOP LEFT */
 		
-		Log.d( "testunit", "testing findSqrCoodToZoom.findSqrCoordToZoomInOn( );" );
 		findSqrCoodToZoom.findSqrCoordToZoomInOn( );
 		
 		assertEquals( touchXZ[0], 0 );
@@ -131,21 +129,13 @@ public class FindSqrCoordToZoomInOnTest {
 		findSqrCoodToZoom = new FindSqrCoordToZoomInOn( touchXZ, touchYZ, currentRectColoured, bitmapSize,
 														sqrSize, textMatrix, ZOOM_SCALE );
 		
-		//calculate where zoomXY should be according to screen size equation
-		//int coordX = (int) (( (textMatrix.getRelativeAndPos())[currentRectColoured.getRow()][currentRectColoured.getColumn()] ).getSqrL( )*ZOOM_SCALE);
-		//int coordY = (int) (( (textMatrix.getRelativeAndPos())[currentRectColoured.getRow()][currentRectColoured.getColumn()] ).getSqrT( )*ZOOM_SCALE);
-		
 		//coordinates for right most side
-		int coordX =  (int)(bitmapSize * ZOOM_SCALE - bitmapSize);
-		int coordY =  (int)(bitmapSize * ZOOM_SCALE - bitmapSize);
-		Log.d( "testunit", "testing findSqrCoodToZoom.findSqrCoordToZoomInOn-2( );" );
-		Log.d( "testunit", "coordX: " + coordX + " coordY: " + coordY );
+		int coordX =  540;
+		int coordY =  540;
 		
+		//test call
 		findSqrCoodToZoom.findSqrCoordToZoomInOn( );
-		
-		
-		Log.d( "testunit", "touchXZ[0] = " + touchXZ[0] );
-		
+
 		assertEquals( touchXZ[0], coordX );
 		assertEquals( touchYZ[0], coordY );
 		
@@ -159,11 +149,60 @@ public class FindSqrCoordToZoomInOnTest {
 		coordX = 270;
 		coordY = 270;
 		
-		Log.d( "testunit", "testing findSqrCoodToZoom.findSqrCoordToZoomInOn-3( );" );
-		Log.d( "testunit", "coordX: " + coordX + " coordY: " + coordY );
+		//test call
 		findSqrCoodToZoom.findSqrCoordToZoomInOn( );
 		
 		assertEquals( touchXZ[0], coordX );
 		assertEquals( touchYZ[0], coordY );
+		
+		
+			/* TEST LEFT BOTTOM, SHOULD ZOOM PUZZLE-VIEW TO LEFT BOTTOM OF PUZZLE */
+		
+		currentRectColoured = new Pair( 8, 0 );
+		findSqrCoodToZoom = new FindSqrCoordToZoomInOn( touchXZ, touchYZ, currentRectColoured, bitmapSize,
+				sqrSize, textMatrix, ZOOM_SCALE );
+		
+		coordX = 0;
+		coordY = 540;
+		
+		//test call
+		findSqrCoodToZoom.findSqrCoordToZoomInOn( );
+		
+		assertEquals( touchXZ[0], coordX );
+		assertEquals( touchYZ[0], coordY );
+		
+		
+			/* TEST RIGHT TOP, SHOULD ZOOM PUZZLE-VIEW TO RIGHT TOP OF PUZZLE */
+		
+		currentRectColoured = new Pair( 8, 0 );
+		findSqrCoodToZoom = new FindSqrCoordToZoomInOn( touchXZ, touchYZ, currentRectColoured, bitmapSize,
+				sqrSize, textMatrix, ZOOM_SCALE );
+		
+		coordX = 0;
+		coordY = 540;
+		
+		//test call
+		findSqrCoodToZoom.findSqrCoordToZoomInOn( );
+		
+		assertEquals( touchXZ[0], coordX );
+		assertEquals( touchYZ[0], coordY );
+		
+		
+			/* TEST SQR (4,2), SHOULD ZOOM PUZZLE-VIEW TO CENTER LEFT OF PUZZLE */
+		
+		currentRectColoured = new Pair( 4, 2 );
+		findSqrCoodToZoom = new FindSqrCoordToZoomInOn( touchXZ, touchYZ, currentRectColoured, bitmapSize,
+				sqrSize, textMatrix, ZOOM_SCALE );
+		
+		
+		coordX = 0;
+		coordY = ((int)((textMatrix.getRelativeAndPos()[currentRectColoured.getRow()][currentRectColoured.getColumn()].getSqrT()*ZOOM_SCALE) - ((bitmapSize-sqrSize*ZOOM_SCALE)/2) ) );
+		
+		//test call
+		findSqrCoodToZoom.findSqrCoordToZoomInOn( );
+		
+		assertEquals( touchXZ[0], coordX );
+		assertEquals( touchYZ[0], coordY );
+		
 	}
 }

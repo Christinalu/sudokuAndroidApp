@@ -55,6 +55,12 @@ public class FileCSVAnalyze
 			if( (fileName.substring( 0, 4 )).contentEquals( "pkg_" ) ) //check if file starts with "pkg_"
 			{
 				fileNoStart = fileName.substring( 4 ); //remove "pkg_"
+				
+				Log.d( "extension","extension: " + fileNoStart.substring( fileNoStart.length()-4, fileNoStart.length() ) );
+				//test for ".csv" extension
+				if( fileNoStart.substring( fileNoStart.length()-4, fileNoStart.length() ).contentEquals( ".csv" ) == false )
+				{ return -1; }
+				
 				fileNoExtension = fileNoStart.substring(0, fileNoStart.length()-4 ); //remove ".csv" extension
 				
 				try{
