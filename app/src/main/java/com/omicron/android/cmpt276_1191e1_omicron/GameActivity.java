@@ -226,6 +226,9 @@ public class GameActivity extends AppCompatActivity
 //										 }
 //		);
 
+		TextView Hint=(TextView) findViewById(R.id.hint_content);
+
+
 
 			/**  INITIALIZE  **/
 
@@ -379,7 +382,7 @@ public class GameActivity extends AppCompatActivity
 
 		// call function to set all listeners - needs drawR
 		listeners = new ButtonListener( currentRectColoured, usrSudokuArr, btnArr,
-										drawR, touchX, touchY, lastRectColoured, usrLangPref, btnClicked );
+										drawR, touchX, touchY, lastRectColoured, usrLangPref, btnClicked,Hint,wordArray );
 
 
 

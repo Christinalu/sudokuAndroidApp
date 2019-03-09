@@ -40,18 +40,6 @@
             <!--android:contentDescription="@string/hint"-->
             <!--android:scaleType="fitXY"-->
             <!--android:src="@drawable/light_bulb" />-->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/hint_content"
-            android:textSize="25sp"
-            android:text="@android:string/untitled"
-            android:textColor="@color/white"
-            android:layout_alignBottom="@id/keypad"
-            android:layout_marginBottom="160dp"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="50dp"
-            android:layout_toStartOf="@id/button_zoom_out" />
 
         <ImageButton
             android:id="@+id/button_zoom_out"
@@ -156,5 +144,15 @@
         </TableRow>
     </TableLayout>
     </RelativeLayout>
+    <TextView
+        android:id="@+id/hint_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="center"
+        android:padding="20dp"
+        android:text=""
+        android:textColor="@color/white"
+        android:textSize="20sp" />
 
 </android.support.design.widget.CoordinatorLayout>

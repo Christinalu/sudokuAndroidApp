@@ -7,6 +7,8 @@
     android:background="@color/mediumaquamarine"
     tools:context=".GameActivity">
 
+
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -48,18 +50,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/hint_content"
-                android:text="@android:string/untitled"
-                android:textSize="20sp"
-                android:textColor="@color/white"
-                android:layout_toStartOf="@id/keypad"
-                android:layout_marginEnd="40dp"
-                android:layout_alignParentTop="true"
-                android:layout_marginTop="30dp"/>
-
         <ImageButton
             android:id="@+id/button_zoom_in"
             android:layout_width="wrap_content"
@@ -84,98 +74,110 @@
             android:scaleType="fitXY"
             app:srcCompat="@android:drawable/btn_minus" />
 
-        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/keypad"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:layout_alignParentEnd="true"
-            android:orientation="vertical"
-            android:useDefaultMargins="true">
+            <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/keypad"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_gravity="end"
+                android:orientation="vertical"
+                android:useDefaultMargins="true">
 
                 <Button
                     android:id="@+id/keypad_1"
-                    android:paddingRight="10dp"
-                    android:paddingLeft="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/buttons"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
                     android:text="@string/keypads"
                     android:textColor="@android:color/white" />
 
                 <Button
                     android:id="@+id/keypad_2"
-                    android:paddingRight="10dp"
-                    android:paddingLeft="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/buttons"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
                     android:text="@string/keypads"
                     android:textColor="@android:color/white" />
 
                 <Button
                     android:id="@+id/keypad_3"
-                    android:paddingRight="10dp"
-                    android:paddingLeft="10dp"
-                    android:background="@drawable/buttons"
                     android:layout_weight="1"
+                    android:background="@drawable/buttons"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
                     android:text="@string/keypads"
                     android:textColor="@android:color/white" />
 
                 <Button
                     android:id="@+id/keypad_4"
-                    android:paddingRight="10dp"
-                    android:paddingLeft="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/buttons"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
                     android:text="@string/keypads"
                     android:textColor="@android:color/white" />
 
                 <Button
                     android:id="@+id/keypad_5"
-                    android:paddingRight="10dp"
-                    android:paddingLeft="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/buttons"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
                     android:text="@string/keypads"
                     android:textColor="@android:color/white" />
 
                 <Button
                     android:id="@+id/keypad_6"
-                    android:paddingRight="10dp"
-                    android:paddingLeft="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/buttons"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
                     android:text="@string/keypads"
                     android:textColor="@android:color/white" />
 
                 <Button
                     android:id="@+id/keypad_7"
-                    android:paddingRight="10dp"
-                    android:paddingLeft="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/buttons"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
                     android:text="@string/keypads"
                     android:textColor="@android:color/white" />
 
                 <Button
                     android:id="@+id/keypad_8"
-                    android:paddingRight="10dp"
-                    android:paddingLeft="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/buttons"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
                     android:text="@string/keypads"
                     android:textColor="@android:color/white" />
 
                 <Button
                     android:id="@+id/keypad_9"
-                    android:paddingRight="10dp"
-                    android:paddingLeft="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/buttons"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
                     android:text="@string/keypads"
                     android:textColor="@android:color/white" />
 
             </TableLayout>
         </RelativeLayout>
+
     </RelativeLayout>
+
+    <TextView
+        android:id="@+id/hint_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="center"
+        android:padding="20dp"
+        android:text=""
+        android:textColor="@color/white"
+        android:textSize="20sp" />
 
 </android.support.design.widget.CoordinatorLayout>
