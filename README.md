@@ -21,6 +21,8 @@ Sudoku Vocabulary App is optimized for:
 * [Second iteration] (https://csil-git1.cs.surrey.sfu.ca/eazizika/CMPT276-1191E1-Omicron/wikis/Second-Iteration)
 
 
+#Tests
+All the tests are under AndroidTest and Test folders.
 # Installation
 
 
