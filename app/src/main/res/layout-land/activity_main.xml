@@ -20,10 +20,12 @@
 
 		<TextView
 			android:layout_width="wrap_content"
-			android:layout_height="60dp"
+			android:layout_height="wrap_content"
 			android:text="@string/sudoku"
 			android:textColor="@color/translucent"
 			android:textSize="30sp"
+			android:layout_marginTop="10dp"
+			android:layout_marginBottom="10dp"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintLeft_toLeftOf="parent"
 			app:layout_constraintRight_toRightOf="parent"
@@ -207,7 +209,7 @@
 				android:id="@+id/pkg_radio_group"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:orientation="vertical"></RadioGroup>
+				android:orientation="vertical"/>
 
 		</ScrollView>
 
