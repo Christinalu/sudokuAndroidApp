@@ -45,9 +45,9 @@ public class ButtonListener extends AppCompatActivity
 												 @SuppressLint("SetTextI18n")
 												 @Override
 												 public boolean onLongClick(View v) {
-												     Hint.setBackgroundColor(Color.DKGRAY);
+												     Hint.setBackgroundColor(R.drawable.buttons);
                                                      final Drawable buttonBackground = btnArr[index].getBackground();
-                                                     btnArr[index].setBackgroundColor(Color.DKGRAY);
+                                                     btnArr[index].setBackgroundColor(R.drawable.buttons);
 													 if(usrLangPref==0){
 													     if(usrModePref==1){
                                                              Hint.setText(wordArray[index].getNative() + " : " + numArray[index]);
