@@ -41,7 +41,7 @@ public class FileCSVAnalyze
 		
 		
 		// loop through all pkg_n files and mark which names already exist
-		for( int i=0; i<file.length; i++ )
+		for( int i=0; i<file.length; i++)
 		{
 			Log.d("upload", "file-name-CSV: " + file[i].getName( ) );
 			
@@ -111,14 +111,14 @@ public class FileCSVAnalyze
 		 */
 		
 		String strLine; //store each line from .csv file
-		StringBuilder strBuild = new StringBuilder( ); //used to concatinate all lines into single String Stream
+		StringBuilder strBuild = new StringBuilder( ); //used to concatenate all lines into single String Stream
 		
 		String[] splitLine; //array to store the strings parsed from line by comma
 		String lang;
 		String[] res = { "", "" };
 		
 		try {
-			strLine = buffRead.readLine( ); //required if file empty to prevent crash on accessing .split() on null pointer
+			strLine = buffRead.readLine(); //required if file empty to prevent crash on accessing .split() on null pointer
 		} catch (IOException e) {
 			strLine = null;
 			e.printStackTrace();
@@ -126,7 +126,7 @@ public class FileCSVAnalyze
 		
 		if( strLine == null ) //test if file is empty by testing first line
 		{ return res; }
-		
+
 		//get first valid line containing the language
 		splitLine = strLine.split( "," ); //split by comma
 		
