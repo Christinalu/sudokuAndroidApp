@@ -2,6 +2,7 @@ package com.omicron.android.cmpt276_1191e1_omicron;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -25,7 +26,7 @@ public class ButtonListener extends AppCompatActivity
 
 	public ButtonListener(final Pair currentRectColoured, final SudokuGenerator usrSudokuArr, final Button[] btnArr, final drw drawR,
 						  final int[] touchX, final int[] touchY, final Pair lastRectColoured,
-						  final int usrLangPref, final int[] btnClicked, final TextView Hint, final Word[] wordArray )
+						  final int usrLangPref, final int[] btnClicked, final TextView Hint, final Word[] wordArray,final int usrModePref,final String[] numArray )
 	{
 		// pulled out of button listeners
 		final PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
@@ -45,14 +46,29 @@ public class ButtonListener extends AppCompatActivity
 												 @Override
 												 public boolean onLongClick(View v) {
 												     Hint.setBackgroundColor(Color.DKGRAY);
+                                                     final Drawable buttonBackground = btnArr[index].getBackground();
+                                                     btnArr[index].setBackgroundColor(Color.DKGRAY);
 													 if(usrLangPref==0){
-														 Hint.setText(wordArray[index].getNative()+" : "+wordArray[index].getTranslation());
+													     if(usrModePref==1){
+                                                             Hint.setText(wordArray[index].getNative() + " : " + numArray[index]);
+                                                             Log.d( "Counter","wordArr[" + index + "]: " + wordArray[index].getNative() + "," + wordArray[index].getTranslation() + "," + wordArray[index].getInFileLineNum() + "," + wordArray[index].getHintClick()+"," + numArray[index] );
+                                                         }
+                                                         else {
+                                                             Hint.setText(wordArray[index].getNative() + " : " + wordArray[index].getTranslation());
+                                                             Log.d( "Counter","wordArr[" + index + "]: " + wordArray[index].getNative() + "," + wordArray[index].getTranslation() + "," + wordArray[index].getInFileLineNum() + "," + wordArray[index].getHintClick() );
+                                                         }
 													 }
-													 else{
-														 Hint.setText(wordArray[index].getTranslation()+" : "+wordArray[index].getNative());
-													 }
+													 else {
+                                                         if (usrModePref == 1) {
+                                                             Hint.setText(wordArray[index].getTranslation() + " : " + numArray[index]);
+                                                             Log.d("Counter", "wordArr[" + index + "]: " + wordArray[index].getNative() + "," + wordArray[index].getTranslation() + "," + wordArray[index].getInFileLineNum() + "," + wordArray[index].getHintClick() + "," + numArray[index]);
+                                                         } else {
+                                                             Hint.setText(wordArray[index].getTranslation() + " : " + wordArray[index].getNative());
+                                                             Log.d("Counter", "wordArr[" + index + "]: " + wordArray[index].getNative() + "," + wordArray[index].getTranslation() + "," + wordArray[index].getInFileLineNum() + "," + wordArray[index].getHintClick());
+                                                         }
+                                                     }
 													 wordArray[index].incrementHintClick();
-													 Log.d( "upload","wordArr[" + index + "]: " + wordArray[index].getNative() + "," + wordArray[index].getTranslation() + "," + wordArray[index].getInFileLineNum() + "," + wordArray[index].getHintClick() );
+
 
 													 handler.postDelayed(new Runnable() {
 														 @Override
@@ -60,8 +76,10 @@ public class ButtonListener extends AppCompatActivity
 															 // Do something after 5s = 5000ms
                                                              Hint.setBackgroundColor(Color.TRANSPARENT);
 															 Hint.setText("");
-														 }
+                                                             btnArr[index].setBackground(buttonBackground);
+                                                     }
 													 }, 4000);
+
 
 													 return true;
 												 }

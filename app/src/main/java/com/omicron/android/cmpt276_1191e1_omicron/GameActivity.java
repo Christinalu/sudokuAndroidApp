@@ -382,7 +382,7 @@ public class GameActivity extends AppCompatActivity
 
 		// call function to set all listeners - needs drawR
 		listeners = new ButtonListener( currentRectColoured, usrSudokuArr, btnArr,
-										drawR, touchX, touchY, lastRectColoured, usrLangPref, btnClicked,Hint,wordArray );
+										drawR, touchX, touchY, lastRectColoured, usrLangPref, btnClicked,Hint,wordArray,usrModePref,numArray );
 
 
 
