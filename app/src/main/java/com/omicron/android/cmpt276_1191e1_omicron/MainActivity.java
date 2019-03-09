@@ -81,12 +81,12 @@ public class MainActivity extends AppCompatActivity
 			{
 					new Word( "Un", "Un", 1, 1 ),
 					new Word( "Two", "Deux", 2, 1 ),
-					new Word( "Threeeeeeeeee", "Troisssssssss", 3, 1 ),
+					new Word( "Three", "Trois", 3, 1 ),
 					new Word( "Four", "Quatre", 4, 1 ),
 					new Word( "Five", "Cinq", 5, 1 ),
 					new Word( "Six", "Six", 6, 1 ),
 					new Word( "Seven", "Sept", 7, 1 ),
-					new Word( "Eightttttttttttttt", "Huitttttttttttttt", 8, 1 ),
+					new Word( "Eight", "Huit", 8, 1 ),
 					new Word( "Nine", "Neuf", 9, 1 ),
 					new Word( "en-US", "fr-FR", -1, -1 ), //lang
 					new Word( "pkg_n.csv", "", -1, -1 ) //pkg name
@@ -178,10 +178,6 @@ public class MainActivity extends AppCompatActivity
 				}
 			}
 		});
-		
-		
-		
-		
 		
 		
 		//create button which will start new UploadActivity to upload and process .csv file

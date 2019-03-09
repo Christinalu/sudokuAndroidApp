@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -210,20 +211,20 @@ public class GameActivity extends AppCompatActivity
 		}
 
 		//create dictionary button
-		Button btnDictionary = (Button) findViewById(R.id.button_dictionary);
-
-		btnDictionary.setOnClickListener(new View.OnClickListener() { // important, SudokuGenerator Arr must be initialized before this
-											 @Override
-											 public void onClick(View v) {
-												 //create activity window for the dictionary
-												 Intent activityDictionary = new Intent(GameActivity.this, DictionaryActivity.class);
-
-												 //save wordArray for Dictionary Activity
-												 activityDictionary.putExtra("wordArray", wordArray);
-												 startActivity(activityDictionary); //switch to dictionary window
-											 }
-										 }
-		);
+//		ImageButton btnDictionary = (ImageButton) findViewById(R.id.button_dictionary);
+//
+//		btnDictionary.setOnClickListener(new View.OnClickListener() { // important, SudokuGenerator Arr must be initialized before this
+//											 @Override
+//											 public void onClick(View v) {
+//												 //create activity window for the dictionary
+//												 Intent activityDictionary = new Intent(GameActivity.this, DictionaryActivity.class);
+//
+//												 //save wordArray for Dictionary Activity
+//												 activityDictionary.putExtra("wordArray", wordArray);
+//												 startActivity(activityDictionary); //switch to dictionary window
+//											 }
+//										 }
+//		);
 
 
 			/**  INITIALIZE  **/
@@ -345,15 +346,26 @@ public class GameActivity extends AppCompatActivity
 		// choose button language based on user preference
 		if( usrLangPref == 0 )
 		{
-			btnArr[0].setText( "ONE" );
-			btnArr[1].setText( "TWO" );
-			btnArr[2].setText( "THREE" );
-			btnArr[3].setText( "FOUR" );
-			btnArr[4].setText( "FIVE" );
-			btnArr[5].setText( "SIX" );
-			btnArr[6].setText( "SEVEN" );
-			btnArr[7].setText( "EIGHT" );
-			btnArr[8].setText( "NINE" );
+			btnArr[0].setText( wordArray[0].getNative() );
+			btnArr[1].setText( wordArray[1].getNative() );
+			btnArr[2].setText( wordArray[2].getNative() );
+			btnArr[3].setText( wordArray[3].getNative() );
+			btnArr[4].setText( wordArray[4].getNative() );
+			btnArr[5].setText( wordArray[5].getNative() );
+			btnArr[6].setText( wordArray[6].getNative() );
+			btnArr[7].setText( wordArray[7].getNative() );
+			btnArr[8].setText( wordArray[8].getNative() );
+		}
+		else{
+			btnArr[0].setText( wordArray[0].getTranslation() );
+			btnArr[1].setText( wordArray[1].getTranslation() );
+			btnArr[2].setText( wordArray[2].getTranslation() );
+			btnArr[3].setText( wordArray[3].getTranslation() );
+			btnArr[4].setText( wordArray[4].getTranslation() );
+			btnArr[5].setText( wordArray[5].getTranslation() );
+			btnArr[6].setText( wordArray[6].getTranslation() );
+			btnArr[7].setText( wordArray[7].getTranslation() );
+			btnArr[8].setText( wordArray[8].getTranslation() );
 		}
 
 
@@ -424,7 +436,7 @@ public class GameActivity extends AppCompatActivity
 
 			/* ZOOM IN BUTTON */
 
-		Button btnZoomIn =findViewById( R.id.button_zoom_in );
+		ImageButton btnZoomIn = findViewById( R.id.button_zoom_in );
 		btnZoomIn.setOnClickListener(new View.OnClickListener( )
 			{
 				@Override
@@ -459,7 +471,7 @@ public class GameActivity extends AppCompatActivity
 
 			/* ZOOM OUT BUTTON */
 
-		Button btnZoomOut =findViewById( R.id.button_zoom_out );
+		ImageButton btnZoomOut = findViewById( R.id.button_zoom_out );
 		btnZoomOut.setOnClickListener(new View.OnClickListener( )
 					{
 						@Override
