@@ -25,6 +25,16 @@ public class Select9Word
 	
 	public int select(Word[] wordArray, String fileNameSelected, BufferedReader buffRead ) throws IOException
 	{
+		//discrete units are units assigned to words to mimin discrete probability
+		//for example, starting out, you could have 5 words with 10 units each == 50 total units
+		//hence the probability of choosing one word would be units_of_word / total_units == 10/50 == 0.2
+		
+		int hintCountTotal = 0;
+		int SINGL_WORD_BLOCK_UNIT_SZ_CONST = 10; //constant stores how many discrete units are assigned to a single word HintClick
+		int SINGL_WORD_BLOCK_UNIT_SZ; //depending on SINGL_WORD_BLOCK_UNIT_SZ_CONST and HintClick, this will represent units of single word OF 1 HINT-COUNT
+		int WORD_INCREASE_UNIT_MULTIP = 10; //multiplier whch increases word_unit depending on how many words there are, ie if == 10; then 10 words == 100 total units and 100 words == 1000 total units
+		float MAX_PERCENTAGE_OF_TOTAL; //stores a percentage of how much probability a word is allowed to gain; ie if == 0.2 and total_units == 1000 (ie 10 words with 100 units), then the max units a word can have would be 0.2*1000 = 200 units max per block
+		int MAX_WORD_UNIT_LIMIT; //stores the maximum units that a single word can have at any time
 		
 		
 			/** STATISTICALLY CHOOSE 9 MOST DIFFICULT WORD BASED ON HINT CLICK**/
@@ -32,7 +42,7 @@ public class Select9Word
 		String line;
 		String[] strSplit;
 		
-		int lineCount = 0;
+		int lineCount = 0; //also how many word pairs in file
 		int i = 0;
 		long total = 0; //stores total number of Click Count
 		long totalBk = 0; //back up for "total"
@@ -58,7 +68,9 @@ public class Select9Word
 				total = total + Long.parseLong( strSplit[2] ); //add Click Count for each word
 				
 				//note: in Range( 0,0 ), it means only 0th index; Range( 1,5 ) means from 1 to 5 inclusive
-				rangeArr[lineCount] = new Range( totalBk, total-1, strSplit[0], strSplit[1], Integer.parseInt( strSplit[2] ) );
+				int hintCount = Integer.parseInt( strSplit[2] );
+				hintCountTotal = hintCountTotal + hintCount;
+				rangeArr[lineCount] = new Range( totalBk, total-1, strSplit[0], strSplit[1], hintCount );
 				
 				lineCount++;
 			}
@@ -74,7 +86,20 @@ public class Select9Word
 		///////////////////////
 		
 		
-		// RANDOMLY CHOOSE 9 WORDS (based on difficulty) //
+		SINGL_WORD_BLOCK_UNIT_SZ = SINGL_WORD_BLOCK_UNIT_SZ_CONST * lineCount; //find how many units a word will have
+		int totalUnitsDefault = SINGL_WORD_BLOCK_UNIT_SZ * lineCount; //get total units based on fresh, equal, probability word file
+		
+		//find MAX_PERCENTAGE_OF_TOTAL based on word count
+		
+		
+		MAX_WORD_UNIT_LIMIT = (int)(MAX_PERCENTAGE_OF_TOTAL * totalUnitsDefault);
+		
+		Log.d( "select", "lineCount: " + lineCount );
+		Log.d( "select", "SINGL_WORD_BLOCK_UNIT_SZ: " + SINGL_WORD_BLOCK_UNIT_SZ );
+		Log.d( "select", "MAX_WORD_UNIT_LIMIT: " + MAX_WORD_UNIT_LIMIT );
+		
+		
+			// RANDOMLY CHOOSE 9 WORDS (based on difficulty) //
 		
 		// NOTE: Random Number generator does not return all range for "long"
 		Random rand = new Random( );

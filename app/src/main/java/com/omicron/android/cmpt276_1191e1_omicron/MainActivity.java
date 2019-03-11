@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity
 	private WordPackageFileIndex wordPackageFileIndexArr; //stores word packages name and internal file name
 	private String wordPackageName; //stores name of all Word Packages the user has so far
 	private int MAX_WORD_PKG = 50; //max word packages user is allowed to import
-	private int MAX_CSV_ROW = 150; //allow up to 150 pairs per package
+	private int MAX_CSV_ROW = 150; //allow up to 150 pairs per package; for performance and because of Select9Word select(), do not exceed 1000 words
 	private int CURRENT_WORD_PKG_COUNT = 0; //stores current number of packages the user has uploaded
 	private FileCSV fileCSV; //object containing CSV functions
 	private int[] indexOfRadBtnToRemove = { -1 }; //which radio btn to remove
