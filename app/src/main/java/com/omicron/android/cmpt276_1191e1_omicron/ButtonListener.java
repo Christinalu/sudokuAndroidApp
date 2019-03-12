@@ -68,8 +68,7 @@ public class ButtonListener extends AppCompatActivity
                                                          }
                                                      }
 													 wordArray[index].incrementHintClick();
-
-
+													 
 													 handler.postDelayed(new Runnable() {
 														 @Override
 														 public void run() {
@@ -92,7 +91,7 @@ public class ButtonListener extends AppCompatActivity
 											 public void onClick(View v)
 											 {
 												 //if current button selected is valid and is not restricted
-												 if( currentRectColoured.getRow() != -1 && usrSudokuArr.PuzzleOriginal[currentRectColoured.getRow()][currentRectColoured.getColumn()	] == 0 )
+												 if( currentRectColoured.getRow() != -1 && usrSudokuArr.PuzzleOriginal[currentRectColoured.getRow()][currentRectColoured.getColumn()] == 0 )
 												 {
 													 // increase the count of inserted numbers if needed
 													 track.track( usrSudokuArr, currentRectColoured ); //important, 'track' must occur before 'usrSudokuArr.Puzzle[][] = x'
@@ -106,20 +105,21 @@ public class ButtonListener extends AppCompatActivity
 													 drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
 													 btnClicked[0] = 0;
 													 //textOverlay.reDrawText( usrLangPref );
-
-													 int a = currentRectColoured.getRow();
-													 int b = currentRectColoured.getColumn();
+													 
+													 Log.d( "selectW", "btn clicked: " + var );
 													 
 													 //check if word inserted is correct (used to decrease probability of word being selected in Select9Word() )
-													 if( var == usrSudokuArr.getPuzzleOriginalSolution()[a][b] ) //if input matches solution
+													 if( var == usrSudokuArr.getPuzzleOriginalSolution()[currentRectColoured.getRow()][currentRectColoured.getColumn()] ) //if input matches solution
 													 {
-													 	Log.d( "selectW", "user sqr input correct" );
+													 	Log.d( "selectW", "btn listener: user sqr input correct" );
 													 	if( wordArray[var].getAlreadyUsedInGame() == false ) //if correctly using this word for the first time in game
 														{
-															wordArray[var].setUsedInGame(); //mark as used
-															wordArray[var].setToAllowToDecreaseDifficulty( ); //allow for difficulty to be decreased
+															wordArray[var-1].setUsedInGame(); //mark as used
+															wordArray[var-1].setToAllowToDecreaseDifficulty( ); //allow for difficulty to be decreased
 														}
 													 }
+													 // do not include "else if inserted wrong input, do not allow to be decreased" because user is likely to make mistakes
+													 // SO FAR keep the idea that "if inserted correct word once without using HintClick, it implies the user is getting better with that word"
 													 
 													 //have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
 													 if( track.enableCheck )

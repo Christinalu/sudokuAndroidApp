@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity
 		
 		fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW );
 		
-		//TEST IF USER JUST INSTALLED APP - IF USER HAS, LOAD DEFAULT FILES
+			/* TEST IF USER JUST INSTALLED APP - IF USER HAS, LOAD DEFAULT FILES */
 		int usrNewInstall = fileCSV.checkIfCurrentWordPkgCountFileExists( this ); //0==files already exist
 		
 		if( usrNewInstall == 0 ) //if app was already installed and has correct files - get current_word_pkg_count
@@ -464,6 +464,7 @@ public class MainActivity extends AppCompatActivity
 						resumeActivity.putExtra("numArrayMA", numArrayResume);
 					}
 					resumeActivity.putExtra("languageMA", languageResume);
+					resumeActivity.putExtra( "HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB );
 					startActivityForResult(resumeActivity, 0);
 				}
 				else {
@@ -554,6 +555,8 @@ public class MainActivity extends AppCompatActivity
 		
 		Log.d( "upload", "onStart() called from MainActivity" );
 	}
+	
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent resumeSrc) {
 		if (resumeSrc != null) {
@@ -588,6 +591,7 @@ public class MainActivity extends AppCompatActivity
 			savedInstanceState.putSerializable("SudokuArrMA", usrSudokuArrResume);
 			savedInstanceState.putInt("usrModeMA", usrModePrefResume);
 			savedInstanceState.putString("languageMA", languageResume);
+			savedInstanceState.putInt( "HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB );
 			if (usrModePrefResume == 1) {
 				savedInstanceState.putStringArray("numArrayMA", numArrayResume);
 			}
@@ -618,6 +622,13 @@ public class MainActivity extends AppCompatActivity
 		
 		//call function to modify wordArray[]
 		int res = select9Word.select( wordArray, fileNameSelected, buffRead, HINT_CLICK_TO_MAX_PROB );
+		
+		//// debug ////////
+		for( int i=0; i<9; i++ )
+		{
+			Log.d( "selectW", "wordArr[] " + i + " file line: " + wordArray[i].getInFileLineNum() );
+		}
+		///////////////////
 		
 		return res;
 	}

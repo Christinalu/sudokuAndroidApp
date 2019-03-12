@@ -140,7 +140,7 @@ public class GameActivity extends AppCompatActivity
 			usrSudokuArr = (SudokuGenerator) savedInstanceState.get("SudokuArrGA");
 			usrModePref = (int) savedInstanceState.getSerializable("usrModeGA");
 			language = (String) savedInstanceState.getSerializable("languageGA");
-			HINT_CLICK_TO_MAX_PROB = (int) savedInstanceState.getSerializable( "HINT_CLICK_TO_MAX_PROB" );
+			HINT_CLICK_TO_MAX_PROB = savedInstanceState.getInt( "HINT_CLICK_TO_MAX_PROB" );
 			if (usrModePref == 1) {
 				numArray = (String[]) savedInstanceState.getSerializable("numArrayGA");
 			}
@@ -156,7 +156,7 @@ public class GameActivity extends AppCompatActivity
 					usrSudokuArr = (SudokuGenerator) gameSrc.getSerializableExtra("SudokuArrMA");
 					usrModePref = (int) gameSrc.getSerializableExtra("usrModeMA");
 					language = (String) gameSrc.getSerializableExtra("languageMA");
-					HINT_CLICK_TO_MAX_PROB = (int) savedInstanceState.getSerializable( "HINT_CLICK_TO_MAX_PROB" );
+					HINT_CLICK_TO_MAX_PROB = (int) gameSrc.getSerializableExtra( "HINT_CLICK_TO_MAX_PROB" );
 					if (usrModePref == 1) {
 						numArray = (String[]) gameSrc.getStringArrayExtra("numArrayMA");
 					}
@@ -165,7 +165,7 @@ public class GameActivity extends AppCompatActivity
 					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPref");
 					usrDiffPref = (int) gameSrc.getSerializableExtra("usrDiffPref");
 					usrModePref = (int) gameSrc.getSerializableExtra("usrModeMA");
-					HINT_CLICK_TO_MAX_PROB = (int) savedInstanceState.getSerializable( "HINT_CLICK_TO_MAX_PROB" );
+					HINT_CLICK_TO_MAX_PROB = (int) gameSrc.getSerializableExtra( "HINT_CLICK_TO_MAX_PROB" );
 					if (usrModePref == 1) {
 						//create separate array to draw from for this mode
 						numArray = new String[9];
@@ -729,14 +729,22 @@ public class GameActivity extends AppCompatActivity
 			
 			String line;
 			long newHintClick = 0;
-			int i = 0; //index to keep track of row index in file
+			int i = 0; // line index to keep track of row index in file
 			boolean lineFound;
+			
+			
+				/* READ FILE AND UPDATE HintClick */
+			
+			// IMPORTANT: 	the idea is that "if inserted correct word once without using HintClick, it implies the user is getting better with that word"
+			//				WITHOUT using any HintClick; if HintClick used, then word considered still difficult so increase HintClick
+			//				in this case, the user is allowed to place word in incorrect sqr, but if eventually places it in correct square, difficulty is decreased (as long as usr did not use HintClick)
+			
 			while( (line = buffRead.readLine()) != null ) //
 			{
 				lineFound = false; //reset
 				
-				// FIND LINE OF WORD IN CSV (based on wordArr[i].getInFileLineNum() //
-				for( int k=0; k<9; k++ )
+					/* FIND LINE OF WORD IN CSV (based on wordArr[i].getInFileLineNum() */
+				for( int k=0; k<9; k++ ) //loop through all 9 words
 				{
 					if( i == wordArray[k].getInFileLineNum() ) //if updating line with word that was used in wordArray
 					{
@@ -752,6 +760,9 @@ public class GameActivity extends AppCompatActivity
 							{
 								wordArray[k].setDoNotAllowToDecreaseDifficulty( ); //disable so that word cannot have difficulty decreased in this game, until user starts new game
 								newHintClick = hintClickSoFar - HINT_CLICK_ON_DECREASE;
+								Log.d( "selectW", "word: " + wordArray[k].getNative() );
+								Log.d( "selectW", "line index: " + i );
+								Log.d( "selectW", "HintClick decreased with hintClickSoFar=" + hintClickSoFar + " newHintClick=" + newHintClick );
 							}
 							else
 							{ newHintClick = hintClickSoFar; } //keep the same HintCount (because newHintCount==0 and no need to decrease count)
@@ -766,8 +777,6 @@ public class GameActivity extends AppCompatActivity
 						{ newHintClick = HINT_CLICK_TO_MAX_PROB; }
 						
 						lineFound = true; //csv file line matches a word in wordArray[]
-						
-						//TODO: check if allowed to decrease difficulty by getting wordArr.allowToDecreaseDifficulty
 						
 						break; //do not consider the rest
 					}

@@ -38,7 +38,8 @@ public class Select9Word
 		int SINGLE_WORD_BLOCK_UNIT_SZ; //depending on SINGL_WORD_BLOCK_UNIT_SZ_CONST and HintClick, this will represent units of single word OF 1 HINT-COUNT
 		int WORD_INCREASE_UNIT_MULTIP = 10; //multiplier whch increases word_unit depending on how many words there are, ie if == 10; then 10 words == 100 total units and 100 words == 1000 total units
 		float MAX_PERCENTAGE_OF_TOTAL = 0.1f; //stores a percentage of how much probability a word is allowed to gain; ie if == 0.2 and total_units == 1000 (ie 10 words with 100 units), then the max units a word can have would be 0.2*1000 = 200 units max per block
-		int MAX_WORD_UNIT_LIMIT; //stores the maximum units that a single word can have at any time
+		int MAX_WORD_UNIT_LIMIT_DEFAULT; //stores the maximum units that a single word can have at any time
+		int MAX_WORD_UNIT_LIMIT; //same as MAX_WORD_UNIT_LIMIT_DEFAULT but adjusted for HintClick
 		long TOTAL_UNITS = 0; //stores all the units from all the HintCount blocks //needs to be long ( > int)
 		int WORD_UNIT_INCREASE_PER_HINT_CLICK; //defines how many units are added per HintClick (when HintClick > 1)
 		
@@ -50,7 +51,7 @@ public class Select9Word
 		
 		int lineCount = 0; //also how many word pairs in file
 		int i = 0;
-		long total = 0; //stores total number of Click Count
+		int total = 0; //stores total number of Click Count
 		long totalBk = 0; //back up for "total"
 		Range[] rangeArr = new Range[MAX_CSV_ROW]; //array for each word pair, storing the range of "hint clicks"
 		
@@ -71,7 +72,7 @@ public class Select9Word
 			{
 				strSplit = line.split( "," );
 				totalBk = total;
-				total = total + Long.parseLong( strSplit[2] ); //add Click Count for each word
+				total = total + Integer.parseInt( strSplit[2] ); //add Click Count for each word
 				
 				//note: in Range( 0,0 ), it means only 0th index; Range( 1,5 ) means from 1 to 5 inclusive
 				int hintCount = Integer.parseInt( strSplit[2] );
@@ -99,24 +100,19 @@ public class Select9Word
 		// units in a word with MAX_PERCENTAGE_OF_TOTAL, at max: MAX_UNIT == MAX_PERCENTAGE_OF_TOTAL*(lineCount * (lineCount*SINGL_WORD_BLOCK_UNIT_SZ_CONST) )
 		// probability of choosing one word with max_probability == MAX_UNIT / ( (lineCount-1) * lineCount * SINGL_WORD_BLOCK_UNIT_SZ_CONST )
 		
+		MAX_WORD_UNIT_LIMIT_DEFAULT = (int)(MAX_PERCENTAGE_OF_TOTAL * totalUnitsDefault); //find how many units a word can contain at any time
 		
-		// TODO: test the following with 9 words (and MAX_PRECRENT_OF_TOT = 0.1), it should detect that probability decreases instead of increase
+		if( MAX_WORD_UNIT_LIMIT_DEFAULT < SINGLE_WORD_BLOCK_UNIT_SZ  ) //needs a minimum word count for probability to increase, so that taking MAX_PERCENTAGE_OF_TOTAL wont decreases probability
+		{ MAX_WORD_UNIT_LIMIT_DEFAULT = SINGLE_WORD_BLOCK_UNIT_SZ; }
 		
-		//find MAX_PERCENTAGE_OF_TOTAL based on DEFAULT word count block HintClick (ie when adding new file, based on that, define this)
+		WORD_UNIT_INCREASE_PER_HINT_CLICK = ( MAX_WORD_UNIT_LIMIT_DEFAULT - SINGLE_WORD_BLOCK_UNIT_SZ ) / HINT_CLICK_TO_MAX_PROB; //find how many units will be added per additional click
 		
+		//find MAX_UNIT_LIMIT based on MAX HintClick (should be <= MAX_WORD_UNIT_LIMIT_DEFAULT)
+		MAX_WORD_UNIT_LIMIT = SINGLE_WORD_BLOCK_UNIT_SZ + (HINT_CLICK_TO_MAX_PROB-1)*WORD_UNIT_INCREASE_PER_HINT_CLICK;
 		
-		
-		
-		
-		
-		MAX_WORD_UNIT_LIMIT = (int)(MAX_PERCENTAGE_OF_TOTAL * totalUnitsDefault); //find how many units a word can contain at any time
-		
-		if( MAX_WORD_UNIT_LIMIT < SINGLE_WORD_BLOCK_UNIT_SZ  ) //needs a minimum word count for probability to increase, so that taking MAX_PERCENTAGE_OF_TOTAL wont decreases probability
-		{ MAX_WORD_UNIT_LIMIT = SINGLE_WORD_BLOCK_UNIT_SZ; }
-		
-		WORD_UNIT_INCREASE_PER_HINT_CLICK = ( MAX_WORD_UNIT_LIMIT - SINGLE_WORD_BLOCK_UNIT_SZ ) / 15; //find how many units will be added per additional click
 		
 			/* CREATE RANGE BASED ON HintClick */
+		
 		// NOTE: 1 HintClick = SINGLE_WORD_BLOCK_UNIT_SZ
 		// set up first word
 		int num = SINGLE_WORD_BLOCK_UNIT_SZ;
@@ -129,7 +125,7 @@ public class Select9Word
 		for( int j=1; j<lineCount; j++ )
 		{
 			rangeArr[j].setNumLeft( rangeArr[j-1].getNumRight()+1 ); //left to prev word range.right but +1
-			num = SINGLE_WORD_BLOCK_UNIT_SZ + (rangeArr[0].getHintClick() - 1 )*WORD_UNIT_INCREASE_PER_HINT_CLICK; //calculate how many units in this word
+			num = SINGLE_WORD_BLOCK_UNIT_SZ + (rangeArr[j].getHintClick() - 1 )*WORD_UNIT_INCREASE_PER_HINT_CLICK; //calculate how many units in this word
 			rangeArr[j].setNumRight( TOTAL_UNITS + num );
 			TOTAL_UNITS = TOTAL_UNITS + num;
 		}
@@ -150,41 +146,24 @@ public class Select9Word
 		///////////////////////
 		
 		
-		
-		
-		// TODO: test for bounds above MAX_WORD_UNIT_LIMIT and below SINGL_WORD_BLOCK_UNIT_SZ
-		
-		// TODO: make sure to use HINT_CLICK_TO_MAX_PROB so that when user clicks 15 times, the wor reaches MAX probability in 15 clicks
-		
-		// TODO: dont forget to decrease probability by 1 HINT_CLICK if a word was selected for the game, but the user did not use a HintClick
-		// TODO:	implying that the user did not have any difficulty with the word
-		
-		// TODO: also change in GameActivity when saving HintClick to file, add a limit that if > 15, dont increase click count
-		
-		// TODO: test if when in Justin's mode, check if his mode also modifies wordArray HintClick (based on code so far, it should, but it may not be desired?)
-		
-		// TODO: dont forget to change puzzleSeed back
-		
-		// TODO: re enable scramble(Puzzle);
-		
-		// TODO: test if difficulty is only decreased once a game for word (if inserted correctly)
-		
-		// TODO: printf Range[] and monitor if UNITS are as they should (print already implemented)
-		
-		
 		Log.d( "selectW", "lineCount: " + lineCount );
+		Log.d( "selectW", "WORD_UNIT_INCREASE_PER_HINT_CLICK: " + WORD_UNIT_INCREASE_PER_HINT_CLICK );
+		Log.d( "selectW", "totalUnitsDefault: " + totalUnitsDefault );
 		Log.d( "selectW", "SINGLE_WORD_BLOCK_UNIT_SZ: " + SINGLE_WORD_BLOCK_UNIT_SZ );
-		Log.d( "selectW", "MAX_WORD_UNIT_LIMIT: " + MAX_WORD_UNIT_LIMIT );
+		Log.d( "selectW", "MAX_WORD_UNIT_LIMIT_DEFAULT: " + MAX_WORD_UNIT_LIMIT_DEFAULT );
+		Log.d( "selectW", "MAX_WORD_UNIT_LIMIT: " + MAX_WORD_UNIT_LIMIT + " (should not exceed " + MAX_WORD_UNIT_LIMIT_DEFAULT + " )" );
+		Log.d( "selectW", "TOTAL_UNITS: " + TOTAL_UNITS );
 		
 		
 			// RANDOMLY CHOOSE 9 WORDS (based on difficulty) //
 		
 		// NOTE: Random Number generator does not return all range for "long"
 		Random rand = new Random( );
-		long randPos; //random position to choose
+		int randPos; //random position to choose
 		int n = 0; //used to prevent run-on random generator
 		boolean breakOut = false;
 		int[] wordUsed = new int[lineCount]; //array for all words used to mark if a word was selected for wordArray
+		int wordsUsedSoFar = 0; //stores number of words used so far for wordArr[]
 		
 		for( int k=0; k<9; k++ ) //loop to find 9 words
 		{
@@ -192,8 +171,9 @@ public class Select9Word
 			breakOut = false; //reset
 			while( n < 500000 )
 			{
-				// TODO: changed Rand from long to int
-				randPos = rand.nextInt( ) % total; //random position to choose
+				//randPos = rand.nextInt( ) % total; //random position to choose
+				randPos = rand.nextInt( ) % (int)TOTAL_UNITS; //random position to choose
+				
 				
 				//loop through rangeArr and find which word range has this value
 				for( int c=0; c<lineCount; c++ )
@@ -211,22 +191,44 @@ public class Select9Word
 							wordUsed[c] = 1; //mark word as used
 							//break out of loop
 							breakOut = true;
+							wordsUsedSoFar++;
 							break; //do not look for more words
 						}
 					}
 				}
 				
-				if( breakOut == true )//breaked after found valid word
-				{ break; } //so break out of while loop
+				if( breakOut == true )//break after found valid word
+				{ break; }
 				
 				n++;
 			}
 			
-			if( n >= 500000 ) //exhausted all tries
-			{ return 1; }
+			if( n >= 500000 ) //if exhausted all tries, linearly choose 9 words
+			{
+				Log.d( "selectW", "WARNING: exhauster all tries in Select9Word" );
+				int r = rand.nextInt( ) % lineCount; //get a random position to start
+				//loop linearly and choose 9 words
+				int c = 0;
+				while( c<lineCount && wordsUsedSoFar < 9 )
+				{
+					
+					if( wordUsed[r] == 1 ) //if word already used
+					{
+						//void
+					}
+					else //word not previously selected for wordArray
+					{
+						//USE THIS WORD AS NEW wordArr[k]
+						wordArray[wordsUsedSoFar] = new Word( rangeArr[r].getStrNative(), rangeArr[r].getStrTranslation(), r+1, 0 );
+						wordsUsedSoFar++;
+						wordUsed[r] = 1; //mark word as used
+					}
+					r = (r+1) % lineCount; //move to next word in rangeArr[]
+					c++;
+				}
+				break; //already found 9 words
+			}
 		}
-		
-		// TODO: implement safety feature that when "all tries exhausted", choose rand position and linearly loop + choose 9 words
 		
 		
 		//// debug //////
