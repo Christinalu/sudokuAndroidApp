@@ -745,10 +745,19 @@ public class GameActivity extends AppCompatActivity
 						
 						//to what hintClickSoFar was so far originally in the file, add wordArray.getHintClick() from the current game
 						//newHintClick = hintClickSoFar + wordArray[k].getHintClick()*STATISTIC_MULTIPLE;
-						if( wordArray[k].getHintClick() == 0 ) //if no HintClicks fot this word, it means user has less difficulty so decrease HintClick to decrease probability
-						{ newHintClick = hintClickSoFar - HINT_CLICK_ON_DECREASE; }
+						
+						if( wordArray[k].getHintClick() == 0 ) //if no HintClicks for this word, it means user has less difficulty so decrease HintClick to decrease probability
+						{
+							if( wordArray[k].getAllowToDecreaseDifficulty() ) //if user inserted correct word (ONLY ONCE)
+							{
+								wordArray[k].setDoNotAllowToDecreaseDifficulty( ); //disable so that word cannot have difficulty decreased in this game, until user starts new game
+								newHintClick = hintClickSoFar - HINT_CLICK_ON_DECREASE;
+							}
+							else
+							{ newHintClick = hintClickSoFar; } //keep the same HintCount (because newHintCount==0 and no need to decrease count)
+						}
 						else
-						{ newHintClick = hintClickSoFar +  wordArray[k].getHintClick(); }
+						{ newHintClick = hintClickSoFar +  wordArray[k].getHintClick(); } //user used HintClick
 						
 						//test for bounds
 						if( newHintClick < 1 ) //if too low
@@ -757,6 +766,8 @@ public class GameActivity extends AppCompatActivity
 						{ newHintClick = HINT_CLICK_TO_MAX_PROB; }
 						
 						lineFound = true; //csv file line matches a word in wordArray[]
+						
+						//TODO: check if allowed to decrease difficulty by getting wordArr.allowToDecreaseDifficulty
 						
 						break; //do not consider the rest
 					}

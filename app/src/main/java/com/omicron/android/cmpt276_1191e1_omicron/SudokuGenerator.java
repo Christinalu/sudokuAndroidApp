@@ -17,19 +17,21 @@ public class SudokuGenerator implements Serializable {
     //This class accepts a hardcoded Puzzle and randomizes it to generate a new puzzle which is guaranteed to be unique and the same difficulty and the puzzle taken in as the argument.
     private int size;
     public int[][] PuzzleOriginal;
-    public int[][] Puzzle; //stores user input changes
+	public int[][] PuzzleOriginalSolution;
+	public int[][] Puzzle; //stores user input changes
     
     //test array
     //int[][] testSeed = {{0,3,0,4,9,1,2,5,8},{4,8,2,5,7,3,6,9,1},{9,1,5,6,2,8,4,3,7},{8,2,9,1,3,7,5,4,6},{3,4,1,2,6,5,8,7,9},{5,6,7,8,4,9,1,2,3},{7,5,6,9,1,2,3,8,4},{1,3,8,7,5,4,9,6,2},{2,9,4,3,8,6,7,1,5}};
-    public int[][] testSeedSolution = {{0,0,2,5,4,9,6,8,3},{6,4,5,8,7,3,2,1,9},{3,8,9,2,6,1,7,4,5},{4,9,6,3,2,7,8,5,1},{8,1,3,4,5,6,9,7,2},{2,5,7,1,9,8,4,3,6},{9,6,4,7,1,5,3,2,8},{7,3,1,6,8,2,5,9,4},{5,2,8,9,3,4,1,6,7}};
-    public int[][] testSeed = {{0,0,2,5,4,9,6,8,3},{6,4,5,8,7,3,2,1,9},{3,8,9,2,6,1,7,4,5},{4,9,6,3,2,7,8,5,1},{8,1,3,4,5,6,9,7,2},{2,5,7,1,9,8,4,3,6},{9,6,4,7,1,5,3,2,8},{7,3,1,6,8,2,5,9,4},{5,2,8,9,3,4,1,6,7}};
+    public int[][] testSeedSolution = {{1,7,2,5,4,9,6,8,3},{6,4,5,8,7,3,2,1,9},{3,8,9,2,6,1,7,4,5},{4,9,6,3,2,7,8,5,1},{8,1,3,4,5,6,9,7,2},{2,5,7,1,9,8,4,3,6},{9,6,4,7,1,5,3,2,8},{7,3,1,6,8,2,5,9,4},{5,2,8,9,3,4,1,6,7}};
+    public int[][] testSeed = {{0,0,0,0,0,0,0,0,0},{6,4,5,8,7,3,2,1,9},{3,8,9,2,6,1,7,4,5},{4,9,6,3,2,7,8,5,1},{8,1,3,4,5,6,9,7,2},{2,5,7,1,9,8,4,3,6},{9,6,4,7,1,5,3,2,8},{7,3,1,6,8,2,5,9,4},{5,2,8,9,3,4,1,6,7}};
     
     
     public SudokuGenerator(int i)
     {
         size = 9;
         PuzzleOriginal = new int[size][size];
-        Puzzle = new int[size][size];
+		PuzzleOriginalSolution = new int[size][size];
+		Puzzle = new int[size][size];
 
        //test arrays outside SudokuGenerator
        
@@ -48,19 +50,24 @@ public class SudokuGenerator implements Serializable {
         
         
         // TODO: re enable scramble(Puzzle);
+		
+		// TODO: set Puzzle
         
         //scramble(Puzzle);
         
         
         copyarr( Puzzle, PuzzleOriginal );
+        
+        Log.d( "select", "puzzle solution:" );
+        printArr( testSeedSolution );
     }
 
     // test method to print for debugging
-    public void printOriginal( )
+    public void printArr( int[][] arr )
 	{
 		for( int i=0; i<size; i++ )
 		{
-			Log.d("MATRIX", " " + PuzzleOriginal[i][0] + " " + PuzzleOriginal[i][1] + " " + PuzzleOriginal[i][2]+ " " + PuzzleOriginal[i][3]+ " " + PuzzleOriginal[i][4]+ " " + PuzzleOriginal[i][5]+ " " + PuzzleOriginal[i][6]+ " " + PuzzleOriginal[i][7]+ " " + PuzzleOriginal[i][8] );
+			Log.d("MATRIX", " " + arr[i][0] + " " + arr[i][1] + " " + arr[i][2]+ " " + arr[i][3]+ " " + arr[i][4]+ " " + arr[i][5]+ " " + arr[i][6]+ " " + arr[i][7]+ " " + arr[i][8] );
 		}
 		Log.d( "MATRIX"," \n\n");
 	}
@@ -188,4 +195,7 @@ public class SudokuGenerator implements Serializable {
             }
         }
     }
+    
+    public int[][] getPuzzleOriginalSolution( )
+	{ return PuzzleOriginalSolution; }
 }

@@ -107,8 +107,19 @@ public class ButtonListener extends AppCompatActivity
 													 btnClicked[0] = 0;
 													 //textOverlay.reDrawText( usrLangPref );
 
-													 //check if word inserted is correct (used to decrease probability of word being selected in Select9Word() )
+													 int a = currentRectColoured.getRow();
+													 int b = currentRectColoured.getColumn();
 													 
+													 //check if word inserted is correct (used to decrease probability of word being selected in Select9Word() )
+													 if( var == usrSudokuArr.getPuzzleOriginalSolution()[a][b] ) //if input matches solution
+													 {
+													 	Log.d( "selectW", "user sqr input correct" );
+													 	if( wordArray[var].getAlreadyUsedInGame() == false ) //if correctly using this word for the first time in game
+														{
+															wordArray[var].setUsedInGame(); //mark as used
+															wordArray[var].setToAllowToDecreaseDifficulty( ); //allow for difficulty to be decreased
+														}
+													 }
 													 
 													 //have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
 													 if( track.enableCheck )

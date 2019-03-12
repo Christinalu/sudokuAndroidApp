@@ -121,20 +121,35 @@ public class Select9Word
 		// set up first word
 		int num = SINGLE_WORD_BLOCK_UNIT_SZ;
 		rangeArr[0].setNumLeft(1);
-		num = num + rangeArr[0].getHintClick() * WORD_UNIT_INCREASE_PER_HINT_CLICK;
+		num = num + (rangeArr[0].getHintClick() - 1 ) * WORD_UNIT_INCREASE_PER_HINT_CLICK;
 		rangeArr[0].setNumRight(  num );
 		TOTAL_UNITS = num;
 		
+		//create UNIT based range
 		for( int j=1; j<lineCount; j++ )
 		{
-			
-			TOTAL_UNITS =
+			rangeArr[j].setNumLeft( rangeArr[j-1].getNumRight()+1 ); //left to prev word range.right but +1
+			num = SINGLE_WORD_BLOCK_UNIT_SZ + (rangeArr[0].getHintClick() - 1 )*WORD_UNIT_INCREASE_PER_HINT_CLICK; //calculate how many units in this word
+			rangeArr[j].setNumRight( TOTAL_UNITS + num );
+			TOTAL_UNITS = TOTAL_UNITS + num;
 		}
 		
 		
 		// OVERFLOW TEST
 		if( TOTAL_UNITS >= Integer.MAX_VALUE )
 		{ return -1; } //error overflow
+		
+		
+		//// debug /////////////
+		Log.d( "upload", "# of line: " + lineCount );
+		Log.d( "upload", "# TOTAL: " + total );
+		for( int j=0; j<lineCount; j++ ) //print rangeArr[]
+		{
+			Log.d( "selectW", "RANGE :: unit block " + (j+1) + ": ( " + rangeArr[j].getNumLeft() + ", " + rangeArr[j].getNumRight() + " )" );
+		}
+		///////////////////////
+		
+		
 		
 		
 		// TODO: test for bounds above MAX_WORD_UNIT_LIMIT and below SINGL_WORD_BLOCK_UNIT_SZ
@@ -152,10 +167,14 @@ public class Select9Word
 		
 		// TODO: re enable scramble(Puzzle);
 		
+		// TODO: test if difficulty is only decreased once a game for word (if inserted correctly)
 		
-		Log.d( "select", "lineCount: " + lineCount );
-		Log.d( "select", "SINGLE_WORD_BLOCK_UNIT_SZ: " + SINGLE_WORD_BLOCK_UNIT_SZ );
-		Log.d( "select", "MAX_WORD_UNIT_LIMIT: " + MAX_WORD_UNIT_LIMIT );
+		// TODO: printf Range[] and monitor if UNITS are as they should (print already implemented)
+		
+		
+		Log.d( "selectW", "lineCount: " + lineCount );
+		Log.d( "selectW", "SINGLE_WORD_BLOCK_UNIT_SZ: " + SINGLE_WORD_BLOCK_UNIT_SZ );
+		Log.d( "selectW", "MAX_WORD_UNIT_LIMIT: " + MAX_WORD_UNIT_LIMIT );
 		
 		
 			// RANDOMLY CHOOSE 9 WORDS (based on difficulty) //
