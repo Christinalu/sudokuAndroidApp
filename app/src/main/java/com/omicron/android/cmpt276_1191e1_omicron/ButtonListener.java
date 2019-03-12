@@ -107,6 +107,9 @@ public class ButtonListener extends AppCompatActivity
 													 btnClicked[0] = 0;
 													 //textOverlay.reDrawText( usrLangPref );
 
+													 //check if word inserted is correct (used to decrease probability of word being selected in Select9Word() )
+													 
+													 
 													 //have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
 													 if( track.enableCheck )
 													 {

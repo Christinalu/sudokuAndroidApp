@@ -133,7 +133,7 @@ public class FileCSVAnalyze
 		int commaCount = countChar( strLine, ',' ); //find how many commas there are in string
 		
 		
-			// TEST FORMAT
+			// TEST FORMAT (for title)
 		if( splitLine.length == 2 && splitLine[0].length() > 0 && splitLine[1].length() > 0 && commaCount == 1 && //also check that if 2 attributes then there should be 1 comma
 				splitLine[0].length() <= MAX_LANG_LEN && splitLine[1].length() <= MAX_LANG_LEN ) //check for correct formatting; ie if not null, all cells filled, if not enough or too many cells
 		{
@@ -144,6 +144,8 @@ public class FileCSVAnalyze
 		{ return res; }
 		
 		
+			// TEST FORMAT
+	
 		int totalLineCnt = 0; //stores the number of word pairs in the file
 		
 		int loopLimit = 0; //only loop to MAX, looping any more is irrelevant since file does not meet size requirement

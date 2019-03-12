@@ -23,18 +23,24 @@ public class Select9Word
 	}
 	
 	
-	public int select(Word[] wordArray, String fileNameSelected, BufferedReader buffRead ) throws IOException
+	public int select(Word[] wordArray, String fileNameSelected, BufferedReader buffRead, int HINT_CLICK_TO_MAX_PROB ) throws IOException
 	{
+		/*
+		 * Modifies existing wordArray with the statistically selected words
+		 * Returns 1 on failure
+		 */
 		//discrete units are units assigned to words to mimin discrete probability
 		//for example, starting out, you could have 5 words with 10 units each == 50 total units
 		//hence the probability of choosing one word would be units_of_word / total_units == 10/50 == 0.2
 		
 		int hintCountTotal = 0;
-		int SINGL_WORD_BLOCK_UNIT_SZ_CONST = 10; //constant stores how many discrete units are assigned to a single word HintClick
-		int SINGL_WORD_BLOCK_UNIT_SZ; //depending on SINGL_WORD_BLOCK_UNIT_SZ_CONST and HintClick, this will represent units of single word OF 1 HINT-COUNT
+		int SINGLE_WORD_BLOCK_UNIT_SZ_CONST = 10; //constant stores how many discrete units are assigned to a single word HintClick
+		int SINGLE_WORD_BLOCK_UNIT_SZ; //depending on SINGL_WORD_BLOCK_UNIT_SZ_CONST and HintClick, this will represent units of single word OF 1 HINT-COUNT
 		int WORD_INCREASE_UNIT_MULTIP = 10; //multiplier whch increases word_unit depending on how many words there are, ie if == 10; then 10 words == 100 total units and 100 words == 1000 total units
-		float MAX_PERCENTAGE_OF_TOTAL; //stores a percentage of how much probability a word is allowed to gain; ie if == 0.2 and total_units == 1000 (ie 10 words with 100 units), then the max units a word can have would be 0.2*1000 = 200 units max per block
+		float MAX_PERCENTAGE_OF_TOTAL = 0.1f; //stores a percentage of how much probability a word is allowed to gain; ie if == 0.2 and total_units == 1000 (ie 10 words with 100 units), then the max units a word can have would be 0.2*1000 = 200 units max per block
 		int MAX_WORD_UNIT_LIMIT; //stores the maximum units that a single word can have at any time
+		long TOTAL_UNITS = 0; //stores all the units from all the HintCount blocks //needs to be long ( > int)
+		int WORD_UNIT_INCREASE_PER_HINT_CLICK; //defines how many units are added per HintClick (when HintClick > 1)
 		
 		
 			/** STATISTICALLY CHOOSE 9 MOST DIFFICULT WORD BASED ON HINT CLICK**/
@@ -70,7 +76,7 @@ public class Select9Word
 				//note: in Range( 0,0 ), it means only 0th index; Range( 1,5 ) means from 1 to 5 inclusive
 				int hintCount = Integer.parseInt( strSplit[2] );
 				hintCountTotal = hintCountTotal + hintCount;
-				rangeArr[lineCount] = new Range( totalBk, total-1, strSplit[0], strSplit[1], hintCount );
+				rangeArr[lineCount] = new Range( 0, 0, strSplit[0], strSplit[1], hintCount );
 				
 				lineCount++;
 			}
@@ -86,16 +92,69 @@ public class Select9Word
 		///////////////////////
 		
 		
-		SINGL_WORD_BLOCK_UNIT_SZ = SINGL_WORD_BLOCK_UNIT_SZ_CONST * lineCount; //find how many units a word will have
-		int totalUnitsDefault = SINGL_WORD_BLOCK_UNIT_SZ * lineCount; //get total units based on fresh, equal, probability word file
+		SINGLE_WORD_BLOCK_UNIT_SZ = SINGLE_WORD_BLOCK_UNIT_SZ_CONST * lineCount; //find how many units a word with HintCount == 1 will have
+		int totalUnitsDefault = SINGLE_WORD_BLOCK_UNIT_SZ * lineCount; //get total units based on new, equal, probability word file where each word has HintClick == 1
 		
-		//find MAX_PERCENTAGE_OF_TOTAL based on word count
+		//// NOTE /////
+		// units in a word with MAX_PERCENTAGE_OF_TOTAL, at max: MAX_UNIT == MAX_PERCENTAGE_OF_TOTAL*(lineCount * (lineCount*SINGL_WORD_BLOCK_UNIT_SZ_CONST) )
+		// probability of choosing one word with max_probability == MAX_UNIT / ( (lineCount-1) * lineCount * SINGL_WORD_BLOCK_UNIT_SZ_CONST )
 		
 		
-		MAX_WORD_UNIT_LIMIT = (int)(MAX_PERCENTAGE_OF_TOTAL * totalUnitsDefault);
+		// TODO: test the following with 9 words (and MAX_PRECRENT_OF_TOT = 0.1), it should detect that probability decreases instead of increase
+		
+		//find MAX_PERCENTAGE_OF_TOTAL based on DEFAULT word count block HintClick (ie when adding new file, based on that, define this)
+		
+		
+		
+		
+		
+		
+		MAX_WORD_UNIT_LIMIT = (int)(MAX_PERCENTAGE_OF_TOTAL * totalUnitsDefault); //find how many units a word can contain at any time
+		
+		if( MAX_WORD_UNIT_LIMIT < SINGLE_WORD_BLOCK_UNIT_SZ  ) //needs a minimum word count for probability to increase, so that taking MAX_PERCENTAGE_OF_TOTAL wont decreases probability
+		{ MAX_WORD_UNIT_LIMIT = SINGLE_WORD_BLOCK_UNIT_SZ; }
+		
+		WORD_UNIT_INCREASE_PER_HINT_CLICK = ( MAX_WORD_UNIT_LIMIT - SINGLE_WORD_BLOCK_UNIT_SZ ) / 15; //find how many units will be added per additional click
+		
+			/* CREATE RANGE BASED ON HintClick */
+		// NOTE: 1 HintClick = SINGLE_WORD_BLOCK_UNIT_SZ
+		// set up first word
+		int num = SINGLE_WORD_BLOCK_UNIT_SZ;
+		rangeArr[0].setNumLeft(1);
+		num = num + rangeArr[0].getHintClick() * WORD_UNIT_INCREASE_PER_HINT_CLICK;
+		rangeArr[0].setNumRight(  num );
+		TOTAL_UNITS = num;
+		
+		for( int j=1; j<lineCount; j++ )
+		{
+			
+			TOTAL_UNITS =
+		}
+		
+		
+		// OVERFLOW TEST
+		if( TOTAL_UNITS >= Integer.MAX_VALUE )
+		{ return -1; } //error overflow
+		
+		
+		// TODO: test for bounds above MAX_WORD_UNIT_LIMIT and below SINGL_WORD_BLOCK_UNIT_SZ
+		
+		// TODO: make sure to use HINT_CLICK_TO_MAX_PROB so that when user clicks 15 times, the wor reaches MAX probability in 15 clicks
+		
+		// TODO: dont forget to decrease probability by 1 HINT_CLICK if a word was selected for the game, but the user did not use a HintClick
+		// TODO:	implying that the user did not have any difficulty with the word
+		
+		// TODO: also change in GameActivity when saving HintClick to file, add a limit that if > 15, dont increase click count
+		
+		// TODO: test if when in Justin's mode, check if his mode also modifies wordArray HintClick (based on code so far, it should, but it may not be desired?)
+		
+		// TODO: dont forget to change puzzleSeed back
+		
+		// TODO: re enable scramble(Puzzle);
+		
 		
 		Log.d( "select", "lineCount: " + lineCount );
-		Log.d( "select", "SINGL_WORD_BLOCK_UNIT_SZ: " + SINGL_WORD_BLOCK_UNIT_SZ );
+		Log.d( "select", "SINGLE_WORD_BLOCK_UNIT_SZ: " + SINGLE_WORD_BLOCK_UNIT_SZ );
 		Log.d( "select", "MAX_WORD_UNIT_LIMIT: " + MAX_WORD_UNIT_LIMIT );
 		
 		
@@ -114,7 +173,8 @@ public class Select9Word
 			breakOut = false; //reset
 			while( n < 500000 )
 			{
-				randPos = rand.nextLong( ) % total; //random position to choose
+				// TODO: changed Rand from long to int
+				randPos = rand.nextInt( ) % total; //random position to choose
 				
 				//loop through rangeArr and find which word range has this value
 				for( int c=0; c<lineCount; c++ )
@@ -146,6 +206,8 @@ public class Select9Word
 			if( n >= 500000 ) //exhausted all tries
 			{ return 1; }
 		}
+		
+		// TODO: implement safety feature that when "all tries exhausted", choose rand position and linearly loop + choose 9 words
 		
 		
 		//// debug //////

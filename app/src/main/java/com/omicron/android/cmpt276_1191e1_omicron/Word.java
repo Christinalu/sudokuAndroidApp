@@ -11,6 +11,7 @@ public class Word implements Serializable
 	private String mTranslation;
 	private int mInFileLineNum; //stores on which line in .csv this word is found
 	private long mHintClick; //stores the number of times the user had difficulty with a word
+	private boolean alreadyUsedInGame; //stores if the word was already used in game once
 
 	//create a word
 	public Word( String wordNative, String wordTranslation, int inFileLineNum, long hintClick )
@@ -19,6 +20,7 @@ public class Word implements Serializable
 		mTranslation = wordTranslation;
 		mInFileLineNum = inFileLineNum;
 		mHintClick = hintClick;
+		alreadyUsedInGame = false;
 	}
 
 	//get native word
@@ -46,4 +48,8 @@ public class Word implements Serializable
 	public void incrementHintClick( ){ mHintClick++; }
 	
 	public long getHintClick(  ){ return mHintClick; }
+	
+	public boolean getAlreadyUsedInGame( ){ return alreadyUsedInGame; }
+	
+	public void setUsedInGame( ){ alreadyUsedInGame = true; }
 }
