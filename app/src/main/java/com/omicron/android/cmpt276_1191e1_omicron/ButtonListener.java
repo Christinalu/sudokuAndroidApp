@@ -109,7 +109,7 @@ public class ButtonListener extends AppCompatActivity
 													 Log.d( "selectW", "btn clicked: " + var );
 													 
 													 //check if word inserted is correct (used to decrease probability of word being selected in Select9Word() )
-													 if( var == usrSudokuArr.getPuzzleOriginalSolution()[currentRectColoured.getRow()][currentRectColoured.getColumn()] ) //if input matches solution
+													 if( var == usrSudokuArr.getSolution()[currentRectColoured.getRow()][currentRectColoured.getColumn()] ) //if input matches solution
 													 {
 													 	Log.d( "selectW", "btn listener: user sqr input correct" );
 													 	if( wordArray[var].getAlreadyUsedInGame() == false ) //if correctly using this word for the first time in game
