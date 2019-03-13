@@ -33,6 +33,8 @@ public class ExampleInstrumentedTest {
         //Context appContext = InstrumentationRegistry.getTargetContext();
         
         assertEquals("com.omicron.android.cmpt276_1191e1_omicron", appContext.getPackageName());
+
+
     }
     
     

@@ -27,6 +27,10 @@ public class Block
 		return selected;
 	}
 
+	public boolean getSelected(){
+		return selected;
+	}
+
 	public void select( )
 	{
 		selected = true;
