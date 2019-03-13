@@ -56,8 +56,6 @@ public class WordPackageFileIndex
 			nativeLang = linePart[2];
 			translateLang = linePart[3];
 			
-			// TODO: finished? -yes
-			
 			//add all data into a PackageFile object
 			packageFileArr[i] = new PackageFile( pkgName, fileName, nativeLang, translateLang );
 		

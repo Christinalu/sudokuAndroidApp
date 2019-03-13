@@ -28,4 +28,6 @@ public class Range
 	public String getStrNative( ){ return strNative; }
 	public String getStrTranslation( ){ return strTranslation; }
 	public int getHintClick( ){ return hintClick; }
+	public void setNumLeft( long n ){ left = n; }
+	public void setNumRight( long n ){ right = n; }
 }

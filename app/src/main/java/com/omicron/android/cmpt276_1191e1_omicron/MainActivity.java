@@ -64,8 +64,9 @@ public class MainActivity extends AppCompatActivity
 	private WordPackageFileIndex wordPackageFileIndexArr; //stores word packages name and internal file name
 	private String wordPackageName; //stores name of all Word Packages the user has so far
 	private int MAX_WORD_PKG = 50; //max word packages user is allowed to import
-	private int MAX_CSV_ROW = 150; //allow up to 150 pairs per package
+	private int MAX_CSV_ROW = 150; //allow up to 150 pairs per package;IMPORTANT: because of Select9Word select(), too many words may cause an error
 	private int CURRENT_WORD_PKG_COUNT = 0; //stores current number of packages the user has uploaded
+	private int HINT_CLICK_TO_MAX_PROB = 15; //defines how many HintClicks are required for a word to reach MAX_WORD_UNIT_LIMIT
 	private FileCSV fileCSV; //object containing CSV functions
 	private int[] indexOfRadBtnToRemove = { -1 }; //which radio btn to remove
 	private boolean[] removeBtnEnable = { true }; //when false, do not allow "REMOVE PKG" button (required because GameActivity may be using that file to save "Hint Click")
@@ -115,7 +116,7 @@ public class MainActivity extends AppCompatActivity
 		
 		fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW );
 		
-		//TEST IF USER JUST INSTALLED APP - IF USER HAS, LOAD DEFAULT FILES
+			/* TEST IF USER JUST INSTALLED APP - IF USER HAS, LOAD DEFAULT FILES */
 		int usrNewInstall = fileCSV.checkIfCurrentWordPkgCountFileExists( this ); //0==files already exist
 		
 		if( usrNewInstall == 0 ) //if app was already installed and has correct files - get current_word_pkg_count
@@ -330,7 +331,6 @@ public class MainActivity extends AppCompatActivity
 				@Override
 				public void onClick( View v )
 				{
-					// TODO: in here, one START btn is pressed, create word array with respect to pkg selected
 					
 					RadioButton radBtnSelected = findViewById( pkgRadioGroup.getCheckedRadioButtonId() );
 					String pkgNameSelected = radBtnSelected.getText().toString( ); //get pkg name inside
@@ -340,6 +340,7 @@ public class MainActivity extends AppCompatActivity
 						int res = initializeWordArray( fileNameSelected ); //based on pkg, initialize the array (select 9 words)
 						if( res == 1 ){
 							Log.d( "upload", "ERROR: initializeWordArray( ) returned an error" );
+							Toast.makeText(MainActivity.this, "Something went wrong. Could not start Game", Toast.LENGTH_SHORT).show();
 							return;
 						} //error: could not initialize wordArray
 					} catch (IOException e) {
@@ -377,6 +378,7 @@ public class MainActivity extends AppCompatActivity
 							gameActivity.putExtra("state", state);
 							gameActivity.putExtra("usrModeMA", usrModePref);
 							gameActivity.putExtra("languageMA", language);
+							gameActivity.putExtra( "HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB );
 							startActivityForResult(gameActivity,0);
 						}
 						else {
@@ -391,6 +393,7 @@ public class MainActivity extends AppCompatActivity
 						gameActivity.putExtra("state", state);
 						gameActivity.putExtra("usrModeMA", usrModePref);
 						gameActivity.putExtra("languageMA", language);
+						gameActivity.putExtra( "HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB );
 						startActivityForResult(gameActivity,0);
 					}
 				}
@@ -461,6 +464,7 @@ public class MainActivity extends AppCompatActivity
 						resumeActivity.putExtra("numArrayMA", numArrayResume);
 					}
 					resumeActivity.putExtra("languageMA", languageResume);
+					resumeActivity.putExtra( "HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB );
 					startActivityForResult(resumeActivity, 0);
 				}
 				else {
@@ -551,6 +555,8 @@ public class MainActivity extends AppCompatActivity
 		
 		Log.d( "upload", "onStart() called from MainActivity" );
 	}
+	
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent resumeSrc) {
 		if (resumeSrc != null) {
@@ -585,6 +591,7 @@ public class MainActivity extends AppCompatActivity
 			savedInstanceState.putSerializable("SudokuArrMA", usrSudokuArrResume);
 			savedInstanceState.putInt("usrModeMA", usrModePrefResume);
 			savedInstanceState.putString("languageMA", languageResume);
+			savedInstanceState.putInt( "HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB );
 			if (usrModePrefResume == 1) {
 				savedInstanceState.putStringArray("numArrayMA", numArrayResume);
 			}
@@ -614,7 +621,14 @@ public class MainActivity extends AppCompatActivity
 		Select9Word select9Word = new Select9Word( MAX_CSV_ROW );
 		
 		//call function to modify wordArray[]
-		int res = select9Word.select( wordArray, fileNameSelected, buffRead );
+		int res = select9Word.select( wordArray, fileNameSelected, buffRead, HINT_CLICK_TO_MAX_PROB );
+		
+		//// debug ////////
+		for( int i=0; i<9; i++ )
+		{
+			Log.d( "selectW", "wordArr[] " + i + " file line: " + wordArray[i].getInFileLineNum() );
+		}
+		///////////////////
 		
 		return res;
 	}

@@ -121,6 +121,8 @@ public class GameActivity extends AppCompatActivity
 	private int screenW;
 	private int bitmapSize; //lowest of screen dimensions - size of square bitmap
 	private int sqrSize; //size of single square in matrix
+	
+	int HINT_CLICK_TO_MAX_PROB;
 
 
 	@Override
@@ -138,6 +140,7 @@ public class GameActivity extends AppCompatActivity
 			usrSudokuArr = (SudokuGenerator) savedInstanceState.get("SudokuArrGA");
 			usrModePref = (int) savedInstanceState.getSerializable("usrModeGA");
 			language = (String) savedInstanceState.getSerializable("languageGA");
+			HINT_CLICK_TO_MAX_PROB = savedInstanceState.getInt( "HINT_CLICK_TO_MAX_PROB" );
 			if (usrModePref == 1) {
 				numArray = (String[]) savedInstanceState.getSerializable("numArrayGA");
 			}
@@ -153,6 +156,7 @@ public class GameActivity extends AppCompatActivity
 					usrSudokuArr = (SudokuGenerator) gameSrc.getSerializableExtra("SudokuArrMA");
 					usrModePref = (int) gameSrc.getSerializableExtra("usrModeMA");
 					language = (String) gameSrc.getSerializableExtra("languageMA");
+					HINT_CLICK_TO_MAX_PROB = (int) gameSrc.getSerializableExtra( "HINT_CLICK_TO_MAX_PROB" );
 					if (usrModePref == 1) {
 						numArray = (String[]) gameSrc.getStringArrayExtra("numArrayMA");
 					}
@@ -161,6 +165,7 @@ public class GameActivity extends AppCompatActivity
 					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPref");
 					usrDiffPref = (int) gameSrc.getSerializableExtra("usrDiffPref");
 					usrModePref = (int) gameSrc.getSerializableExtra("usrModeMA");
+					HINT_CLICK_TO_MAX_PROB = (int) gameSrc.getSerializableExtra( "HINT_CLICK_TO_MAX_PROB" );
 					if (usrModePref == 1) {
 						//create separate array to draw from for this mode
 						numArray = new String[9];
@@ -708,7 +713,7 @@ public class GameActivity extends AppCompatActivity
 		//wordArray[5].updateHintClick( 10 );
 		//wordArray[8].updateHintClick( 3 );
 		
-		
+		int HINT_CLICK_ON_DECREASE = 1; //if user had a word in puzzle but did not use HintClick, then it implies the user has less difficulty with word, so decrease HintClick by this
 		FileInputStream fileInStream = null; //open file from internal storage
 		try {
 			fileInStream = this.openFileInput( wordArray[10].getNative( ) ); //get internal file name, contained in 10th index of wordArray
@@ -723,14 +728,22 @@ public class GameActivity extends AppCompatActivity
 			
 			String line;
 			long newHintClick = 0;
-			int i = 0; //index to keep track of row index in file
+			int i = 0; // line index to keep track of row index in file
 			boolean lineFound;
+			
+			
+				/* READ FILE AND UPDATE HintClick */
+			
+			// IMPORTANT: 	the idea is that "if inserted correct word once without using HintClick, it implies the user is getting better with that word"
+			//				WITHOUT using any HintClick; if HintClick used, then word considered still difficult so increase HintClick
+			//				in this case, the user is allowed to place word in incorrect sqr, but if eventually places it in correct square, difficulty is decreased (as long as usr did not use HintClick)
+			
 			while( (line = buffRead.readLine()) != null ) //
 			{
 				lineFound = false; //reset
 				
-				// FIND LINE OF WORD IN CSV (based on wordArr[i].getInFileLineNum() //
-				for( int k=0; k<9; k++ )
+					/* FIND LINE OF WORD IN CSV (based on wordArr[i].getInFileLineNum() */
+				for( int k=0; k<9; k++ ) //loop through all 9 words
 				{
 					if( i == wordArray[k].getInFileLineNum() ) //if updating line with word that was used in wordArray
 					{
@@ -738,7 +751,30 @@ public class GameActivity extends AppCompatActivity
 						long hintClickSoFar = Long.parseLong(strSplit[2]); //get original click count from file
 						
 						//to what hintClickSoFar was so far originally in the file, add wordArray.getHintClick() from the current game
-						newHintClick = hintClickSoFar + wordArray[k].getHintClick()*STATISTIC_MULTIPLE;
+						//newHintClick = hintClickSoFar + wordArray[k].getHintClick()*STATISTIC_MULTIPLE;
+						
+						if( wordArray[k].getHintClick() == 0 ) //if no HintClicks for this word, it means user has less difficulty so decrease HintClick to decrease probability
+						{
+							if( wordArray[k].getAllowToDecreaseDifficulty() ) //if user inserted correct word (ONLY ONCE)
+							{
+								wordArray[k].setDoNotAllowToDecreaseDifficulty( ); //disable so that word cannot have difficulty decreased in this game, until user starts new game
+								newHintClick = hintClickSoFar - HINT_CLICK_ON_DECREASE;
+								Log.d( "selectW", "word: " + wordArray[k].getNative() );
+								Log.d( "selectW", "line index: " + i );
+								Log.d( "selectW", "HintClick decreased with hintClickSoFar=" + hintClickSoFar + " newHintClick=" + newHintClick );
+							}
+							else
+							{ newHintClick = hintClickSoFar; } //keep the same HintCount (because newHintCount==0 and no need to decrease count)
+						}
+						else
+						{ newHintClick = hintClickSoFar +  wordArray[k].getHintClick(); } //user used HintClick
+						
+						//test for bounds
+						if( newHintClick < 1 ) //if too low
+						{ newHintClick = 1; }
+						else if( newHintClick > HINT_CLICK_TO_MAX_PROB )
+						{ newHintClick = HINT_CLICK_TO_MAX_PROB; }
+						
 						lineFound = true; //csv file line matches a word in wordArray[]
 						
 						break; //do not consider the rest

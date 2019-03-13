@@ -52,16 +52,20 @@ public class SudokuGenerator implements Serializable {
         }
         scramble(Puzzle, PuzzleSol);
         copyarr( Puzzle, PuzzleOriginal );
+        
+        
+        Log.d( "selectW", "puzzle solution:" );
+        printArr( "selectW", PuzzleSol );
     }
 
     // test method to print for debugging
-    public void printOriginal( )
+    public void printArr( String tag, int[][] arr )
 	{
 		for( int i=0; i<size; i++ )
 		{
-			Log.d("MATRIX", " " + PuzzleOriginal[i][0] + " " + PuzzleOriginal[i][1] + " " + PuzzleOriginal[i][2]+ " " + PuzzleOriginal[i][3]+ " " + PuzzleOriginal[i][4]+ " " + PuzzleOriginal[i][5]+ " " + PuzzleOriginal[i][6]+ " " + PuzzleOriginal[i][7]+ " " + PuzzleOriginal[i][8] );
+			Log.d(tag, " " + arr[i][0] + " " + arr[i][1] + " " + arr[i][2]+ " " + arr[i][3]+ " " + arr[i][4]+ " " + arr[i][5]+ " " + arr[i][6]+ " " + arr[i][7]+ " " + arr[i][8] );
 		}
-		Log.d( "MATRIX"," \n\n");
+		Log.d( tag," \n\n");
 	}
 
     // test method to print for debugging
@@ -201,4 +205,10 @@ public class SudokuGenerator implements Serializable {
             }
         }
     }
+    
+    public int[][] getPuzzleOriginalSolution( )
+	{ return PuzzleOriginalSolution; }
+	
+	public int[][] getTestSeedSolution( )
+	{ return testSeedSolution; }
 }
