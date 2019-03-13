@@ -3,6 +3,7 @@ package com.omicron.android.cmpt276_1191e1_omicron;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -25,7 +26,7 @@ public class TextMatrix
 		 *       changing single setText() resulted in resetting animation for all TextView
 		 *       (because when calling setText() it re-wraps all texts in single Layout, so hat to create multiple Layouts)
 		 */
-
+		
 		textViewArr = new RelativeAndPos[9][9];
 
 		for( int i=0; i<9; i++ )
@@ -44,8 +45,11 @@ public class TextMatrix
 		Log.d( "screen", "sqrSize: " + sqrSize );
 		
 		//adapt text size depending on screen (square) size
-		TXT_SIZE_NORMAL = sqrSize / 7f; // 7 is arbitrary scaling factors
-		TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * ( ZOOM_SCALE * 0.8f ); //0.8 means as screen gets bigger so will the text but at a slower rate
+		//TXT_SIZE_NORMAL = sqrSize / 4f; // 7 is arbitrary scaling factors
+		Log.d( "tag-2", "sqrSize: " +sqrSize );
+		//TXT_SIZE_NORMAL = sqrSize * 0.142857f;
+		TXT_SIZE_NORMAL = sqrSize * 0.3846f;
+		TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * ( ZOOM_SCALE * 1.0f ); //0.8 means as screen gets bigger so will the text but at a slower rate
 	}
 
 
@@ -64,7 +68,7 @@ public class TextMatrix
 				textViewArr[i][j].getRelativeLayout().setLayoutParams( parameter );
 
 				//upscale text size
-				( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setTextSize( TXT_SIZE_ZOOM );
+				( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setTextSize( TypedValue.COMPLEX_UNIT_PX, TXT_SIZE_ZOOM );
 			}
 		}
 	}
@@ -72,7 +76,7 @@ public class TextMatrix
 
 	public void scaleTextZoomOut(  )
 	{
-		RelativeLayout.LayoutParams parameter = new RelativeLayout.LayoutParams( (int)(sqrSize), (int)(sqrSize) );//height and width are inpixel
+		RelativeLayout.LayoutParams parameter = new RelativeLayout.LayoutParams( (int)(sqrSize), (int)(sqrSize) );//height and width are in pixel
 
 		//this method scales all of the text in zoom mode
 		for( int i=0; i<9; i++ )
@@ -85,7 +89,7 @@ public class TextMatrix
 				textViewArr[i][j].getRelativeLayout().setLayoutParams( parameter );
 
 				//downscale text size
-				( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setTextSize( TXT_SIZE_NORMAL );
+				( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setTextSize( TypedValue.COMPLEX_UNIT_PX, TXT_SIZE_NORMAL );
 			}
 		}
 	}
@@ -173,7 +177,7 @@ public class TextMatrix
 		( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setSingleLine( true ); //limit to single line
 		( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setMarqueeRepeatLimit( -1 ); //makes marquee loop forever
 		textViewArr[i][j].getRelativeLayout().setPadding( 10, 10, 10,10 ); //add padding so text is not shown right at the edge
-		( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setTextSize( TXT_SIZE_NORMAL ); //set text size
+		( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setTextSize(TypedValue.COMPLEX_UNIT_PX, TXT_SIZE_NORMAL ); //set text size
 
 		//add the original sqrT/L coordinates
 		textViewArr[i][j].setCoordinates( sqrT, sqrL );
