@@ -205,10 +205,7 @@ public class SudokuGenerator implements Serializable {
             }
         }
     }
-    
-    public int[][] getPuzzleOriginalSolution( )
-	{ return PuzzleOriginalSolution; }
 	
-	public int[][] getTestSeedSolution( )
-	{ return testSeedSolution; }
+	public int[][] getSolution( )
+	{ return PuzzleSol; }
 }
