@@ -18,30 +18,39 @@ public class SudokuGenerator implements Serializable {
     private int size;
     public int[][] PuzzleOriginal;
     public int[][] Puzzle; //stores user input changes
+    public int[][] PuzzleSol; //stores puzzle solution
 
     public SudokuGenerator(int i)
     {
         size = 9;
         PuzzleOriginal = new int[size][size];
         Puzzle = new int[size][size];
+        PuzzleSol = new int[size][size];
 
         //test array
         //int[][] testSeed = {{0,3,0,4,9,1,2,5,8},{4,8,2,5,7,3,6,9,1},{9,1,5,6,2,8,4,3,7},{8,2,9,1,3,7,5,4,6},{3,4,1,2,6,5,8,7,9},{5,6,7,8,4,9,1,2,3},{7,5,6,9,1,2,3,8,4},{1,3,8,7,5,4,9,6,2},{2,9,4,3,8,6,7,1,5}};
 		int[][] testSeed = {{0,0,2,5,4,9,6,8,3},{6,4,5,8,7,3,2,1,9},{3,8,9,2,6,1,7,4,5},{4,9,6,3,2,7,8,5,1},{8,1,3,4,5,6,9,7,2},{2,5,7,1,9,8,4,3,6},{9,6,4,7,1,5,3,2,8},{7,3,1,6,8,2,5,9,4},{5,2,8,9,3,4,1,6,7}};
 
 		int[][] PuzzSeedEasy = {{0, 0, 7, 2, 8, 0, 0, 5, 0}, {0, 5, 6, 1, 7, 9, 0, 0, 0}, {1, 2, 0, 0, 0, 6, 0, 4, 0}, {8, 0, 0, 0, 1, 0, 0, 2, 3}, {0, 0, 0, 0, 9, 0, 0, 0, 0}, {6, 4, 0, 0, 3, 0, 0, 0, 7}, {0, 8, 0, 7, 0, 0, 0, 3, 4}, {0, 0, 0, 9, 6, 5, 2, 7, 0}, {0, 6, 0, 0, 4, 3, 9, 0, 0}};
-        int[][] PuzzSeedMed = {{8, 0, 0, 7, 9, 0, 0, 0, 5}, {0, 0, 0, 3, 0, 0, 6, 0, 0}, {9, 0, 0, 0, 6, 5, 1, 0, 8}, {0, 0, 0, 0, 0, 0, 0, 0, 6}, {6, 5, 0, 8, 3, 7, 0, 4, 1}, {2, 0, 0, 0, 0, 0, 0, 0, 0}, {7, 0, 5, 1, 8, 0, 0, 0, 9}, {0, 0, 2, 0, 0, 3, 0, 0, 0}, {3, 0, 0, 0, 5, 6, 0, 0, 2}};
-        int[][] PuzzSeedHard = {{0, 0, 0, 3, 0, 0, 0, 6, 0}, {0, 0, 3, 0, 0, 1, 7, 0, 0}, {0, 8, 0, 0, 7, 0, 0, 0, 2}, {0, 2, 0, 6, 0, 3, 0, 9, 0}, {0, 6, 0, 0, 4, 0, 0, 5, 0}, {0, 1, 0, 7, 0, 9, 0, 3, 0}, {6, 0, 0, 0, 2, 0, 0, 4, 0}, {0, 0, 5, 9, 0, 0, 6, 0, 0}, {0, 3, 0, 0, 0, 6, 0, 0, 0}};
+		int[][] PuzzSeedEasySol = {{9, 3, 7, 2, 8, 4, 1, 5, 6}, {4, 5, 6, 1, 7, 9, 3, 8, 2}, {1, 2, 8, 3, 5, 6, 7, 4, 9}, {8, 9, 5, 6, 1, 7, 4, 2, 3}, {2, 7, 3, 4, 9, 8, 5, 6, 1}, {6, 4, 1, 5, 3, 2, 8, 9, 7}, {5, 8, 9, 7, 2, 1, 6, 3, 4}, {3, 1, 4, 9, 6, 5, 2, 7, 8}, {7, 6, 2, 8, 4, 3, 9, 1, 5}};
+		int[][] PuzzSeedMed = {{8, 0, 0, 7, 9, 0, 0, 0, 5}, {0, 0, 0, 3, 0, 0, 6, 0, 0}, {9, 0, 0, 0, 6, 5, 1, 0, 8}, {0, 0, 0, 0, 0, 0, 0, 0, 6}, {6, 5, 0, 8, 3, 7, 0, 4, 1}, {2, 0, 0, 0, 0, 0, 0, 0, 0}, {7, 0, 5, 1, 8, 0, 0, 0, 9}, {0, 0, 2, 0, 0, 3, 0, 0, 0}, {3, 0, 0, 0, 5, 6, 0, 0, 2}};
+		int[][] PuzzSeedMedSol = {{8, 3, 6, 7, 9, 1, 4, 2, 5}, {5, 2, 1, 3, 4, 8, 6, 9, 7}, {9, 7, 4, 2, 6, 5, 1, 3, 8}, {4, 1, 3, 5, 2, 9, 8, 7, 6}, {6, 5, 9, 8, 3, 7, 2, 4, 1}, {2, 8, 7, 6, 1, 4, 9, 5, 3}, {7, 4, 5, 1, 8, 2, 3, 6, 9}, {1, 6, 2, 9, 7, 3, 5, 8, 4}, {3, 9, 8, 4, 5, 6, 7, 1, 2}};
+		int[][] PuzzSeedHard = {{0, 0, 0, 3, 0, 0, 0, 6, 0}, {0, 0, 3, 0, 0, 1, 7, 0, 0}, {0, 8, 0, 0, 7, 0, 0, 0, 2}, {0, 2, 0, 6, 0, 3, 0, 9, 0}, {0, 6, 0, 0, 4, 0, 0, 5, 0}, {0, 1, 0, 7, 0, 9, 0, 3, 0}, {6, 0, 0, 0, 2, 0, 0, 4, 0}, {0, 0, 5, 9, 0, 0, 6, 0, 0}, {0, 3, 0, 0, 0, 6, 0, 0, 0}};
+        int[][] PuzzSeedHardSol = {{2, 7, 1, 3, 9, 8, 5, 6, 4}, {4, 5, 3, 2, 6, 1, 7, 8, 9}, {9, 8, 6, 5, 7, 4, 3, 1, 2}, {7, 2, 8, 6, 5, 3, 4, 9, 1}, {3, 6, 9, 1, 4, 2, 8, 5, 7}, {5, 1, 4, 7, 8, 9, 2, 3, 6}, {6, 9, 7, 8, 2, 5, 1, 4, 3}, {1, 4, 5, 9, 3, 7, 6, 2, 8}, {8, 3, 2, 4, 1, 6, 9, 7, 5}};
+
         if (i == 2) {
             copyarr(PuzzSeedHard, Puzzle);
+            copyarr(PuzzSeedHardSol, PuzzleSol);
         }
         else if (i == 1) {
             copyarr(PuzzSeedMed, Puzzle);
+            copyarr(PuzzSeedMedSol, PuzzleSol);
         }
         else {
             copyarr(PuzzSeedEasy, Puzzle);
+            copyarr(PuzzSeedEasySol, PuzzleSol);
         }
-        scramble(Puzzle);
+        scramble(Puzzle, PuzzleSol);
         copyarr( Puzzle, PuzzleOriginal );
     }
 
@@ -62,6 +71,11 @@ public class SudokuGenerator implements Serializable {
 		{
 			Log.d("MATRIX", " " + Puzzle[i][0] + " " + Puzzle[i][1] + " " + Puzzle[i][2]+ " " + Puzzle[i][3]+ " " + Puzzle[i][4]+ " " + Puzzle[i][5]+ " " + Puzzle[i][6]+ " " + Puzzle[i][7]+ " " + Puzzle[i][8] );
 		}
+        Log.d( "MATRIX"," \n\n");
+        for( int i=0; i<size; i++ )
+        {
+            Log.d("MATRIX", " " + PuzzleSol[i][0] + " " + PuzzleSol[i][1] + " " + PuzzleSol[i][2]+ " " + PuzzleSol[i][3]+ " " + PuzzleSol[i][4]+ " " + PuzzleSol[i][5]+ " " + PuzzleSol[i][6]+ " " + PuzzleSol[i][7]+ " " + PuzzleSol[i][8] );
+        }
         Log.d( "MATRIX"," \n\n");
 	}
 
@@ -102,13 +116,15 @@ public class SudokuGenerator implements Serializable {
     }
 
     // takes a 2D puzzle array and will shuffle rows/columns to create a new puzzle with unique solution
-    private void scramble(int[][] Puzzle)
+    private void scramble(int[][] Puzzle, int[][] PuzzleSol)
     {
         int colrow = size;
         int tempSec;
         int puzzleSec;
         int[][] temparr = new int[colrow][colrow];
+        int[][] tempsolarr = new int[colrow][colrow];
         copyarr(Puzzle, temparr);
+        copyarr(PuzzleSol, tempsolarr);
         int[] order = new int[3];
 
         //swap rows in 3x9 until 9x9 fully swapped
@@ -123,12 +139,14 @@ public class SudokuGenerator implements Serializable {
                 for (int k = 0; k < colrow; k++) {
                     //col
                     Puzzle[puzzleSec][k] = temparr[tempSec][k]; //swap the two rows
+                    PuzzleSol[puzzleSec][k] = tempsolarr[tempSec][k]; //swap the two rows
                 }
             }
         }
 
         // repeat 3x9 for col
         copyarr(Puzzle, temparr);
+        copyarr(PuzzleSol, tempsolarr);
         //swap cols 9x3 until 9x9 fully swapped
         for (int i = 0; i < 3; i++) {
             //ith box to the right
@@ -141,12 +159,14 @@ public class SudokuGenerator implements Serializable {
                 for (int k = 0; k < colrow; k++) {
                     //row
                     Puzzle[k][puzzleSec] = temparr[k][tempSec];
+                    PuzzleSol[k][puzzleSec] = tempsolarr[k][tempSec];
                 }
             }
         }
 
         // swap the 3x9 blocks
         copyarr(Puzzle, temparr);
+        copyarr(PuzzleSol, tempsolarr);
         //swap row boxes
         randomize(order, 3);
         Log.d( "RAND", " -- " + order[0] + ", " + order[1] + ", " + order[2] );
@@ -158,10 +178,12 @@ public class SudokuGenerator implements Serializable {
                 tempSec = (order[i] * 3) + j; // swap with the chosen 3x9 from arr based on randomize()
                 for (int k = 0; k < colrow; k++) {
                     Puzzle[puzzleSec][k] = temparr[tempSec][k]; // copy the row from randomize()
+                    PuzzleSol[puzzleSec][k] = tempsolarr[tempSec][k]; // copy the row from randomize()
                 }
             }
         }
         copyarr(Puzzle, temparr);
+        copyarr(PuzzleSol, tempsolarr);
         //swap col boxes
         randomize(order, 3);
         Log.d( "RAND", " -- " + order[0] + ", " + order[1] + ", " + order[2] );
@@ -174,6 +196,7 @@ public class SudokuGenerator implements Serializable {
                 for (int k = 0; k < colrow; k++) {
                     //row
                     Puzzle[k][puzzleSec] = temparr[k][tempSec];
+                    PuzzleSol[k][puzzleSec] = tempsolarr[k][tempSec];
                 }
             }
         }
