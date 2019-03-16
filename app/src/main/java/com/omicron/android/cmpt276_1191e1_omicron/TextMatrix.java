@@ -17,9 +17,10 @@ public class TextMatrix
 
 	private RelativeAndPos[][] textViewArr; //holds all text views
 	private Context gameActivity;
-	private int sqrSize;
+	private int sqrSizeWidth;
+	private int sqrSizeHeight;
 
-	public TextMatrix( Context context, int sqrSize2, float ZOOM_SCALE2 )
+	public TextMatrix( Context context, int sqrSizeWidth2, int sqrSizeHeight2, float ZOOM_SCALE2 )
 	{
 		/*
 		 * NOTE: individual LinearLayout are required for each TextView to fix issue where
@@ -39,25 +40,26 @@ public class TextMatrix
 		}
 
 		gameActivity = context;
-		sqrSize = sqrSize2;
+		sqrSizeWidth = sqrSizeWidth2;
+		sqrSizeHeight = sqrSizeHeight2;
 		ZOOM_SCALE = ZOOM_SCALE2;
 		
-		Log.d( "screen", "sqrSize: " + sqrSize );
+		Log.d( "screen", "sqrSizeWidth: " + sqrSizeWidth + " sqrSizeHeight: " +sqrSizeHeight );
 		
 		//adapt text size depending on screen (square) size
 		//TXT_SIZE_NORMAL = sqrSize / 4f; // 7 is arbitrary scaling factors
-		Log.d( "tag-2", "sqrSize: " +sqrSize );
 		//TXT_SIZE_NORMAL = sqrSize * 0.142857f;
-		TXT_SIZE_NORMAL = sqrSize * 0.3846f;
+		TXT_SIZE_NORMAL = sqrSizeHeight * 0.3846f;
 		TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * ( ZOOM_SCALE * 1.0f ); //0.8 means as screen gets bigger so will the text but at a slower rate
 	}
 
 
 	public void scaleTextZoomIn(  )
 	{
-		RelativeLayout.LayoutParams parameter = new RelativeLayout.LayoutParams( (int)(sqrSize*ZOOM_SCALE), (int)(sqrSize*ZOOM_SCALE) );//height and width are inpixel
-
-		//this method scales all of the text in zoom mode
+		RelativeLayout.LayoutParams parameter = new RelativeLayout.LayoutParams( (int)( sqrSizeWidth*ZOOM_SCALE) ,
+													(int)( sqrSizeHeight*ZOOM_SCALE ) );//height and width are in pixel
+		
+		//this method scales all of the text in "zoom in" mode
 		for( int i=0; i<9; i++ )
 		{
 			for( int j=0; j<9; j++ )
@@ -76,7 +78,7 @@ public class TextMatrix
 
 	public void scaleTextZoomOut(  )
 	{
-		RelativeLayout.LayoutParams parameter = new RelativeLayout.LayoutParams( (int)(sqrSize), (int)(sqrSize) );//height and width are in pixel
+		RelativeLayout.LayoutParams parameter = new RelativeLayout.LayoutParams( (int)(sqrSizeWidth), (int)(sqrSizeHeight) );//height and width are in pixel
 
 		//this method scales all of the text in zoom mode
 		for( int i=0; i<9; i++ )
@@ -149,7 +151,7 @@ public class TextMatrix
 	}
 
 
-	public void newTextView( int sqrL, int sqrT, int sqrSize, int i, int j, Word[] wordArray,
+	public void newTextView( int sqrL, int sqrT, int sqrSizeWidth, int sqrSizeHeight, int i, int j, Word[] wordArray,
 							SudokuGenerator usrSudokuArr, int usrLangPref )
 	{
 		/*
@@ -162,7 +164,7 @@ public class TextMatrix
 		 * depending on individual word length is better
 		 */
 
-		RelativeLayout.LayoutParams parameter = new RelativeLayout.LayoutParams(sqrSize, sqrSize);//height and width are inpixel
+		RelativeLayout.LayoutParams parameter = new RelativeLayout.LayoutParams(sqrSizeWidth, sqrSizeHeight);//height and width are inpixel
 
 		textViewArr[i][j].getRelativeLayout().getChildAt(0).setSelected( true ); //set focus
 

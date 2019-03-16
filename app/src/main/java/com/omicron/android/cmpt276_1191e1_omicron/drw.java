@@ -34,7 +34,8 @@ public class drw
 	private int[] zoomClickSafe;
 	private int[] zoomButtonDisableUpdate;
 	private int[] btnClicked;
-	private int bitmapSize;
+	private int bitmapSizeWidth;
+	private int bitmapSizeHeight;
 	private Word[] wordArray;
 	private float ZOOM_SCALE;
 
@@ -43,7 +44,7 @@ public class drw
 				RelativeLayout rectLayout2, RelativeLayout rectTextLayout2, TextMatrix textMatrix2, SudokuGenerator usrSudokuArr2,
 				int[] zoomOn2, int[] drag2, int[] dX2, int[] dY2,
 				int[] touchXZ2, int[] touchYZ2, int[] zoomButtonSafe2, int[] zoomClickSafe2,
-				int[] zoomButtonDisableUpdate2, int bitmapSize2, Word[] wordArray2, int[] btnClicked2,
+				int[] zoomButtonDisableUpdate2, int bitmapSizeWidth2, int bitmapSizeHeight2, Word[] wordArray2, int[] btnClicked2,
 				float ZOOM_SCALE2 )
 	{
 		paint = paint2;
@@ -62,7 +63,8 @@ public class drw
 		zoomButtonSafe = zoomButtonSafe2;
 		zoomClickSafe = zoomClickSafe2;
 		zoomButtonDisableUpdate = zoomButtonDisableUpdate2;
-		bitmapSize = bitmapSize2;
+		bitmapSizeWidth = bitmapSizeWidth2;
+		bitmapSizeHeight = bitmapSizeHeight2;
 		wordArray = wordArray2;
 		btnClicked = btnClicked2;
 		ZOOM_SCALE = ZOOM_SCALE2;
@@ -199,7 +201,7 @@ public class drw
 						{
 							// if in "zoom", check to see if clicking outside the zoomed map
 							// before when clicked in empty space on BOTTOM side, it highlighted square because click was valid within rectLayout
-							if( touchX[0] > bitmapSize || touchY[0] > bitmapSize )
+							if( touchX[0] > bitmapSizeWidth || touchY[0] > bitmapSizeHeight )
 							{
 								// NOTE: this works only for hardcoded bitmap size : should change this code when adapting bitmap to screen size
 								break; // do not count click (outside bound)
