@@ -33,16 +33,18 @@ public class FileCSV
 	 */
 	
 	private int MAX_CSV_ROW; //allow up to 150 pairs per package
+	private int MIN_CSV_ROW; //minimum number of words required in file
 	private int MAX_WORD_LEN = 35; //only allow words with max 35 char
 	private int MAX_LANG_LEN = 25; //only allow language names up to 25 char
 	private int MAX_WORD_PKG; //max word packages user is allowed to import
 	private int LIMIT_TITLE = 1000;
 	private int LIMIT_LOOP = 10000;
 	
-	public FileCSV( int MAX_WORD_PKG2, int MAX_CSV_ROW2 )
+	public FileCSV( int MAX_WORD_PKG2, int MAX_CSV_ROW2, int MIN_CSV_ROW2 )
 	{
 		MAX_WORD_PKG = MAX_WORD_PKG2;
 		MAX_CSV_ROW = MAX_CSV_ROW2;
+		MIN_CSV_ROW = MIN_CSV_ROW2;
 	}
 	
 	public int findCurrentPackageCount( Context context ) throws IOException
@@ -272,7 +274,7 @@ public class FileCSV
 		FileCSVAnalyze fileAnalyseReadCSV = new FileCSVAnalyze( MAX_WORD_PKG );
 		
 		//analyse .csv data and get string[] with [0] .csv data and [1] with line
-		String [] res = fileAnalyseReadCSV.analyseReadCSVFile( buffRead, MAX_LANG_LEN, MAX_CSV_ROW, MAX_WORD_LEN );
+		String [] res = fileAnalyseReadCSV.analyseReadCSVFile( buffRead, MAX_LANG_LEN, MAX_CSV_ROW, MAX_WORD_LEN, MIN_CSV_ROW );
 		
 		return res;
 	}

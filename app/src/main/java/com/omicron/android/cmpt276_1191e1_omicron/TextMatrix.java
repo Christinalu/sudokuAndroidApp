@@ -19,8 +19,10 @@ public class TextMatrix
 	private Context gameActivity;
 	private int sqrSizeWidth;
 	private int sqrSizeHeight;
+	private int puzzleTypeSize; //stores number or row/col a puzzle has
 
-	public TextMatrix( Context context, int sqrSizeWidth2, int sqrSizeHeight2, float ZOOM_SCALE2 )
+	public TextMatrix( Context context, int sqrSizeWidth2, int sqrSizeHeight2, float ZOOM_SCALE2,
+					   int puzzleTypeSize2 )
 	{
 		/*
 		 * NOTE: individual LinearLayout are required for each TextView to fix issue where
@@ -28,11 +30,12 @@ public class TextMatrix
 		 *       (because when calling setText() it re-wraps all texts in single Layout, so hat to create multiple Layouts)
 		 */
 		
-		textViewArr = new RelativeAndPos[9][9];
+		puzzleTypeSize = puzzleTypeSize2;
+		textViewArr = new RelativeAndPos[puzzleTypeSize][puzzleTypeSize];
 
-		for( int i=0; i<9; i++ )
+		for( int i=0; i<puzzleTypeSize; i++ )
 		{
-			for( int j=0; j<9; j++ )
+			for( int j=0; j<puzzleTypeSize; j++ )
 			{
 				textViewArr[i][j] = new RelativeAndPos( context );
 				textViewArr[i][j].getRelativeLayout().addView( new TextView( context ) );
@@ -56,13 +59,13 @@ public class TextMatrix
 
 	public void scaleTextZoomIn(  )
 	{
-		RelativeLayout.LayoutParams parameter = new RelativeLayout.LayoutParams( (int)( sqrSizeWidth*ZOOM_SCALE) ,
+		RelativeLayout.LayoutParams parameter = new RelativeLayout.LayoutParams( (int)( sqrSizeWidth*ZOOM_SCALE),
 													(int)( sqrSizeHeight*ZOOM_SCALE ) );//height and width are in pixel
 		
 		//this method scales all of the text in "zoom in" mode
-		for( int i=0; i<9; i++ )
+		for( int i=0; i<puzzleTypeSize; i++ )
 		{
-			for( int j=0; j<9; j++ )
+			for( int j=0; j<puzzleTypeSize; j++ )
 			{
 				textViewArr[i][j].getRelativeLayout().setX( textViewArr[i][j].getRelativeLayout().getX( ) * ZOOM_SCALE ); //set x,y coordinate to multiple of 2
 				textViewArr[i][j].getRelativeLayout().setY( textViewArr[i][j].getRelativeLayout().getY( ) * ZOOM_SCALE );
@@ -81,9 +84,9 @@ public class TextMatrix
 		RelativeLayout.LayoutParams parameter = new RelativeLayout.LayoutParams( (int)(sqrSizeWidth), (int)(sqrSizeHeight) );//height and width are in pixel
 
 		//this method scales all of the text in zoom mode
-		for( int i=0; i<9; i++ )
+		for( int i=0; i<puzzleTypeSize; i++ )
 		{
-			for( int j=0; j<9; j++ )
+			for( int j=0; j<puzzleTypeSize; j++ )
 			{
 				textViewArr[i][j].getRelativeLayout().setX( textViewArr[i][j].getSqrL() ); //reset x,y coordinate to original
 				textViewArr[i][j].getRelativeLayout().setY( textViewArr[i][j].getSqrT() );
@@ -103,9 +106,9 @@ public class TextMatrix
 		 * Draw the text according to 'drag' coordinates in zoom mode
 		 */
 
-		for( int i=0; i<9; i++ )
+		for( int i=0; i<puzzleTypeSize; i++ )
 		{
-			for( int j = 0; j < 9; j++ )
+			for( int j=0; j<puzzleTypeSize; j++ )
 			{
 				textViewArr[i][j].getRelativeLayout().setX( textViewArr[i][j].getSqrL() * ZOOM_SCALE + ( -touchXZ[0] + dX[0] ) ); //set x,y coordinate
 				textViewArr[i][j].getRelativeLayout().setY( textViewArr[i][j].getSqrT() * ZOOM_SCALE + ( -touchYZ[0] + dY[0] ) );
@@ -114,7 +117,7 @@ public class TextMatrix
 	}
 
 
-	public void chooseLangAndDraw( int i, int j, Word[] wordArray, SudokuGenerator usrSudokuArr,
+	public void chooseLangAndDraw( int i, int j, WordArray wordArray, SudokuGenerator usrSudokuArr,
 								   int usrLangPref )
 	{
 		// CHOOSE WHAT LANGUAGE TO DRAW IN  TEXT-VIEW MARQUEE
@@ -125,22 +128,22 @@ public class TextMatrix
 		if( usrSudokuArr.Puzzle[i][j]!=0 && usrSudokuArr.PuzzleOriginal[i][j]!=0 && usrLangPref == 0 ) // draw only if the puzzle contains a number; and draw the native translated word
 		{
 			// matrix text - draw translation (because user chose = 0 = native, the matrix is =1=translation)
-			( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setText( wordArray[usrSudokuArr.Puzzle[i][j] - 1].getTranslation() );
+			( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setText( wordArray.getWordTranslationAtIndex( usrSudokuArr.Puzzle[i][j] - 1 ) );
 		}
 		else if( usrSudokuArr.Puzzle[i][j]!=0 && usrSudokuArr.PuzzleOriginal[i][j]!=0 && usrLangPref == 1)
 		{
 			// matrix text - draw native (because user chose = 1 = translation, the matrix is =0=native)
-			( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setText( wordArray[usrSudokuArr.Puzzle[i][j] - 1].getNative() );
+			( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setText( wordArray.getWordNativeAtIndex( usrSudokuArr.Puzzle[i][j] - 1 ) );
 		}
 		else if( usrSudokuArr.Puzzle[i][j]!=0 && usrSudokuArr.PuzzleOriginal[i][j]==0 && usrLangPref == 0)
 		{
 			// user text - draw native (because user chose = 0 = native, draw user square native)
-			( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setText( wordArray[usrSudokuArr.Puzzle[i][j] - 1].getNative() );
+			( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setText( wordArray.getWordNativeAtIndex( usrSudokuArr.Puzzle[i][j] - 1 ) );
 		}
 		else if( usrSudokuArr.Puzzle[i][j]!=0 && usrSudokuArr.PuzzleOriginal[i][j]==0 && usrLangPref == 1)
 		{
 			// user text - draw translation (because user chose = 1 = translation, draw user square translation)
-			( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setText( wordArray[usrSudokuArr.Puzzle[i][j] - 1].getTranslation() );
+			( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setText( wordArray.getWordTranslationAtIndex( usrSudokuArr.Puzzle[i][j] - 1 ) );
 		}
 		else
 		{
@@ -151,7 +154,7 @@ public class TextMatrix
 	}
 
 
-	public void newTextView( int sqrL, int sqrT, int sqrSizeWidth, int sqrSizeHeight, int i, int j, Word[] wordArray,
+	public void newTextView( int sqrL, int sqrT, int sqrSizeWidth, int sqrSizeHeight, int i, int j, WordArray wordArray,
 							SudokuGenerator usrSudokuArr, int usrLangPref )
 	{
 		/*

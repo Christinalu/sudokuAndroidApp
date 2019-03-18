@@ -31,6 +31,7 @@ public class UploadActivity extends AppCompatActivity
 {
 	private int MAX_WORD_PKG; //maximum number of pkgs the user allowed to upload
 	private int MAX_CSV_ROW;
+	private int MIN_CSV_ROW;
 	private int READ_REQUEST_CODE = 0;
 	private int CURRENT_WORD_PKG_COUNT = 0; //stores current number of packages the user has uploaded
 	private  FileCSV fileCSV; //object for using CSV functions
@@ -46,11 +47,12 @@ public class UploadActivity extends AppCompatActivity
 		Intent extra = getIntent( );
 		MAX_WORD_PKG = (int) extra.getSerializableExtra( "MAX_WORD_PKG" );
 		MAX_CSV_ROW = (int) extra.getSerializableExtra( "MAX_CSV_ROW" );
+		MIN_CSV_ROW = (int) extra.getSerializableExtra( "MIN_CSV_ROW" );
 		
 		Log.d( "upload", "in UploadAct MAX_WORD_PKG: " + MAX_WORD_PKG );
 		Log.d( "upload", "in UploadAct CURRENT_WORD_PKG_COUNT[0]: " + CURRENT_WORD_PKG_COUNT );
 		
-		fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW );
+		fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
 		
 		
 		Log.d( "upload", "onCreate for UploadACt called" );

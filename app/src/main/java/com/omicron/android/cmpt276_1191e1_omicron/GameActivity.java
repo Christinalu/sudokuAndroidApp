@@ -47,7 +47,7 @@ public class GameActivity extends AppCompatActivity
 		It will be activated from the Main (Menu) Activity
 	*/
 
-	private Word[] wordArray;
+	private WordArray wordArray;
 	private String[] numArray;
 	private int usrLangPref;
 	private int usrDiffPref = 0;
@@ -90,7 +90,6 @@ public class GameActivity extends AppCompatActivity
 	private int sqrR;
 	private int sqrB;
 
-	private Button [] btnArr;
 	private ButtonListener listeners; // used to call another function to implement all button listeners, to save space in GameActivity
 	private int[] btnClicked = { 0 }; //flag which is activated when a button is clicked - used to let zoom drw class to update TextView (for efficiency purposes)
 
@@ -106,9 +105,9 @@ public class GameActivity extends AppCompatActivity
 
 	private final static int SQR_INNER_DIVIDER = 5;
 	private final static int SQR_OUTER_DIVIDER = 15;
-	private final static int BOUNDARY_OFFSET = 40; //puzzle will have some offset for aesthetic reasons
+	private final static int BOUNDARY_OFFSET = 40; //puzzle will have some offset for aesthetic reasons near edges
 	private final static float ZOOM_SCALE = 1.5f; // zoom factor of how much to zoom in puzzle in "zoom" mode
-	private int PUZZLE_FULL_SIZE; // size of full puzzle from left most column pixel to right most column pixel
+	private int PUZZLE_FULL_SIZE_WIDTH; // size of full puzzle from left most column pixel to right most column pixel
 	private long STATISTIC_MULTIPLE = 2; //used to multiply by factor the number of "Hint Clicks" a user used, to more likely show these words
 	
 	private int[] zoomButtonSafe = { 0 }; //used to prevent a 'click coordinate' from being tested if it is in a rect when switching to "zoom" mode because switching to the mode, should not test click
@@ -124,9 +123,14 @@ public class GameActivity extends AppCompatActivity
 	private int sqrSizeWidth; //size of single square in matrix
 	private int sqrSizeHeight;
 	
-	int HINT_CLICK_TO_MAX_PROB;
+	private int HINT_CLICK_TO_MAX_PROB;
 	private static final float LANDSCAPE_RATIO = 0.75f; //determines how much of the screen will be dedicated to puzzle in landscape
-
+	private int WORD_COUNT; //stores the number of words in wordArray
+	private int COL_PER_BLOCK; //stores how many columns will be inside a block; in 9x9 this would be 3
+	private int ROW_PER_BLOCK;
+	private int VERTICAL_BLOCK; //stores how many (vertical) blocks are in a puzzle; in 9x9 this would be 3 blocks
+	private int HORIZONTAL_BLOCK;
+	
 
 	@Override
 	protected void onCreate( Bundle savedInstanceState )
@@ -138,7 +142,7 @@ public class GameActivity extends AppCompatActivity
 		if (savedInstanceState != null) {
 			//a state had been saved, load it
 			state = 1;
-			wordArray = (Word[]) savedInstanceState.getSerializable("wordArrayGA");
+			wordArray = (WordArray) savedInstanceState.getSerializable("wordArrayGA");
 			usrLangPref = savedInstanceState.getInt("usrLangPrefGA");
 			usrSudokuArr = (SudokuGenerator) savedInstanceState.get("SudokuArrGA");
 			usrModePref = (int) savedInstanceState.getSerializable("usrModeGA");
@@ -154,7 +158,7 @@ public class GameActivity extends AppCompatActivity
 				state = (int) gameSrc.getSerializableExtra("state");
 				//check state: if 1 then we are resuming a previous game, otherwise state == 0 and we are starting a new game
 				if (state == 1) {
-					wordArray = (Word[]) gameSrc.getSerializableExtra("wordArrayMA");
+					wordArray = (WordArray) gameSrc.getSerializableExtra("wordArrayMA");
 					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPrefMA");
 					usrSudokuArr = (SudokuGenerator) gameSrc.getSerializableExtra("SudokuArrMA");
 					usrModePref = (int) gameSrc.getSerializableExtra("usrModeMA");
@@ -164,24 +168,29 @@ public class GameActivity extends AppCompatActivity
 						numArray = (String[]) gameSrc.getStringArrayExtra("numArrayMA");
 					}
 				} else {
-					wordArray = (Word[]) gameSrc.getSerializableExtra("wordArray");
+					wordArray = (WordArray) gameSrc.getSerializableExtra("wordArray");
 					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPref");
 					usrDiffPref = (int) gameSrc.getSerializableExtra("usrDiffPref");
 					usrModePref = (int) gameSrc.getSerializableExtra("usrModeMA");
 					HINT_CLICK_TO_MAX_PROB = (int) gameSrc.getSerializableExtra( "HINT_CLICK_TO_MAX_PROB" );
 					if (usrModePref == 1) {
 						//create separate array to draw from for this mode
+						
+						
+						// TODO: fix the following to adapt to different puzzle types
+						
+						
 						numArray = new String[9];
 						if (usrLangPref == 0) {
 							for (int i = 0; i < 9; i++) {
-								numArray[i] = wordArray[i].getTranslation();
-								wordArray[i].setTranslation(Integer.toString(i+1));
+								numArray[i] = wordArray.getWordTranslationAtIndex( i );
+								wordArray.setWordTranslationAtIndex( i, Integer.toString(i+1) );
 							}
 						}
 						else {
 							for (int i = 0; i < 9; i++) {
-								numArray[i] = wordArray[i].getNative();
-								wordArray[i].setNative(Integer.toString(i + 1));
+								numArray[i] = wordArray.getWordNativeAtIndex( i );
+								wordArray.setWordNativeAtIndex( i, Integer.toString(i + 1) );
 							}
 						}
 					}
@@ -194,7 +203,7 @@ public class GameActivity extends AppCompatActivity
 				Log.d( "upload", " @ WORD_ARRAY ON RESUME GAME:" );
 				for( int i=0; i<9; i++ )
 				{
-					Log.d( "upload","wordArr[" + i + "]: " + wordArray[i].getNative() + "," + wordArray[i].getTranslation() + "," + wordArray[i].getInFileLineNum() + "," + wordArray[i].getHintClick() );
+					Log.d( "upload","wordArr[" + i + "]: " + wordArray.getWordNativeAtIndex( i ) + "," + wordArray.getWordTranslationAtIndex( i ) + "," + wordArray.getWordInFileLineNumAtIndex( i ) + "," + wordArray.getWordHintClickAtIndex( i ) );
 				}
 			}
 		}
@@ -218,8 +227,7 @@ public class GameActivity extends AppCompatActivity
 			});
 		}
 
-
-
+		
 		TextView Hint=(TextView) findViewById(R.id.hint_content);
 
 
@@ -265,7 +273,34 @@ public class GameActivity extends AppCompatActivity
 		//status bar height
 		//this is needed as offset in landscape mode to alight rect matrix with textOverlay
 		int barH = getStatusBarHeight();
-
+		
+		// SET PUZZLE ROW AND COL NUMBER PER BLOCK
+		WORD_COUNT = wordArray.getWordCount( );
+		
+		if( usrModePref == wordArray.getSize4x4() ) {
+			COL_PER_BLOCK = 2;
+			ROW_PER_BLOCK = 2;
+			VERTICAL_BLOCK = 2;
+			HORIZONTAL_BLOCK = 2;
+		}
+		else if( usrModePref == wordArray.getSize6x6() ){
+			COL_PER_BLOCK = 3;
+			ROW_PER_BLOCK = 2;
+			VERTICAL_BLOCK = 2;
+			HORIZONTAL_BLOCK = 3;
+		}
+		else if( usrModePref == wordArray.getSize12x12() ){
+			COL_PER_BLOCK = 4;
+			ROW_PER_BLOCK = 3;
+			VERTICAL_BLOCK = 3;
+			HORIZONTAL_BLOCK = 4;
+		}
+		else{
+			COL_PER_BLOCK = 3;
+			ROW_PER_BLOCK = 3;
+			VERTICAL_BLOCK = 3;
+			HORIZONTAL_BLOCK = 3;
+		}
 
 		// center bitmap based on orientation
 		// original coordinates of where to start to draw square (LO == Left Original)
@@ -277,24 +312,14 @@ public class GameActivity extends AppCompatActivity
 
 			// find matrix single square size based on screen
 			// barH needed in landscape mode
-			sqrSizeWidth = ( bitmapSizeWidth - 2*BOUNDARY_OFFSET - 6*SQR_INNER_DIVIDER - 2*SQR_OUTER_DIVIDER ) / 9;
-			sqrSizeHeight = ( bitmapSizeHeight - barH - 2*BOUNDARY_OFFSET - 6*SQR_INNER_DIVIDER - 2*SQR_OUTER_DIVIDER ) / 9;
-			
-			// find entire matrix puzzle size
-			//PUZZLE_FULL_SIZE = 9*sqrSize + 6*SQR_INNER_DIVIDER + 2*SQR_OUTER_DIVIDER;
+			sqrSizeWidth = ( bitmapSizeWidth - 2*BOUNDARY_OFFSET - (VERTICAL_BLOCK*(COL_PER_BLOCK-1))*SQR_INNER_DIVIDER - (VERTICAL_BLOCK-1)*SQR_OUTER_DIVIDER ) / WORD_COUNT;
+			sqrSizeHeight = ( bitmapSizeHeight - barH - 2*BOUNDARY_OFFSET - (HORIZONTAL_BLOCK*(ROW_PER_BLOCK-1))*SQR_INNER_DIVIDER - (HORIZONTAL_BLOCK-1)*SQR_OUTER_DIVIDER ) / WORD_COUNT;
 
 			bitMap = Bitmap.createBitmap( bitmapSizeWidth, bitmapSizeHeight-barH, Bitmap.Config.ARGB_8888 );
 
 			//set rect_txt_layout the same size as the bitmap
 			rectTextLayout.getLayoutParams().width = bitmapSizeWidth;
 			rectTextLayout.getLayoutParams().height = bitmapSizeHeight-barH;
-
-			
-			///////////
-			//
-			//	removed barH from above rectTextLayout.getLayoutParams().width line - may cause issue
-			//
-			///////////
 			
 			//set layout size of where puzzle matrix will be drawn
 			rectLayout.getLayoutParams().width = bitmapSizeWidth;
@@ -303,14 +328,14 @@ public class GameActivity extends AppCompatActivity
 		else //in portrait mode
 		{
 			// find matrix single square size based on screen
-			sqrSizeWidth = ( bitmapSizeWidth - 2*BOUNDARY_OFFSET - 6*SQR_INNER_DIVIDER - 2*SQR_OUTER_DIVIDER ) / 9;
+			sqrSizeWidth = ( bitmapSizeWidth - 2*BOUNDARY_OFFSET - (VERTICAL_BLOCK*(COL_PER_BLOCK-1))*SQR_INNER_DIVIDER - (VERTICAL_BLOCK-1)*SQR_OUTER_DIVIDER ) / WORD_COUNT;
 			sqrSizeHeight = sqrSizeWidth;
 			
 			// find entire matrix puzzle size
-			PUZZLE_FULL_SIZE = 9*sqrSizeWidth + 6*SQR_INNER_DIVIDER + 2*SQR_OUTER_DIVIDER;
+			PUZZLE_FULL_SIZE_WIDTH = WORD_COUNT*sqrSizeWidth + (VERTICAL_BLOCK*(COL_PER_BLOCK-1))*SQR_INNER_DIVIDER + (VERTICAL_BLOCK-1)*SQR_OUTER_DIVIDER;
 
 			//if in portrait mode, center puzzle top of screen
-			sqrLO = BOUNDARY_OFFSET + (screenW - 2 * BOUNDARY_OFFSET) / 2 - PUZZLE_FULL_SIZE / 2; // if math correct, sqrLO should == BOUNDARY_OFFSET
+			sqrLO = BOUNDARY_OFFSET + (screenW - 2 * BOUNDARY_OFFSET) / 2 - PUZZLE_FULL_SIZE_WIDTH / 2;
 			sqrTO = BOUNDARY_OFFSET; // no boundary offset - note: boundary offset is already included in bitmapSize because width == height, so sqrSize calculated for sqrLO width assures the offset is included in height sqrTO
 
 			bitMap = Bitmap.createBitmap( bitmapSizeWidth, bitmapSizeHeight, Bitmap.Config.ARGB_8888 );
@@ -331,7 +356,7 @@ public class GameActivity extends AppCompatActivity
 
 		rectLayout.addView( imgView );
 
-		textMatrix = new TextMatrix( this, sqrSizeWidth, sqrSizeHeight, ZOOM_SCALE );
+		textMatrix = new TextMatrix( this, sqrSizeWidth, sqrSizeHeight, ZOOM_SCALE, WORD_COUNT );
 
 
 		// set up object to translate to selected square in "zoom" mode
@@ -341,43 +366,6 @@ public class GameActivity extends AppCompatActivity
 
 
 
-			/** SET BUTTON LISTENERS **/
-
-		btnArr = new Button[9]; // set buttons as an array
-		btnArr[0] = (Button) findViewById( R.id.keypad_1 );
-		btnArr[1] = (Button) findViewById( R.id.keypad_2 );
-		btnArr[2] = (Button) findViewById( R.id.keypad_3 );
-		btnArr[3] = (Button) findViewById( R.id.keypad_4 );
-		btnArr[4] = (Button) findViewById( R.id.keypad_5 );
-		btnArr[5] = (Button) findViewById( R.id.keypad_6 );
-		btnArr[6] = (Button) findViewById( R.id.keypad_7 );
-		btnArr[7] = (Button) findViewById( R.id.keypad_8 );
-		btnArr[8] = (Button) findViewById( R.id.keypad_9 );
-
-		// choose button language based on user preference
-		if( usrLangPref == 0 )
-		{
-			btnArr[0].setText( wordArray[0].getNative() );
-			btnArr[1].setText( wordArray[1].getNative() );
-			btnArr[2].setText( wordArray[2].getNative() );
-			btnArr[3].setText( wordArray[3].getNative() );
-			btnArr[4].setText( wordArray[4].getNative() );
-			btnArr[5].setText( wordArray[5].getNative() );
-			btnArr[6].setText( wordArray[6].getNative() );
-			btnArr[7].setText( wordArray[7].getNative() );
-			btnArr[8].setText( wordArray[8].getNative() );
-		}
-		else{
-			btnArr[0].setText( wordArray[0].getTranslation() );
-			btnArr[1].setText( wordArray[1].getTranslation() );
-			btnArr[2].setText( wordArray[2].getTranslation() );
-			btnArr[3].setText( wordArray[3].getTranslation() );
-			btnArr[4].setText( wordArray[4].getTranslation() );
-			btnArr[5].setText( wordArray[5].getTranslation() );
-			btnArr[6].setText( wordArray[6].getTranslation() );
-			btnArr[7].setText( wordArray[7].getTranslation() );
-			btnArr[8].setText( wordArray[8].getTranslation() );
-		}
 
 
 		// PREDEFINE VARIABLES FOR MATRIX OVERLAY
@@ -386,19 +374,23 @@ public class GameActivity extends AppCompatActivity
 
 		drawR = new drw( rectArr, paint, canvas, rectLayout, rectTextLayout, textMatrix, usrSudokuArr, zoomOn, drag,
 						 dX, dY, touchXZ, touchYZ, zoomButtonSafe, zoomClickSafe, zoomButtonDisableUpdate,
-						 bitmapSizeWidth, bitmapSizeHeight, wordArray, btnClicked, ZOOM_SCALE ); // class used to draw/update square matrix
-
+						 bitmapSizeWidth, bitmapSizeHeight, wordArray, btnClicked, ZOOM_SCALE,
+						 COL_PER_BLOCK, ROW_PER_BLOCK, VERTICAL_BLOCK, HORIZONTAL_BLOCK, WORD_COUNT ); // class used to draw/update square matrix
+		
+		
 		// call function to set all listeners - needs drawR
-		listeners = new ButtonListener( currentRectColoured, usrSudokuArr, btnArr,
-										drawR, touchX, touchY, lastRectColoured, usrLangPref, btnClicked, Hint, wordArray,usrModePref,numArray );
+		listeners = new ButtonListener( currentRectColoured, usrSudokuArr,
+										drawR, touchX, touchY, lastRectColoured, usrLangPref, btnClicked,
+										Hint, wordArray,usrModePref,numArray, WORD_COUNT, COL_PER_BLOCK, ROW_PER_BLOCK,
+										this );
 
 
 
 			/** CREATE RECT MATRIX **/
 
-		for( int i=0; i<9; i++ ) //row
+		for( int i=0; i<WORD_COUNT; i++ ) //row
 		{
-			for( int j=0; j<9; j++ ) //column
+			for( int j=0; j<WORD_COUNT; j++ ) //column
 			{
 				//key: sqrL, sqrT means sqr coordinate top and left; sqrLO/TO means original coordinate sqrL/T
 				//increase square dimensions
@@ -407,28 +399,15 @@ public class GameActivity extends AppCompatActivity
 				sqrR = sqrL + sqrSizeWidth; //define end of bottom-right corner
 				sqrB = sqrT + sqrSizeHeight;
 				
-				//add padding
-				if( i>=3 ) //add extra space between rows
-				{
-					sqrT = sqrT + SQR_OUTER_DIVIDER; //square padding
-					sqrB = sqrB + SQR_OUTER_DIVIDER;
-				}
-				if( i>=6 )
-				{
-					sqrT = sqrT + SQR_OUTER_DIVIDER; //square padding
-					sqrB = sqrB + SQR_OUTER_DIVIDER;
-				}
-
-				if( j>=3 ) //add extra space between columns
-				{
-					sqrL = sqrL + SQR_OUTER_DIVIDER; //square padding
-					sqrR = sqrR + SQR_OUTER_DIVIDER;
-				}
-				if( j>=6 )
-				{
-					sqrL = sqrL + SQR_OUTER_DIVIDER; //square padding
-					sqrR = sqrR + SQR_OUTER_DIVIDER;
-				}
+					//ADD PADDING
+				//padding between rows
+				sqrT = sqrT + (i/ROW_PER_BLOCK)*SQR_OUTER_DIVIDER;
+				sqrB = sqrB + (i/ROW_PER_BLOCK)*SQR_OUTER_DIVIDER;
+				
+				//padding between columns
+				sqrL = sqrL + (j/COL_PER_BLOCK)*SQR_OUTER_DIVIDER;
+				sqrR = sqrR + (j/COL_PER_BLOCK)*SQR_OUTER_DIVIDER;
+				
 
 				rectArr[i][j] = new Block( sqrL, sqrT, sqrR, sqrB ); // create the new square
 				//note: this loop has to be here and cannot be replaced by drw class
@@ -480,7 +459,7 @@ public class GameActivity extends AppCompatActivity
 		);
 		
 		
-		/* ZOOM OUT BUTTON */
+			/* ZOOM OUT BUTTON */
 
 		ImageButton btnZoomOut = findViewById( R.id.button_zoom_out );
 		btnZoomOut.setOnClickListener(new View.OnClickListener( )
@@ -709,7 +688,6 @@ public class GameActivity extends AppCompatActivity
 			/** SAVE ALL DATA **/
 			
 		//	THESE ARE FOR TESTING
-		
 		//wordArray[0].updateHintClick( 10 );
 		//wordArray[1].updateHintClick( 1 );
 		//wordArray[3].updateHintClick( 1 );
@@ -746,7 +724,7 @@ public class GameActivity extends AppCompatActivity
 				lineFound = false; //reset
 				
 					/* FIND LINE OF WORD IN CSV (based on wordArr[i].getInFileLineNum() */
-				for( int k=0; k<9; k++ ) //loop through all 9 words
+				for( int k=0; k<WORD_COUNT; k++ ) //loop through all '9' words
 				{
 					if( i == wordArray[k].getInFileLineNum() ) //if updating line with word that was used in wordArray
 					{
@@ -823,7 +801,7 @@ public class GameActivity extends AppCompatActivity
 		super.onStart( );
 		
 		//reset all "HintClick"
-		for( int i=0; i<9; i++ )
+		for( int i=0; i<WORD_COUNT; i++ )
 		{
 			wordArray[i].updateHintClick( 0 );
 		}

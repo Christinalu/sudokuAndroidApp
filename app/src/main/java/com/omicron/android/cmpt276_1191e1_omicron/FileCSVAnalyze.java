@@ -104,7 +104,7 @@ public class FileCSVAnalyze
 	}
 	
 	
-	public String[] analyseReadCSVFile( BufferedReader buffRead, int MAX_LANG_LEN, int MAX_CSV_ROW, int MAX_WORD_LEN ) throws IOException {
+	public String[] analyseReadCSVFile( BufferedReader buffRead, int MAX_LANG_LEN, int MAX_CSV_ROW, int MAX_WORD_LEN, int MIN_CSV_ROW ) throws IOException {
 		/*
 		 * Returns a string[] containing the [0] .csv data and [1] line with language
 		 * Returns empty string in [0] if file does not have proper formatting
@@ -170,7 +170,7 @@ public class FileCSVAnalyze
 		}
 		if( loopLimit > MAX_CSV_ROW ){ return res; }
 		
-		if( totalLineCnt < 9 || totalLineCnt > MAX_CSV_ROW ){ //9 word pairs is a minimum and has to be  <= MAX_CSV_ROW as requirement
+		if( totalLineCnt < MIN_CSV_ROW || totalLineCnt > MAX_CSV_ROW ){ //9 word pairs is a minimum and has to be  <= MAX_CSV_ROW as requirement
 			Log.d( "upload", "ERROR: incorrect number of word pairs" );
 			return res;
 		}

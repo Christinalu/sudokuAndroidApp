@@ -6,21 +6,24 @@ import android.widget.Toast;
 
 public class PuzzleTrack
 {
-	private int [][] matrix = new int[9][9]; //stores 2d array of which elements where filled so far
+	private int [][] matrix; //stores 2d array of which elements where filled so far
 	private int sqrFilled;
 	public boolean isCorrect;
 	public boolean enableCheck; //flag to indicate if to allow to check puzzle for correctess
-
-	public PuzzleTrack( int [][] matrix2 )
+	private int WORD_COUNT;
+	
+	public PuzzleTrack( int [][] matrix2, int WORD_COUNT2 )
 	{
 		sqrFilled = 0;
 		isCorrect = false;
 		enableCheck = false;
+		WORD_COUNT = WORD_COUNT2;
+		matrix = new int[WORD_COUNT][WORD_COUNT];
 
 		// based on original Puzzle matrix, make reference matrix
-		for( int i=0; i<9; i++ )
+		for( int i=0; i<WORD_COUNT; i++ )
 		{
-			for( int j=0; j<9; j++ )
+			for( int j=0; j<WORD_COUNT; j++ )
 			{
 				matrix[i][j] = matrix2[i][j];
 				//update how many squares are already filled
@@ -42,7 +45,7 @@ public class PuzzleTrack
 		}
 
 		//if puzzle filled, check puzzle
-		if( sqrFilled == 81 )
+		if( sqrFilled == WORD_COUNT*WORD_COUNT )
 		{
 			enableCheck = true; //allow for puzzle to be checked
 		}
@@ -54,19 +57,14 @@ public class PuzzleTrack
 		check.PuzzleCheckStart(usrSudokuArr.Puzzle);
 		isCorrect = check.isTrue;
 
-		if (isCorrect)
+		if( isCorrect )
 		{
 			//disable buttons
-			btnArr[0].setOnClickListener(null);
-			btnArr[1].setOnClickListener(null);
-			btnArr[2].setOnClickListener(null);
-			btnArr[3].setOnClickListener(null);
-			btnArr[4].setOnClickListener(null);
-			btnArr[5].setOnClickListener(null);
-			btnArr[6].setOnClickListener(null);
-			btnArr[7].setOnClickListener(null);
-			btnArr[8].setOnClickListener(null);
-			Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_SHORT).show( );
+			for( int i=0; i<WORD_COUNT; i++ )
+			{
+				btnArr[i].setOnClickListener( null );
+			}
+			Toast.makeText(v.getContext(), "CONGRATULATIONS!", Toast.LENGTH_LONG).show( );
 		}
 		else
 		{

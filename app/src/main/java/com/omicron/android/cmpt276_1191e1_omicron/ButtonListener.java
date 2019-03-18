@@ -1,6 +1,7 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -8,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,27 +18,66 @@ import android.widget.Toast;
 public class ButtonListener extends AppCompatActivity
 {
 	/*
-	 *	This class is used to save space from GameActivity
-	 *	it initializes all buttons
-	 *	this also contains code that will let buttons respond by,
-	 *	if selecting valid square, will update PuzzleOriginal
+	 *	This class is used to set up keypad buttons for GameActivity
+	 *	This also contains code that will let buttons respond
+	 *	by updating PuzzleOriginal
 	 */
 
 	private int i;
-
-
-	public ButtonListener(final Pair currentRectColoured, final SudokuGenerator usrSudokuArr, final Button[] btnArr, final drw drawR,
+	private Button [] btnArr;
+	
+	
+	public ButtonListener(final Pair currentRectColoured, final SudokuGenerator usrSudokuArr, final drw drawR,
 						  final int[] touchX, final int[] touchY, final Pair lastRectColoured,
-						  final int usrLangPref, final int[] btnClicked, final TextView Hint, final Word[] wordArray,final int usrModePref,final String[] numArray )
+						  final int usrLangPref, final int[] btnClicked, final TextView Hint, final WordArray wordArray,
+						  final int usrModePref, final String[] numArray, int WORD_COUNT, int COL_PER_BLOCK,
+						  int ROW_PER_BLOCK, Context context )
 	{
 		// pulled out of button listeners
 		final PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
-		final PuzzleTrack track = new PuzzleTrack( usrSudokuArr.Puzzle );
+		final PuzzleTrack track = new PuzzleTrack( usrSudokuArr.Puzzle, WORD_COUNT );
 		final Handler handler = new Handler();
-
+		int rowCount;
+		int btnCount;
+		int indexArr = 0;
+		
+			/** SET BUTTON LISTENERS **/
+		
+		btnArr = new Button[WORD_COUNT]; // set buttons as an array
+		
+			/* CREATE TABLE LAYOUT */
+		if( COL_PER_BLOCK > ROW_PER_BLOCK ) //set row count as biggest of ROW/COL_PER_BLOCK, so that less buttons per row
+		{ rowCount = COL_PER_BLOCK; btnCount = ROW_PER_BLOCK; }		// but more rows allows to fit bigger words
+		else{ rowCount = ROW_PER_BLOCK; btnCount = COL_PER_BLOCK; }
+		
+		TableLayout tableLayout = findViewById( R.id.keypad );
+		TableRow tableRow;
+		Button button;
+		for( int j=0; j<rowCount; j++ ) //add button rows to table
+		{
+			tableRow = new TableRow( context );
+			for( int k=0; k<btnCount; k++ )
+			{
+				button = new Button( context );
+				button.setTextColor( Color.WHITE );
+				button.setBackgroundResource( R.drawable.buttons );
+				
+				// choose button text in language based on user preference
+				if( usrLangPref == 0 )
+				{ button.setText( wordArray.getWordNativeAtIndex( indexArr ) ); }
+				else
+				{ button.setText( wordArray.getWordTranslationAtIndex( indexArr ) ); }
+				
+				btnArr[indexArr] = button;
+				tableRow.addView( button );
+				indexArr++;
+			}
+			tableLayout.addView( tableRow  );
+		}
+		
 
 		// loop to set up all keypad buttons
-		for( i=0; i<9; i++ )
+		for( i=0; i<WORD_COUNT; i++ )
 		{
 			final int var;
 			var = i + 1;
@@ -50,24 +92,20 @@ public class ButtonListener extends AppCompatActivity
                                                      btnArr[index].setBackgroundColor(R.drawable.buttons);
 													 if(usrLangPref==0){
 													     if(usrModePref==1){
-                                                             Hint.setText(wordArray[index].getNative() + " : " + numArray[index]);
-                                                             Log.d( "Counter","wordArr[" + index + "]: " + wordArray[index].getNative() + "," + wordArray[index].getTranslation() + "," + wordArray[index].getInFileLineNum() + "," + wordArray[index].getHintClick()+"," + numArray[index] );
+                                                             Hint.setText(wordArray.getWordNativeAtIndex( index ) + " : " + numArray[index]);
                                                          }
                                                          else {
-                                                             Hint.setText(wordArray[index].getNative() + " : " + wordArray[index].getTranslation());
-                                                             Log.d( "Counter","wordArr[" + index + "]: " + wordArray[index].getNative() + "," + wordArray[index].getTranslation() + "," + wordArray[index].getInFileLineNum() + "," + wordArray[index].getHintClick() );
+                                                             Hint.setText(wordArray.getWordNativeAtIndex(index) + " : " + wordArray.getWordTranslationAtIndex(index));
                                                          }
 													 }
 													 else {
                                                          if (usrModePref == 1) {
-                                                             Hint.setText(wordArray[index].getTranslation() + " : " + numArray[index]);
-                                                             Log.d("Counter", "wordArr[" + index + "]: " + wordArray[index].getNative() + "," + wordArray[index].getTranslation() + "," + wordArray[index].getInFileLineNum() + "," + wordArray[index].getHintClick() + "," + numArray[index]);
+                                                             Hint.setText(wordArray.getWordTranslationAtIndex(index) + " : " + numArray[index]);
                                                          } else {
-                                                             Hint.setText(wordArray[index].getTranslation() + " : " + wordArray[index].getNative());
-                                                             Log.d("Counter", "wordArr[" + index + "]: " + wordArray[index].getNative() + "," + wordArray[index].getTranslation() + "," + wordArray[index].getInFileLineNum() + "," + wordArray[index].getHintClick());
+                                                             Hint.setText(wordArray.getWordTranslationAtIndex(index) + " : " + wordArray.getWordNativeAtIndex(index));
                                                          }
                                                      }
-													 wordArray[index].incrementHintClick();
+													 wordArray.wordIncrementHintClickAtIndex(index);
 													 
 													 handler.postDelayed(new Runnable() {
 														 @Override
@@ -108,14 +146,14 @@ public class ButtonListener extends AppCompatActivity
 													 
 													 Log.d( "selectW", "btn clicked: " + var );
 													 
-													 //check if word inserted is correct (used to decrease probability of word being selected in Select9Word() )
+													 //check if word inserted is correct (used to decrease probability of word being selected in WordArray.selectWord() )
 													 if( var == usrSudokuArr.getSolution()[currentRectColoured.getRow()][currentRectColoured.getColumn()] ) //if input matches solution
 													 {
 													 	Log.d( "selectW", "btn listener: user sqr input correct" );
-													 	if( wordArray[var].getAlreadyUsedInGame() == false ) //if correctly using this word for the first time in game
+													 	if( wordArray.getWordAlreadyUsedInGameAtIndex(var-1) == false ) //if correctly using this word for the first time in game
 														{
-															wordArray[var-1].setUsedInGame(); //mark as used
-															wordArray[var-1].setToAllowToDecreaseDifficulty( ); //allow for difficulty to be decreased
+															wordArray.setWordUsedInGameAtIndex(var-1); //mark as used
+															wordArray.setWordToAllowToDecreaseDifficultyAtIndex(var-1); //allow for difficulty to be decreased
 														}
 													 }
 													 // do not include "else if inserted wrong input, do not allow to be decreased" because user is likely to make mistakes

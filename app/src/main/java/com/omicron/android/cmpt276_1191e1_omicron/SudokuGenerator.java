@@ -10,7 +10,7 @@ public class SudokuGenerator implements Serializable {
     /*
      *    -- IMPORTANT --
      *  This generating function can generate UNIQUE puzzles based on
-     *  pre-defined unique puzzles. One puzzle can be used to
+     *  pre-defined unique puzzles. One 9x9 puzzle can be used to
      *  generate approximately (3!)^8 = 1679616 new puzzles
     */
 
@@ -19,7 +19,17 @@ public class SudokuGenerator implements Serializable {
     public int[][] PuzzleOriginal;
     public int[][] Puzzle; //stores user input changes
     public int[][] PuzzleSol; //stores puzzle solution
-
+    
+    public int[][] testSeed9x9 = {{0,0,2,5,4,9,6,8,3},{6,4,5,8,7,3,2,1,9},{3,8,9,2,6,1,7,4,5},{4,9,6,3,2,7,8,5,1},{8,1,3,4,5,6,9,7,2},{2,5,7,1,9,8,4,3,6},{9,6,4,7,1,5,3,2,8},{7,3,1,6,8,2,5,9,4},{5,2,8,9,3,4,1,6,7}};
+    public int[][] testSeed9x9Solution = {{1,7,2,5,4,9,6,8,3},{6,4,5,8,7,3,2,1,9},{3,8,9,2,6,1,7,4,5},{4,9,6,3,2,7,8,5,1},{8,1,3,4,5,6,9,7,2},{2,5,7,1,9,8,4,3,6},{9,6,4,7,1,5,3,2,8},{7,3,1,6,8,2,5,9,4},{5,2,8,9,3,4,1,6,7}};
+    public int[][] testSeed6x6 = {{0,0,0,0,6,0},{3,0,0,0,0,0},{0,2,0,0,3,0,},{6,0,0,4,0,0,},{0,1,0,3,0,4},{0,0,0,0,0,5}};
+    public int[][] testSeed6x6Solution = {{1,5,4,2,6,3},{3,6,2,5,4,1},{4,2,5,1,3,6,},{6,3,1,4,5,2},{5,1,6,3,2,4},{2,4,3,6,1,5}};
+    public int[][] testSeed4x4 = {{3,0,4,2},{0,0,0,0},{0,0,0,0},{2,0,0,3}};
+    public int[][] testSeed4x4Solution = {{3,1,4,2},{4,2,3,1},{1,3,2,4},{2,4,1,3}};
+    public int[][] testSeed12x12 = {{7,0,0,0,0,0,0,6,0,0,0,0},{0,5,6,0,0,0,0,0,4,0,1,0},{0,0,0,10,3,0,0,0,2,6,12,0},{2,0,0,3,0,7,12,0,0,10,0,4},{0,9,1,0,0,8,0,4,0,0,7,5},{4,7,0,0,0,2,0,0,12,0,0,0},{0,0,0,9,0,0,10,0,0,0,5,6},{5,4,0,0,11,0,6,0,0,3,2,0},{10,0,7,0,0,9,5,0,8,0,0,12},{0,3,12,2,0,0,0,11,10,0,0,0},{0,11,0,8,0,0,0,0,0,1,6,0},{0,0,0,0,9,0,0,0,0,0,0,8}};
+    public int[][] testSeed12x12Solution = {{7,12,2,4,1,11,9,6,5,8,10,3},{3,5,6,11,8,10,2,12,4,9,1,7},{8,1,9,10,3,4,7,5,2,6,12,11},{2,8,11,3,5,7,12,1,6,10,9,4},{12,9,1,6,10,8,11,4,3,2,7,5},{4,7,10,5,6,2,3,9,12,11,8,1},{11,2,3,9,4,12,10,8,1,7,5,6},{5,4,8,12,11,1,6,7,9,3,2,10},{10,6,7,1,2,9,5,3,8,4,11,12},{1,3,12,2,7,6,8,11,10,5,4,9},{9,11,5,8,12,3,4,10,7,1,6,2},{6,10,4,7,9,5,1,2,11,12,3,8}};
+    
+    
     public SudokuGenerator(int i)
     {
         size = 9;
@@ -29,8 +39,7 @@ public class SudokuGenerator implements Serializable {
 
         //test array
         //int[][] testSeed = {{0,3,0,4,9,1,2,5,8},{4,8,2,5,7,3,6,9,1},{9,1,5,6,2,8,4,3,7},{8,2,9,1,3,7,5,4,6},{3,4,1,2,6,5,8,7,9},{5,6,7,8,4,9,1,2,3},{7,5,6,9,1,2,3,8,4},{1,3,8,7,5,4,9,6,2},{2,9,4,3,8,6,7,1,5}};
-		int[][] testSeed = {{0,0,2,5,4,9,6,8,3},{6,4,5,8,7,3,2,1,9},{3,8,9,2,6,1,7,4,5},{4,9,6,3,2,7,8,5,1},{8,1,3,4,5,6,9,7,2},{2,5,7,1,9,8,4,3,6},{9,6,4,7,1,5,3,2,8},{7,3,1,6,8,2,5,9,4},{5,2,8,9,3,4,1,6,7}};
-
+		
 		int[][] PuzzSeedEasy = {{0, 0, 7, 2, 8, 0, 0, 5, 0}, {0, 5, 6, 1, 7, 9, 0, 0, 0}, {1, 2, 0, 0, 0, 6, 0, 4, 0}, {8, 0, 0, 0, 1, 0, 0, 2, 3}, {0, 0, 0, 0, 9, 0, 0, 0, 0}, {6, 4, 0, 0, 3, 0, 0, 0, 7}, {0, 8, 0, 7, 0, 0, 0, 3, 4}, {0, 0, 0, 9, 6, 5, 2, 7, 0}, {0, 6, 0, 0, 4, 3, 9, 0, 0}};
 		int[][] PuzzSeedEasySol = {{9, 3, 7, 2, 8, 4, 1, 5, 6}, {4, 5, 6, 1, 7, 9, 3, 8, 2}, {1, 2, 8, 3, 5, 6, 7, 4, 9}, {8, 9, 5, 6, 1, 7, 4, 2, 3}, {2, 7, 3, 4, 9, 8, 5, 6, 1}, {6, 4, 1, 5, 3, 2, 8, 9, 7}, {5, 8, 9, 7, 2, 1, 6, 3, 4}, {3, 1, 4, 9, 6, 5, 2, 7, 8}, {7, 6, 2, 8, 4, 3, 9, 1, 5}};
 		int[][] PuzzSeedMed = {{8, 0, 0, 7, 9, 0, 0, 0, 5}, {0, 0, 0, 3, 0, 0, 6, 0, 0}, {9, 0, 0, 0, 6, 5, 1, 0, 8}, {0, 0, 0, 0, 0, 0, 0, 0, 6}, {6, 5, 0, 8, 3, 7, 0, 4, 1}, {2, 0, 0, 0, 0, 0, 0, 0, 0}, {7, 0, 5, 1, 8, 0, 0, 0, 9}, {0, 0, 2, 0, 0, 3, 0, 0, 0}, {3, 0, 0, 0, 5, 6, 0, 0, 2}};
@@ -50,9 +59,17 @@ public class SudokuGenerator implements Serializable {
             copyarr(PuzzSeedEasy, Puzzle);
             copyarr(PuzzSeedEasySol, PuzzleSol);
         }
-        scramble(Puzzle, PuzzleSol);
-        copyarr( Puzzle, PuzzleOriginal );
         
+        // TODO: remove the following once implementation complete
+        PuzzleOriginal = testSeed6x6;
+        Puzzle = testSeed6x6;
+        PuzzleSol = testSeed6x6Solution;
+    
+    
+        // TODO: enable scramble() and copyarr()
+        
+        //scramble(Puzzle, PuzzleSol);
+        //copyarr( Puzzle, PuzzleOriginal );
         
         Log.d( "selectW", "puzzle solution:" );
         printArr( "selectW", PuzzleSol );
