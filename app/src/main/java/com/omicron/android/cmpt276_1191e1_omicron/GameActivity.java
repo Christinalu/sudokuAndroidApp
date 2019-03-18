@@ -121,6 +121,7 @@ public class GameActivity extends AppCompatActivity
 	private int screenW;
 	private int bitmapSize; //lowest of screen dimensions - size of square bitmap
 	private int sqrSize; //size of single square in matrix
+	private int numOfPuzzle = 9;
 	
 	int HINT_CLICK_TO_MAX_PROB;
 
@@ -340,7 +341,7 @@ public class GameActivity extends AppCompatActivity
 
 			/** SET BUTTON LISTENERS **/
 
-		btnArr = new Button[9]; // set buttons as an array
+		btnArr = new Button[numOfPuzzle]; // set buttons as an array
 		btnArr[0] = (Button) findViewById( R.id.keypad_1 );
 		btnArr[1] = (Button) findViewById( R.id.keypad_2 );
 		btnArr[2] = (Button) findViewById( R.id.keypad_3 );
