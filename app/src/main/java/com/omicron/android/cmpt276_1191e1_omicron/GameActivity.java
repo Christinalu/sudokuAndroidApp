@@ -29,6 +29,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,6 +54,7 @@ public class GameActivity extends AppCompatActivity
 	private int usrDiffPref = 0;
 	private int state; //0=new start, 1=resume
 	private int usrModePref; //0=standard, 1=speech
+	private int usrPuzzleTypePref; //stores puzzle size 4x4 ...
 
 	private TextToSpeech mTTS;
 	private String theWord;
@@ -77,11 +79,11 @@ public class GameActivity extends AppCompatActivity
 	private drw drawR; // class that draws the squares either highlighted or not, based on touch
 	private Pair lastRectColoured = new Pair( -1, -1 ); // stores the last coloured square coordinates
 	private Pair currentRectColoured = new Pair( -1, -1 ); // stores the current coloured square
-
-	private Block[][] rectArr = new Block[9][9]; // stores all squares in a 2D array
+	
 	private Paint paintblack = new Paint();
 	private TextMatrix textMatrix; //stores the TextView for drawing the text
-
+	private Block[][] rectArr;
+	
 	private int[] touchX = { 0 }; // hold user touch (x,y) coordinate
 	private int[] touchY = { 0 };
 
@@ -92,7 +94,8 @@ public class GameActivity extends AppCompatActivity
 
 	private ButtonListener listeners; // used to call another function to implement all button listeners, to save space in GameActivity
 	private int[] btnClicked = { 0 }; //flag which is activated when a button is clicked - used to let zoom drw class to update TextView (for efficiency purposes)
-
+	private int[] onStopAlreadyCalled = { 0 }; //stop onStop() from being called twice
+	
 	private int[] zoomOn = { 0 }; //indicates if user activated zoom 1==true, 0==false
 	private int[] dX = { 0 }; //change in X coordinate ie 'drag'
 	private int[] dY = { 0 };
@@ -137,12 +140,13 @@ public class GameActivity extends AppCompatActivity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_game);
+		
 
 		//set intent to receive word array from Main Activity
 		if (savedInstanceState != null) {
 			//a state had been saved, load it
 			state = 1;
-			wordArray = (WordArray) savedInstanceState.getSerializable("wordArrayGA");
+			wordArray = (WordArray) savedInstanceState.getParcelable("wordArrayGA");
 			usrLangPref = savedInstanceState.getInt("usrLangPrefGA");
 			usrSudokuArr = (SudokuGenerator) savedInstanceState.get("SudokuArrGA");
 			usrModePref = (int) savedInstanceState.getSerializable("usrModeGA");
@@ -158,7 +162,7 @@ public class GameActivity extends AppCompatActivity
 				state = (int) gameSrc.getSerializableExtra("state");
 				//check state: if 1 then we are resuming a previous game, otherwise state == 0 and we are starting a new game
 				if (state == 1) {
-					wordArray = (WordArray) gameSrc.getSerializableExtra("wordArrayMA");
+					wordArray = (WordArray) gameSrc.getParcelableExtra("wordArrayMA");
 					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPrefMA");
 					usrSudokuArr = (SudokuGenerator) gameSrc.getSerializableExtra("SudokuArrMA");
 					usrModePref = (int) gameSrc.getSerializableExtra("usrModeMA");
@@ -168,7 +172,7 @@ public class GameActivity extends AppCompatActivity
 						numArray = (String[]) gameSrc.getStringArrayExtra("numArrayMA");
 					}
 				} else {
-					wordArray = (WordArray) gameSrc.getSerializableExtra("wordArray");
+					wordArray = (WordArray) gameSrc.getParcelableExtra("wordArray");
 					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPref");
 					usrDiffPref = (int) gameSrc.getSerializableExtra("usrDiffPref");
 					usrModePref = (int) gameSrc.getSerializableExtra("usrModeMA");
@@ -179,16 +183,16 @@ public class GameActivity extends AppCompatActivity
 						
 						// TODO: fix the following to adapt to different puzzle types
 						
-						
-						numArray = new String[9];
+						WORD_COUNT = wordArray.getWordCount( );
+						numArray = new String[WORD_COUNT];
 						if (usrLangPref == 0) {
-							for (int i = 0; i < 9; i++) {
+							for (int i = 0; i < WORD_COUNT; i++) {
 								numArray[i] = wordArray.getWordTranslationAtIndex( i );
 								wordArray.setWordTranslationAtIndex( i, Integer.toString(i+1) );
 							}
 						}
 						else {
-							for (int i = 0; i < 9; i++) {
+							for (int i = 0; i < WORD_COUNT; i++) {
 								numArray[i] = wordArray.getWordNativeAtIndex( i );
 								wordArray.setWordNativeAtIndex( i, Integer.toString(i + 1) );
 							}
@@ -201,7 +205,7 @@ public class GameActivity extends AppCompatActivity
 				
 				//debug wordArray
 				Log.d( "upload", " @ WORD_ARRAY ON RESUME GAME:" );
-				for( int i=0; i<9; i++ )
+				for( int i=0; i<WORD_COUNT; i++ )
 				{
 					Log.d( "upload","wordArr[" + i + "]: " + wordArray.getWordNativeAtIndex( i ) + "," + wordArray.getWordTranslationAtIndex( i ) + "," + wordArray.getWordInFileLineNumAtIndex( i ) + "," + wordArray.getWordHintClickAtIndex( i ) );
 				}
@@ -276,20 +280,21 @@ public class GameActivity extends AppCompatActivity
 		
 		// SET PUZZLE ROW AND COL NUMBER PER BLOCK
 		WORD_COUNT = wordArray.getWordCount( );
+		usrPuzzleTypePref = wordArray.getUsrPuzzleTypePref( );
 		
-		if( usrModePref == wordArray.getSize4x4() ) {
+		if( usrPuzzleTypePref == wordArray.getSize4x4() ) {
 			COL_PER_BLOCK = 2;
 			ROW_PER_BLOCK = 2;
 			VERTICAL_BLOCK = 2;
 			HORIZONTAL_BLOCK = 2;
 		}
-		else if( usrModePref == wordArray.getSize6x6() ){
+		else if( usrPuzzleTypePref == wordArray.getSize6x6() ){
 			COL_PER_BLOCK = 3;
 			ROW_PER_BLOCK = 2;
 			VERTICAL_BLOCK = 2;
 			HORIZONTAL_BLOCK = 3;
 		}
-		else if( usrModePref == wordArray.getSize12x12() ){
+		else if( usrPuzzleTypePref == wordArray.getSize12x12() ){
 			COL_PER_BLOCK = 4;
 			ROW_PER_BLOCK = 3;
 			VERTICAL_BLOCK = 3;
@@ -371,18 +376,21 @@ public class GameActivity extends AppCompatActivity
 		// PREDEFINE VARIABLES FOR MATRIX OVERLAY
 		paintblack.setColor(Color.parseColor("#0000ff"));
 		paintblack.setTextSize(30);
-
+		
+		rectArr = new Block[WORD_COUNT][WORD_COUNT]; // stores all squares in a 2D array
+		
 		drawR = new drw( rectArr, paint, canvas, rectLayout, rectTextLayout, textMatrix, usrSudokuArr, zoomOn, drag,
 						 dX, dY, touchXZ, touchYZ, zoomButtonSafe, zoomClickSafe, zoomButtonDisableUpdate,
 						 bitmapSizeWidth, bitmapSizeHeight, wordArray, btnClicked, ZOOM_SCALE,
 						 COL_PER_BLOCK, ROW_PER_BLOCK, VERTICAL_BLOCK, HORIZONTAL_BLOCK, WORD_COUNT ); // class used to draw/update square matrix
 		
+		TableLayout tableLayout = findViewById( R.id.btn_keypad );
 		
 		// call function to set all listeners - needs drawR
 		listeners = new ButtonListener( currentRectColoured, usrSudokuArr,
 										drawR, touchX, touchY, lastRectColoured, usrLangPref, btnClicked,
 										Hint, wordArray,usrModePref,numArray, WORD_COUNT, COL_PER_BLOCK, ROW_PER_BLOCK,
-										this );
+										this, tableLayout );
 
 
 
@@ -532,10 +540,15 @@ public class GameActivity extends AppCompatActivity
 							drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
 							Log.i("TAG", "normal click: (" + touchX[0] + ", " + touchY[0] + ")");
 						}
+						
+						// TEXT TO SPEECH
 						if (usrModePref == 1) {
 							row = currentRectColoured.getRow();
 							col = currentRectColoured.getColumn();
-							if (row < 9 && col < 9 && row > -1 && col > -1) {
+							
+							// TODO: check if this is correct after adjusting for different puzzle sizes
+							
+							if (row < WORD_COUNT && col < WORD_COUNT && row > -1 && col > -1) {
 								val = usrSudokuArr.PuzzleOriginal[row][col];
 								if (val != 0) {
 									theWord = numArray[val-1];
@@ -547,8 +560,8 @@ public class GameActivity extends AppCompatActivity
 								}
 							}
 						}
+						
 						break;
-
 
 					case MotionEvent.ACTION_MOVE:
 
@@ -592,6 +605,7 @@ public class GameActivity extends AppCompatActivity
 
 							drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
 						}
+						
 						break;
 
 					case MotionEvent.ACTION_UP:
@@ -612,6 +626,7 @@ public class GameActivity extends AppCompatActivity
 
 							Log.i( "TAG", "moved dX: (" + dX[0] + ", " + dY[0] + ")" );
 						}
+						
 						break;
 				}
 
@@ -640,7 +655,7 @@ public class GameActivity extends AppCompatActivity
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
-		savedInstanceState.putSerializable("wordArrayGA", wordArray);
+		savedInstanceState.putParcelable("wordArrayGA", wordArray);
 		savedInstanceState.putInt( "usrLangPrefGA", usrLangPref );
 		savedInstanceState.putSerializable("SudokuArrGA", usrSudokuArr);
 		savedInstanceState.putInt("state", state);
@@ -653,6 +668,9 @@ public class GameActivity extends AppCompatActivity
 
 	@Override
 	public void onBackPressed() {
+		onStop();
+		onStopAlreadyCalled[0] = 1; //stop onStop() from being called again
+		Log.i("selectW", "back pressed");
 		Intent resumeSrc = new Intent( GameActivity.this, MainActivity.class );
 		state = 1;
 		resumeSrc.putExtra( "wordArrayGA", wordArray );
@@ -694,10 +712,19 @@ public class GameActivity extends AppCompatActivity
 		//wordArray[5].updateHintClick( 10 );
 		//wordArray[8].updateHintClick( 3 );
 		
+		//stop onStop() from being called if already called on "back button"
+		if( onStopAlreadyCalled[0] == 1 )
+		{
+			onStopAlreadyCalled[0] = 0;
+			return;
+		}
+		
+		Log.d( "selectW", "onStop() called to save data" );
+		
 		int HINT_CLICK_ON_DECREASE = 1; //if user had a word in puzzle but did not use HintClick, then it implies the user has less difficulty with word, so decrease HintClick by this
 		FileInputStream fileInStream = null; //open file from internal storage
 		try {
-			fileInStream = this.openFileInput( wordArray[10].getNative( ) ); //get internal file name, contained in 10th index of wordArray
+			fileInStream = this.openFileInput( wordArray.getPackageName() ); //get internal file name, contained in 10th index of wordArray
 			
 			
 			// READ ALL CONTENT
@@ -724,9 +751,9 @@ public class GameActivity extends AppCompatActivity
 				lineFound = false; //reset
 				
 					/* FIND LINE OF WORD IN CSV (based on wordArr[i].getInFileLineNum() */
-				for( int k=0; k<WORD_COUNT; k++ ) //loop through all '9' words
+				for( int k=0; k<WORD_COUNT; k++ ) //loop through all 'n' words
 				{
-					if( i == wordArray[k].getInFileLineNum() ) //if updating line with word that was used in wordArray
+					if( i == wordArray.getWordInFileLineNumAtIndex( k ) ) //if updating line with word that was used in wordArray
 					{
 						strSplit = line.split(","); //get all attribute
 						long hintClickSoFar = Long.parseLong(strSplit[2]); //get original click count from file
@@ -734,13 +761,14 @@ public class GameActivity extends AppCompatActivity
 						//to what hintClickSoFar was so far originally in the file, add wordArray.getHintClick() from the current game
 						//newHintClick = hintClickSoFar + wordArray[k].getHintClick()*STATISTIC_MULTIPLE;
 						
-						if( wordArray[k].getHintClick() == 0 ) //if no HintClicks for this word, it means user has less difficulty so decrease HintClick to decrease probability
+						if( wordArray.getWordHintClickAtIndex( k ) == 0 ) //if no HintClicks for this word, it means user has less difficulty so decrease HintClick to decrease probability
 						{
-							if( wordArray[k].getAllowToDecreaseDifficulty() ) //if user inserted correct word (ONLY ONCE)
+							if( wordArray.getWordAllowToDecreaseDifficultyAtIndex( k ) ) //if user inserted correct word (ONLY ONCE)
 							{
-								wordArray[k].setDoNotAllowToDecreaseDifficulty( ); //disable so that word cannot have difficulty decreased in this game, until user starts new game
+								wordArray.setWordDoNotAllowToDecreaseDifficultyAtIndex( k ); //disable so that word cannot have difficulty decreased in this game, until user starts new game
+								wordArray.setWordUsedInGameAtIndex( k );
 								newHintClick = hintClickSoFar - HINT_CLICK_ON_DECREASE;
-								Log.d( "selectW", "word: " + wordArray[k].getNative() );
+								Log.d( "selectW", "word: " + wordArray.getWordNativeAtIndex(k) );
 								Log.d( "selectW", "line index: " + i );
 								Log.d( "selectW", "HintClick decreased with hintClickSoFar=" + hintClickSoFar + " newHintClick=" + newHintClick );
 							}
@@ -748,13 +776,18 @@ public class GameActivity extends AppCompatActivity
 							{ newHintClick = hintClickSoFar; } //keep the same HintCount (because newHintCount==0 and no need to decrease count)
 						}
 						else
-						{ newHintClick = hintClickSoFar +  wordArray[k].getHintClick(); } //user used HintClick
+						{
+							Log.d( "selectW", "adding HintCount: " + wordArray.getWordHintClickAtIndex( k ) );
+							newHintClick = hintClickSoFar +  wordArray.getWordHintClickAtIndex( k );
+							Log.d( "selectW", wordArray.getWordNativeAtIndex(k) + " new hintClick: " + newHintClick );
+						} //user used HintClick
 						
 						//test for bounds
 						if( newHintClick < 1 ) //if too low
 						{ newHintClick = 1; }
 						else if( newHintClick > HINT_CLICK_TO_MAX_PROB )
 						{ newHintClick = HINT_CLICK_TO_MAX_PROB; }
+						
 						
 						lineFound = true; //csv file line matches a word in wordArray[]
 						
@@ -779,7 +812,7 @@ public class GameActivity extends AppCompatActivity
 			buffRead.close( );
 			
 			// WRITE TO FILE //
-			outStream = this.openFileOutput( wordArray[10].getNative( ), this.MODE_PRIVATE ); //open private output stream for re-write
+			outStream = this.openFileOutput( wordArray.getPackageName( ), this.MODE_PRIVATE ); //open private output stream for re-write
 			outStream.write( strBuild.toString().getBytes( ) ); //convert string to bytes and write to file
 			outStream.close( ); //close and save file
 		
@@ -803,7 +836,7 @@ public class GameActivity extends AppCompatActivity
 		//reset all "HintClick"
 		for( int i=0; i<WORD_COUNT; i++ )
 		{
-			wordArray[i].updateHintClick( 0 );
+			wordArray.wordUpdateHintClickAtIndex( i, 0 );
 		}
 	}
 }

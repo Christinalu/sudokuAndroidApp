@@ -1,7 +1,10 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
+import android.view.View;
 import android.widget.RadioGroup;
 
 import java.io.BufferedReader;
@@ -12,7 +15,7 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.Random;
 
-public class WordArray implements Serializable
+public class WordArray implements Parcelable
 {
 	/*
 	 * This class stores the wordArray initialized according to user preference
@@ -21,36 +24,76 @@ public class WordArray implements Serializable
 	
 	private Word[] wordArray; //stores the array with words
 	private int wordCount; //stores how many words in wordArray
-	private RadioGroup radGroup;
+	//private RadioGroup radGroup;
 	private int usrPuzzleTypePref = -1;
 	private static int MAX_CSV_ROW;
 	private static int HINT_CLICK_TO_MAX_PROB;
 	
 	//stores the puzzle sizes
-	private static final int size4x4 = 0;
-	private static final int size6x6 = 1;
-	private static final int size9x9 = 2;
-	private static final int size12x12 = 3;
+	private static int size4x4 = 0;
+	private static int size6x6 = 1;
+	private static int size9x9 = 2;
+	private static int size12x12 = 3;
 	
 	
-	public WordArray( RadioGroup radGroup2, int MAX_CSV_ROW2, int HINT_CLICK_TO_MAX_PROB2 )
+		/* Override Parcelable */
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+	
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeSerializable( wordArray );
+		dest.writeInt( wordCount );
+		dest.writeInt( usrPuzzleTypePref );
+		dest.writeInt( MAX_CSV_ROW );
+		dest.writeInt( HINT_CLICK_TO_MAX_PROB );
+		
+		dest.writeInt( size4x4 );
+		dest.writeInt( size6x6 );
+		dest.writeInt( size9x9 );
+		dest.writeInt( size12x12 );
+	}
+	
+	public WordArray( Parcel in )
+	{
+		//this.id = in.readString();
+		
+		wordArray = (Word[]) in.readSerializable( );
+		wordCount = in.readInt( );
+		usrPuzzleTypePref = in.readInt( );
+		MAX_CSV_ROW = in.readInt( );
+		HINT_CLICK_TO_MAX_PROB = in.readInt( );
+		
+		size4x4 = in.readInt( );
+		size6x6 = in.readInt( );
+		size9x9 = in.readInt( );
+		size12x12 = in.readInt( );
+	}
+	
+	public static final Parcelable.Creator<WordArray> CREATOR = new Parcelable.Creator<WordArray>() {
+		
+		public WordArray createFromParcel(Parcel in) {
+			return new WordArray(in);
+		}
+		
+		public WordArray[] newArray(int size) {
+			return new WordArray[size];
+		}
+	};
+	
+	
+	public WordArray( int usrPuzzleTypePref2, int MAX_CSV_ROW2, int HINT_CLICK_TO_MAX_PROB2 )
 	{
 		// SET UP ARRAY TO STORE WORDS
 		// a Word (pair) contains the word in native language, and its translation
 		//	the n-2 th index contains the corresponding language
 		//	the n-1 th index contains the internal storage file name
 		
-		radGroup = radGroup2;
+		usrPuzzleTypePref = usrPuzzleTypePref2;
 		MAX_CSV_ROW = MAX_CSV_ROW2;
 		HINT_CLICK_TO_MAX_PROB = HINT_CLICK_TO_MAX_PROB2;
-	}
-	
-	
-	public int findUserPuzzleTypePreference( )
-	{
-		//find which puzzle type the user selected
-		usrPuzzleTypePref = radGroup.getCheckedRadioButtonId( );
-		return usrPuzzleTypePref;
 	}
 	
 	
@@ -68,7 +111,9 @@ public class WordArray implements Serializable
 		else
 		{ return -1; }
 		
-		wordArray = new Word[usrPuzzleTypePref + 2]; // +2 is for language and pkg name
+		wordArray = new Word[wordCount + 2]; //+2 for language and pkg name
+		Log.d( "selectW", "usrPuzzleTypePref: " + usrPuzzleTypePref );
+		Log.d( "selectW", "wordArray wordCount: " + wordCount );
 		return 0;
 	}
 	
@@ -90,11 +135,10 @@ public class WordArray implements Serializable
 		 * Returns 1 if could not generate an array
 		 */
 		
-		
 		int res = setUpBasedOnUserTypePreference( );
 		if( res == -1 ){ return 1; } //failed to initialize
 		
-			/* OPEN PKG FILE TO READ */
+		/* OPEN PKG FILE TO READ */
 		
 		FileInputStream fileInStream = null; //open file from internal storage
 		try {
@@ -119,12 +163,9 @@ public class WordArray implements Serializable
 		return res;
 	}
 	
-	public int getUserPuzzleType( )
-	{
-		//returns -1 on failure (because findUserPuzzleTypePreference() has to be called first)
-		//else the puzzle type user selected
-		return usrPuzzleTypePref;
-	}
+	
+	public int getUsrPuzzleTypePref( )
+	{ return usrPuzzleTypePref; }
 	
 	public Word[] getWordArray( )
 	{ return wordArray; }
@@ -145,77 +186,13 @@ public class WordArray implements Serializable
 	{ return size12x12; }
 	
 	
-		/** DEFINE WORD CLASS **/
-		
-	private class Word implements Serializable
-	{
-		/*
-		 * This Object holds a word in native language and its translation
-		 */
-		
-		private String mNative;
-		private String mTranslation;
-		private int mInFileLineNum; //stores on which line in .csv this word is found
-		private long mHintClick; //stores the number of times the user had difficulty with a word
-		private boolean alreadyUsedInGame; //stores if the word was already used in game once
-		private boolean allowToDecreaseDifficulty = false; //when true, can decrease difficulty of word; default must be false so difficulty decreased only when word inserted correctly
-			
-		//create a word
-		public Word( String wordNative, String wordTranslation, int inFileLineNum, long hintClick )
-		{
-			mNative = wordNative;
-			mTranslation = wordTranslation;
-			mInFileLineNum = inFileLineNum;
-			mHintClick = hintClick;
-			alreadyUsedInGame = false;
-		}
-		
-		//get native word
-		public String getNative(  ){ return mNative; }
-			
-		//get translation word
-		public String getTranslation(  ){ return mTranslation; }
-			
-		//set native word
-		public void setNative(String s) {
-			mNative = s;
-			return;
-		}
-		
-		//set translation word
-		public void setTranslation(String s) {
-			mTranslation = s;
-			return;
-		}
-		
-		public int getInFileLineNum(  ){ return mInFileLineNum; }
-		
-		public void updateHintClick( int newHintClick ){ mHintClick = newHintClick; }
-		
-		public void incrementHintClick( ){ mHintClick++; }
-			
-		public long getHintClick(  ){ return mHintClick; }
-			
-		public boolean getAlreadyUsedInGame( ){ return alreadyUsedInGame; }
-			
-		public void setUsedInGame( ){ alreadyUsedInGame = true; }
-			
-		public boolean getAllowToDecreaseDifficulty( )
-		{ return  allowToDecreaseDifficulty; }
-		
-		public void setToAllowToDecreaseDifficulty( )
-		{ allowToDecreaseDifficulty = true; }
-		
-		public void setDoNotAllowToDecreaseDifficulty( )
-		{ allowToDecreaseDifficulty = false; }
-		
-	}
+	
 	
 	
 	public String getWordNativeAtIndex( int i )
 	{
 		//returns empty string on error
-		if( i < 0 || i <= wordCount )
+		if( i < 0 || i >= wordCount )
 		{ return ""; } //invalid index
 		
 		return wordArray[i].getNative( );
@@ -224,7 +201,7 @@ public class WordArray implements Serializable
 	public String getWordTranslationAtIndex( int i )
 	{
 		//returns empty string on error
-		if( i < 0 || i <= wordCount )
+		if( i < 0 || i >= wordCount )
 		{ return ""; } //invalid index
 		
 		return wordArray[i].getTranslation( );
@@ -233,7 +210,7 @@ public class WordArray implements Serializable
 	public int setWordNativeAtIndex( int i, String str )
 	{
 		//returns -1 on error
-		if( i < 0 || i <= wordCount )
+		if( i < 0 || i >= wordCount )
 		{ return -1; } //invalid index
 		wordArray[i].setNative( str );
 		return 0;
@@ -242,7 +219,7 @@ public class WordArray implements Serializable
 	public int setWordTranslationAtIndex( int i, String str )
 	{
 		//returns -1 on error
-		if( i < 0 || i <= wordCount )
+		if( i < 0 || i >= wordCount )
 		{ return -1; } //invalid index
 		wordArray[i].setTranslation( str );
 		return 0;
@@ -251,7 +228,7 @@ public class WordArray implements Serializable
 	public int getWordInFileLineNumAtIndex( int i )
 	{
 		//returns -1 on error
-		if( i < 0 || i <= wordCount )
+		if( i < 0 || i >= wordCount )
 		{ return -1; } //invalid index
 		
 		return wordArray[i].getInFileLineNum( );
@@ -260,7 +237,7 @@ public class WordArray implements Serializable
 	public long getWordHintClickAtIndex( int i )
 	{
 		//returns -1 on error
-		if( i < 0 || i <= wordCount )
+		if( i < 0 || i >= wordCount )
 		{ return -1; } //invalid index
 		
 		return wordArray[i].getHintClick( );
@@ -269,7 +246,7 @@ public class WordArray implements Serializable
 	public int wordUpdateHintClickAtIndex( int i, int newHintClick )
 	{
 		//returns -1 on error
-		if( i < 0 || i <= wordCount )
+		if( i < 0 || i >= wordCount )
 		{ return -1; } //invalid index
 		
 		wordArray[i].updateHintClick( newHintClick );
@@ -279,7 +256,7 @@ public class WordArray implements Serializable
 	public int wordIncrementHintClickAtIndex( int i )
 	{
 		//returns -1 on error
-		if( i < 0 || i <= wordCount )
+		if( i < 0 || i >= wordCount )
 		{ return -1; } //invalid index
 		
 		wordArray[i].incrementHintClick( );
@@ -289,7 +266,7 @@ public class WordArray implements Serializable
 	public boolean getWordAlreadyUsedInGameAtIndex( int i )
 	{
 		//returns true on error
-		if( i < 0 || i <= wordCount )
+		if( i < 0 || i >= wordCount )
 		{ return true; } //assume true on error
 		
 		return wordArray[i].getAlreadyUsedInGame( );
@@ -298,7 +275,7 @@ public class WordArray implements Serializable
 	public int setWordUsedInGameAtIndex( int i )
 	{
 		//returns -1 on error
-		if( i < 0 || i <= wordCount )
+		if( i < 0 || i >= wordCount )
 		{ return -1; } //assume true on error
 		
 		wordArray[i].setUsedInGame( );
@@ -308,7 +285,7 @@ public class WordArray implements Serializable
 	public boolean getWordAllowToDecreaseDifficultyAtIndex( int i )
 	{
 		//returns false on error
-		if( i < 0 || i <= wordCount )
+		if( i < 0 || i >= wordCount )
 		{ return false; } //assume false on error
 		
 		return wordArray[i].getAllowToDecreaseDifficulty( );
@@ -317,7 +294,7 @@ public class WordArray implements Serializable
 	public int setWordToAllowToDecreaseDifficultyAtIndex( int i )
 	{
 		//returns -1 on error
-		if( i < 0 || i <= wordCount )
+		if( i < 0 || i >= wordCount )
 		{ return -1; } //assume false on error
 		
 		wordArray[i].setToAllowToDecreaseDifficulty( );
@@ -327,7 +304,7 @@ public class WordArray implements Serializable
 	public int setWordDoNotAllowToDecreaseDifficultyAtIndex( int i )
 	{
 		//returns -1 on error
-		if( i < 0 || i <= wordCount )
+		if( i < 0 || i >= wordCount )
 		{ return -1; } //assume false on error
 		
 		wordArray[i].setDoNotAllowToDecreaseDifficulty( );
@@ -556,6 +533,5 @@ public class WordArray implements Serializable
 		
 		return 0;
 	}
-	
 	
 }

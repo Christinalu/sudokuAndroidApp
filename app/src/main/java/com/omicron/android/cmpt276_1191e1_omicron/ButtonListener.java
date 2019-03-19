@@ -20,7 +20,7 @@ public class ButtonListener extends AppCompatActivity
 	/*
 	 *	This class is used to set up keypad buttons for GameActivity
 	 *	This also contains code that will let buttons respond
-	 *	by updating PuzzleOriginal
+	 *	by updating Puzzle
 	 */
 
 	private int i;
@@ -31,7 +31,7 @@ public class ButtonListener extends AppCompatActivity
 						  final int[] touchX, final int[] touchY, final Pair lastRectColoured,
 						  final int usrLangPref, final int[] btnClicked, final TextView Hint, final WordArray wordArray,
 						  final int usrModePref, final String[] numArray, int WORD_COUNT, int COL_PER_BLOCK,
-						  int ROW_PER_BLOCK, Context context )
+						  int ROW_PER_BLOCK, Context context, TableLayout tableLayout )
 	{
 		// pulled out of button listeners
 		final PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
@@ -45,22 +45,31 @@ public class ButtonListener extends AppCompatActivity
 		
 		btnArr = new Button[WORD_COUNT]; // set buttons as an array
 		
+		Log.d( "listener", "WORD_COUNT: " + WORD_COUNT );
+		if( btnArr == null){ Log.d( "listener", "ERROR: null Button[]" ); }
+		
 			/* CREATE TABLE LAYOUT */
 		if( COL_PER_BLOCK > ROW_PER_BLOCK ) //set row count as biggest of ROW/COL_PER_BLOCK, so that less buttons per row
 		{ rowCount = COL_PER_BLOCK; btnCount = ROW_PER_BLOCK; }		// but more rows allows to fit bigger words
 		else{ rowCount = ROW_PER_BLOCK; btnCount = COL_PER_BLOCK; }
 		
-		TableLayout tableLayout = findViewById( R.id.keypad );
+		
 		TableRow tableRow;
 		Button button;
+		
+		Log.d( "listener", "rowCount: " + rowCount );
+		Log.d( "listener", "btnCount: " + btnCount );
 		for( int j=0; j<rowCount; j++ ) //add button rows to table
 		{
 			tableRow = new TableRow( context );
 			for( int k=0; k<btnCount; k++ )
 			{
 				button = new Button( context );
+				if( button == null){ Log.d( "listener", "ERROR: null button" ); }
 				button.setTextColor( Color.WHITE );
 				button.setBackgroundResource( R.drawable.buttons );
+				
+				Log.d( "listener", "sample word from array: " + wordArray.getWordNativeAtIndex( indexArr ) );
 				
 				// choose button text in language based on user preference
 				if( usrLangPref == 0 )
@@ -87,6 +96,7 @@ public class ButtonListener extends AppCompatActivity
 												 @SuppressLint("SetTextI18n")
 												 @Override
 												 public boolean onLongClick(View v) {
+												 	 Log.d( "selectW", "long button press" );
 												     Hint.setBackgroundColor(R.drawable.buttons);
                                                      final Drawable buttonBackground = btnArr[index].getBackground();
                                                      btnArr[index].setBackgroundColor(R.drawable.buttons);
@@ -106,6 +116,9 @@ public class ButtonListener extends AppCompatActivity
                                                          }
                                                      }
 													 wordArray.wordIncrementHintClickAtIndex(index);
+													
+													 wordArray.setWordUsedInGameAtIndex(index); //mark as used
+													 wordArray.setWordDoNotAllowToDecreaseDifficultyAtIndex(index); //allow for difficulty to be decreased
 													 
 													 handler.postDelayed(new Runnable() {
 														 @Override
@@ -152,6 +165,8 @@ public class ButtonListener extends AppCompatActivity
 													 	Log.d( "selectW", "btn listener: user sqr input correct" );
 													 	if( wordArray.getWordAlreadyUsedInGameAtIndex(var-1) == false ) //if correctly using this word for the first time in game
 														{
+															Log.d( "selectW", "btn listener: decrease difficulty" );
+															
 															wordArray.setWordUsedInGameAtIndex(var-1); //mark as used
 															wordArray.setWordToAllowToDecreaseDifficultyAtIndex(var-1); //allow for difficulty to be decreased
 														}
@@ -165,7 +180,7 @@ public class ButtonListener extends AppCompatActivity
 														 track.checkPuzzle( usrSudokuArr, check, v, btnArr );
 													 }
 												 }
-												 usrSudokuArr.printCurrent( );
+												 //usrSudokuArr.printCurrent( );
 											 }
 										 }
 

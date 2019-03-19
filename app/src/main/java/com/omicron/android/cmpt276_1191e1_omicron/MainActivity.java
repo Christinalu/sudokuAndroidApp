@@ -45,7 +45,8 @@ public class MainActivity extends AppCompatActivity
 	private int state = 0; //0=new start, 1=resume
 	private String language;
 	private boolean canStart = true;
-
+	private int[] usrPuzzleTypePref = { -1 };
+	
 	WordArray wordArrayResume;
 	String[] numArrayResume;
 	private int usrLangPrefResume;
@@ -101,7 +102,7 @@ public class MainActivity extends AppCompatActivity
 			//a state had been saved, load it. if state == 0, there is nothing to load.
 			state = (int) savedInstanceState.getSerializable("state");
 			if (state == 1) {
-				wordArrayResume = (WordArray) savedInstanceState.getSerializable("wordArrayMA");
+				wordArrayResume = (WordArray) savedInstanceState.getParcelable("wordArrayMA");
 				usrLangPrefResume = savedInstanceState.getInt("usrLangPrefMA");
 				usrSudokuArrResume = (SudokuGenerator) savedInstanceState.get("SudokuArrMA");
 				usrModePrefResume = (int) savedInstanceState.getSerializable("usrModeMA");
@@ -322,10 +323,7 @@ public class MainActivity extends AppCompatActivity
 
 		
 			/** START GAME BUTTON **/
-		
-		//initialize a word array to store puzzle words and preferences
-		RadioGroup radGroup = findViewById( R.id.btn_type );
-		wordArray = new WordArray( radGroup, MAX_CSV_ROW, HINT_CLICK_TO_MAX_PROB );
+			
 		
 		// used to switch to gameActivity
 		Button btnStart = (Button) findViewById( R.id.button_start );
@@ -336,7 +334,12 @@ public class MainActivity extends AppCompatActivity
 				{
 					RadioButton radBtnSelected = findViewById( pkgRadioGroup.getCheckedRadioButtonId() );
 					String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex( pkgRadioGroup.indexOfChild( radBtnSelected ) ).getInternalFileName( ); //get pkg internal file name to find csv
-					wordArray.findUserPuzzleTypePreference( ); //stores user puzzle preference inside wordArray
+					//wordArray.findUserPuzzleTypePreference( ); //stores user puzzle preference inside wordArray
+					
+					//initialize a word array to store puzzle words and preferences
+					RadioGroup radGroup = findViewById( R.id.btn_type );
+					usrPuzzleTypePref[0] = findUserPuzzleTypePreference( radGroup ); //stores user puzzle preference inside wordArray
+					wordArray = new WordArray( usrPuzzleTypePref[0], MAX_CSV_ROW, HINT_CLICK_TO_MAX_PROB );
 					
 					try {
 						//based on pkg, initialize the wordArray (select 'n' words)
@@ -563,7 +566,7 @@ public class MainActivity extends AppCompatActivity
 			//if all necessary game preferences are written in memory, then unblock resume button
 			if (resumeSrc.hasExtra("wordArrayGA") && resumeSrc.hasExtra("usrLangPrefGA") && resumeSrc.hasExtra("SudokuArrGA") && resumeSrc.hasExtra("usrModeGA") && resumeSrc.hasExtra("languageGA")) {
 				Log.i("TAG", "resumeSrc has all elements");
-				wordArrayResume = (WordArray) resumeSrc.getSerializableExtra("wordArrayGA");
+				wordArrayResume = (WordArray) resumeSrc.getParcelableExtra("wordArrayGA");
 				usrLangPrefResume = (int) resumeSrc.getSerializableExtra("usrLangPrefGA");
 				usrSudokuArrResume = (SudokuGenerator) resumeSrc.getSerializableExtra("SudokuArrGA");
 				usrModePrefResume = (int) resumeSrc.getSerializableExtra("usrModeGA");
@@ -586,7 +589,7 @@ public class MainActivity extends AppCompatActivity
 		super.onSaveInstanceState(savedInstanceState);
 		savedInstanceState.putInt("state", state);
 		if (state == 1) {
-			savedInstanceState.putSerializable("wordArrayMA", wordArrayResume);
+			savedInstanceState.putParcelable("wordArrayMA", wordArrayResume);
 			savedInstanceState.putInt("usrLangPrefMA", usrLangPrefResume);
 			savedInstanceState.putSerializable("SudokuArrMA", usrSudokuArrResume);
 			savedInstanceState.putInt("usrModeMA", usrModePrefResume);
@@ -598,7 +601,15 @@ public class MainActivity extends AppCompatActivity
 		}
 	}
 	
-	
+	private int findUserPuzzleTypePreference( RadioGroup radGroup )
+	{
+		//find which puzzle type the user selected
+		int usrPuzzleTypePref = -1;
+		int btnID = radGroup.getCheckedRadioButtonId( );
+		View radioBtn = radGroup.findViewById( btnID );
+		usrPuzzleTypePref = radGroup.indexOfChild( radioBtn );
+		return usrPuzzleTypePref - 1; //-1 because first index is TextView
+	}
 }
 
 
