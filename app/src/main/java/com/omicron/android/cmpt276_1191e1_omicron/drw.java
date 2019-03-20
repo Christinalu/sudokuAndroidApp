@@ -34,17 +34,22 @@ public class drw
 	private int[] zoomClickSafe;
 	private int[] zoomButtonDisableUpdate;
 	private int[] btnClicked;
-	private int bitmapSize;
-	private Word[] wordArray;
+	private int bitmapSizeWidth;
+	private int bitmapSizeHeight;
+	private WordArray wordArray;
 	private float ZOOM_SCALE;
-
+	private int WORD_COUNT; //stores the number of words in wordArray
+	private int COL_PER_BLOCK; //stores how many columns will be inside a block; in 9x9 this would be 3
+	private int ROW_PER_BLOCK;
+	private int VERTICAL_BLOCK; //stores how many (vertical) blocks are in a puzzle; in 9x9 this would be 3 blocks
+	private int HORIZONTAL_BLOCK;
 
 	public drw( Block[][] rectArr2, Paint paint2, Canvas canvas2,
 				RelativeLayout rectLayout2, RelativeLayout rectTextLayout2, TextMatrix textMatrix2, SudokuGenerator usrSudokuArr2,
 				int[] zoomOn2, int[] drag2, int[] dX2, int[] dY2,
 				int[] touchXZ2, int[] touchYZ2, int[] zoomButtonSafe2, int[] zoomClickSafe2,
-				int[] zoomButtonDisableUpdate2, int bitmapSize2, Word[] wordArray2, int[] btnClicked2,
-				float ZOOM_SCALE2 )
+				int[] zoomButtonDisableUpdate2, int bitmapSizeWidth2, int bitmapSizeHeight2, WordArray wordArray2, int[] btnClicked2,
+				float ZOOM_SCALE2, int COL_PER_BLOCK2, int ROW_PER_BLOCK2, int VERTICAL_BLOCK2, int HORIZONTAL_BLOCK2, int WORD_COUNT2 )
 	{
 		paint = paint2;
 		rectArr = rectArr2;
@@ -62,10 +67,16 @@ public class drw
 		zoomButtonSafe = zoomButtonSafe2;
 		zoomClickSafe = zoomClickSafe2;
 		zoomButtonDisableUpdate = zoomButtonDisableUpdate2;
-		bitmapSize = bitmapSize2;
+		bitmapSizeWidth = bitmapSizeWidth2;
+		bitmapSizeHeight = bitmapSizeHeight2;
 		wordArray = wordArray2;
 		btnClicked = btnClicked2;
 		ZOOM_SCALE = ZOOM_SCALE2;
+		COL_PER_BLOCK = COL_PER_BLOCK2;
+		ROW_PER_BLOCK = ROW_PER_BLOCK2;
+		VERTICAL_BLOCK = VERTICAL_BLOCK2;
+		HORIZONTAL_BLOCK = HORIZONTAL_BLOCK2;
+		WORD_COUNT = WORD_COUNT2;
 	}
 
 	public void reDraw( int[] touchX, int[] touchY, Pair lastRectColoured,
@@ -87,10 +98,10 @@ public class drw
 
 			if( zoomButtonSafe[0] == 0 && zoomButtonDisableUpdate[0] == 0 ) // do not update on button click (zoomSafe == 0 means only test after going out of "zoom" mode, that is, do not check the 'click coordinate' if it is in a square because those coordinates do not count as a click)
 			{																// when zoomButtonDisableUpdate[0] == 0, do not update currectRectColoured (when switching "zoom" modes)
-				// TEST IF USER TOUCH INSIDE A SQUARE
-				for (int i = 0; i < 9; i++)
+				// TEST IF USER-TOUCH INSIDE A SQUARE
+				for( int i=0; i<WORD_COUNT; i++ )
 				{
-					for (int j = 0; j < 9; j++)
+					for( int j=0; j<WORD_COUNT; j++ )
 					{
 						if( rectArr[i][j].getRect( ).contains( touchX[0], touchY[0] )  ) // find if sqr was clicked
 						{
@@ -125,9 +136,9 @@ public class drw
 
 
 			// REDRAW ALL SQUARES IN ZOOM MODE WITH CORRESPONDING SHADES
-			for (int i = 0; i < 9; i++)
+			for( int i=0; i<WORD_COUNT; i++ )
 			{
-				for (int j = 0; j < 9; j++)
+				for( int j=0; j<WORD_COUNT; j++ )
 				{
 					//set colours; must occur after figuring out is rect contained
 					if (rectArr[i][j].isSelected()) //if a selected rect
@@ -156,7 +167,7 @@ public class drw
 
 			rectLayout.invalidate( ); //required to update to print to screen
 		}
-		else if (zoomOn[0] == 1)
+		else if( zoomOn[0] == 1 )
 		{
 
 				/** DRAW ZOOM IN MODE **/
@@ -183,23 +194,23 @@ public class drw
 				canvas.translate(-touchXZ[0], -touchYZ[0]);
 			}
 
-			canvas.scale(ZOOM_SCALE, ZOOM_SCALE);
+			canvas.scale( ZOOM_SCALE, ZOOM_SCALE );
 
 
-			// LOOP TO FIND IF TOUCH IS INSIDE SQUARE
+				/* LOOP TO FIND IF TOUCH IS INSIDE SQUARE */
 			// note: this loop must be separate; cannot be combined with colour loop (see above for reason)
 
 			if( drag[0] == 0 && zoomButtonDisableUpdate[0] == 0 ) // do not update on button click (zoomSafe == 0 means only test after going in "zoom" mode, that is, do not check the 'click coordinate' until user touches screen again because those coordinates do not count as a click)
 			{
-				for (int i = 0; i < 9; i++)
+				for( int i=0; i<WORD_COUNT; i++ )
 				{
-					for (int j = 0; j < 9; j++)
+					for( int j=0; j<WORD_COUNT; j++ )
 					{
 						if (rectArr[i][j].getRect().contains(px, py) && zoomClickSafe[0] == 0) // find if sqr was clicked
 						{
 							// if in "zoom", check to see if clicking outside the zoomed map
 							// before when clicked in empty space on BOTTOM side, it highlighted square because click was valid within rectLayout
-							if( touchX[0] > bitmapSize || touchY[0] > bitmapSize )
+							if( touchX[0] > bitmapSizeWidth || touchY[0] > bitmapSizeHeight )
 							{
 								// NOTE: this works only for hardcoded bitmap size : should change this code when adapting bitmap to screen size
 								break; // do not count click (outside bound)
@@ -235,9 +246,9 @@ public class drw
 
 
 			// redraw all squares in zoom/scale mode with corresponding shade
-			for (int i = 0; i < 9; i++)
+			for( int i=0; i<WORD_COUNT; i++ )
 			{
-				for (int j = 0; j < 9; j++)
+				for( int j=0; j<WORD_COUNT; j++ )
 				{
 					//set colours; must occur after figuring out is rect contained
 					if (rectArr[i][j].isSelected()) //if a selected rect
@@ -257,8 +268,6 @@ public class drw
 
 
 			// DRAW TEXT OVERLAY + RESTORE
-
-
 			// update text of currently selected square on button click
 			if( currentRectColoured.getRow() != -1 && btnClicked[0] == 1 )
 			{

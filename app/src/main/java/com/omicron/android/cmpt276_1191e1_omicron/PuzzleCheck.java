@@ -11,6 +11,10 @@ public class PuzzleCheck {
 
     public PuzzleCheck(int[][] arr) {
         //void
+        
+        // TODO: move puzzle check in SudokuGenerator
+        
+        // TODO: configure puzzle check to check 4x4 6x6 12x12
     }
 
 	public void PuzzleCheckStart(int[][] arr) {

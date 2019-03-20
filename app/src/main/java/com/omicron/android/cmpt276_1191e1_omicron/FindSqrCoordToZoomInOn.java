@@ -6,10 +6,10 @@ import android.widget.TextView;
 public class FindSqrCoordToZoomInOn
 {
 	/*
-	 * This objects adjusts the coodinates of where to zoom in
+	 * This objects adjusts the coordinates of where to zoom in
 	 * Say a user is in "zoom out" mode, then clicks on a square,
 	 * then when user switched to "zoom in" mode, this will calculate
-	 * coordiantes to zoom in onto that selected square
+	 * coordinates to zoom in onto that selected square
 	 *
 	 * If no square selected, it will zoom in to center by default
 	 */
@@ -17,19 +17,24 @@ public class FindSqrCoordToZoomInOn
 	private int[] touchXZ;
 	private int[] touchYZ;
 	private Pair currentRectColoured;
-	private int bitmapSize;
-	private int sqrSize;
+	private int bitmapSizeWidth;
+	private int bitmapSizeHeight;
+	private int sqrSizeWidth;
+	private int sqrSizeHeight;
 	private TextMatrix textMatrix;
 	private float ZOOM_SCALE;
 
-	public FindSqrCoordToZoomInOn(int[] touchXZ2, int[] touchYZ2, Pair currentRectColoured2, int bitmapSize2,
-								  int sqrSize2, TextMatrix textMatrix2, float ZOOM_SCALE2 )
+	public FindSqrCoordToZoomInOn(int[] touchXZ2, int[] touchYZ2, Pair currentRectColoured2, int bitmapSizeWidth2,
+								  int bitmapSizeHeight2, int sqrSizeWidth2, int sqrSizeHeight2,
+								  TextMatrix textMatrix2, float ZOOM_SCALE2 )
 	{
 		touchXZ = touchXZ2;
 		touchYZ = touchYZ2;
 		currentRectColoured = currentRectColoured2;
-		bitmapSize = bitmapSize2;
-		sqrSize = sqrSize2;
+		bitmapSizeWidth = bitmapSizeWidth2;
+		bitmapSizeHeight = bitmapSizeHeight2;
+		sqrSizeWidth = sqrSizeWidth2;
+		sqrSizeHeight = sqrSizeHeight2;
 		textMatrix = textMatrix2;
 		ZOOM_SCALE = ZOOM_SCALE2;
 	}
@@ -52,35 +57,34 @@ public class FindSqrCoordToZoomInOn
 
 			//translate from corner of square to corner of zoom view area
 			//note: "zoom view area" is the square field of view, ie the only rectangular area that is visible in zoom mode out of whole puzzle
-			topX = topX - (int)((bitmapSize-sqrSize*ZOOM_SCALE)/2);
-			topY = topY - (int)((bitmapSize-sqrSize*ZOOM_SCALE)/2);
-
-
+			topX = topX - (int)( (bitmapSizeWidth-sqrSizeWidth*ZOOM_SCALE) / 2 );
+			topY = topY - (int)( (bitmapSizeHeight-sqrSizeHeight*ZOOM_SCALE) / 2 );
+			
 			// FIX OUT-OF-BOUNDS
 			//ie: if calculated coordinates of selected square is too close to top left corner, set view at (0,0)
-			if( topX < 0 ) //if too close to top
+			if( topX < 0 ) //if too close left
 			{
 				topX = 0;
 			}
-			else if( topX > bitmapSize*ZOOM_SCALE - bitmapSize ) //if too close to bottom
+			else if( topX > bitmapSizeWidth*ZOOM_SCALE - bitmapSizeWidth ) //if too close to right
 			{
-				topX = (int)(bitmapSize*ZOOM_SCALE - bitmapSize);
+				topX = (int)(bitmapSizeWidth*ZOOM_SCALE - bitmapSizeWidth);
 			}
 
-			if( topY < 0 ) //if too close to left
+			if( topY < 0 ) //if too close to top
 			{
 				topY = 0;
 			}
-			else if( topY > bitmapSize*ZOOM_SCALE - bitmapSize ) //if too close to right
+			else if( topY > bitmapSizeHeight*ZOOM_SCALE - bitmapSizeHeight ) //if too close to bottom
 			{
-				topY = (int)(bitmapSize*ZOOM_SCALE - bitmapSize);
+				topY = (int)(bitmapSizeHeight*ZOOM_SCALE - bitmapSizeHeight);
 			}
 		}
 		else
 		{
 			// default: translate to center of matrix
-			topX = (int)(bitmapSize*ZOOM_SCALE/2 - bitmapSize/2);
-			topY = (int)(bitmapSize*ZOOM_SCALE/2 - bitmapSize/2);
+			topX = (int)(bitmapSizeWidth*ZOOM_SCALE/2 - bitmapSizeWidth/2);
+			topY = (int)(bitmapSizeHeight*ZOOM_SCALE/2 - bitmapSizeHeight/2);
 		}
 
 		touchXZ[0] = topX;

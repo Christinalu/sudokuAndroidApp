@@ -41,11 +41,13 @@ public class MainActivity extends AppCompatActivity
 	private int usrModePref = 0; // 0=standard, 1=speech
 	private int usrLangPref = 0; // 0=eng_fr, 1=fr_eng; 0 == native(squares that cannot be modified); 1 == translation(the words that the user inserts)
 	private int usrDiffPref; //0=easy,1=medium,2=difficult
+	private int usrPuzzleType; //determines if it is a 4x4, 6x6, 9x9 or 12x12 sudoku puzzle
 	private int state = 0; //0=new start, 1=resume
 	private String language;
 	private boolean canStart = true;
-
-	Word[] wordArrayResume;
+	private int[] usrPuzzleTypePref = { -1 };
+	
+	WordArray wordArrayResume;
 	String[] numArrayResume;
 	private int usrLangPrefResume;
 	private SudokuGenerator usrSudokuArrResume;
@@ -64,21 +66,16 @@ public class MainActivity extends AppCompatActivity
 	private WordPackageFileIndex wordPackageFileIndexArr; //stores word packages name and internal file name
 	private String wordPackageName; //stores name of all Word Packages the user has so far
 	private int MAX_WORD_PKG = 50; //max word packages user is allowed to import
-	private int MAX_CSV_ROW = 150; //allow up to 150 pairs per package;IMPORTANT: because of Select9Word select(), too many words may cause an error
+	private int MAX_CSV_ROW = 150; //allow up to 150 pairs per package; IMPORTANT: because of WordArray.selectWord(), too many words may cause an error
+	private int MIN_CSV_ROW = 12; //minimum number of words required in file
 	private int CURRENT_WORD_PKG_COUNT = 0; //stores current number of packages the user has uploaded
 	private int HINT_CLICK_TO_MAX_PROB = 15; //defines how many HintClicks are required for a word to reach MAX_WORD_UNIT_LIMIT
 	private FileCSV fileCSV; //object containing CSV functions
 	private int[] indexOfRadBtnToRemove = { -1 }; //which radio btn to remove
 	private boolean[] removeBtnEnable = { true }; //when false, do not allow "REMOVE PKG" button (required because GameActivity may be using that file to save "Hint Click")
 	
-	
-	// SET UP ARRAY TO STORE WORDS
-	// a Word (pair) contains the word in native language, and its translation
-	// note: this array will remain of size 9, and only changed when modes are switched
-	//       this is required in DictionaryActivity.java
-	//		 the 9th index contains the corresponding language
-	//		 the 10th index contains the internal storage file name
-	private Word[] wordArray =new Word[]
+	private WordArray wordArray;
+	/*private Word[] wordArray =new Word[]
 			{
 					new Word( "Un", "Un", 1, 1 ),
 					new Word( "Two", "Deux", 2, 1 ),
@@ -91,7 +88,9 @@ public class MainActivity extends AppCompatActivity
 					new Word( "Nine", "Neuf", 9, 1 ),
 					new Word( "en-US", "fr-FR", -1, -1 ), //lang
 					new Word( "pkg_n.csv", "", -1, -1 ) //pkg name
-			};
+			};*/
+	
+	// TODO: fix buttons in landscape mode
 	
 	@Override
 	protected void onCreate( Bundle savedInstanceState )
@@ -103,7 +102,7 @@ public class MainActivity extends AppCompatActivity
 			//a state had been saved, load it. if state == 0, there is nothing to load.
 			state = (int) savedInstanceState.getSerializable("state");
 			if (state == 1) {
-				wordArrayResume = (Word[]) savedInstanceState.getSerializable("wordArrayMA");
+				wordArrayResume = (WordArray) savedInstanceState.getParcelable("wordArrayMA");
 				usrLangPrefResume = savedInstanceState.getInt("usrLangPrefMA");
 				usrSudokuArrResume = (SudokuGenerator) savedInstanceState.get("SudokuArrMA");
 				usrModePrefResume = (int) savedInstanceState.getSerializable("usrModeMA");
@@ -114,7 +113,7 @@ public class MainActivity extends AppCompatActivity
 			}
 		}
 		
-		fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW );
+		fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
 		
 			/* TEST IF USER JUST INSTALLED APP - IF USER HAS, LOAD DEFAULT FILES */
 		int usrNewInstall = fileCSV.checkIfCurrentWordPkgCountFileExists( this ); //0==files already exist
@@ -192,6 +191,7 @@ public class MainActivity extends AppCompatActivity
 										Intent uploadActivityIntent = new Intent( MainActivity.this, UploadActivity.class );
 										uploadActivityIntent.putExtra( "MAX_WORD_PKG", MAX_WORD_PKG );
 										uploadActivityIntent.putExtra( "MAX_CSV_ROW", MAX_CSV_ROW );
+										uploadActivityIntent.putExtra( "MIN_CSV_ROW", MIN_CSV_ROW );
 										
 										startActivity( uploadActivityIntent );
 									}
@@ -323,6 +323,7 @@ public class MainActivity extends AppCompatActivity
 
 		
 			/** START GAME BUTTON **/
+			
 		
 		// used to switch to gameActivity
 		Button btnStart = (Button) findViewById( R.id.button_start );
@@ -331,18 +332,23 @@ public class MainActivity extends AppCompatActivity
 				@Override
 				public void onClick( View v )
 				{
-					
 					RadioButton radBtnSelected = findViewById( pkgRadioGroup.getCheckedRadioButtonId() );
-					String pkgNameSelected = radBtnSelected.getText().toString( ); //get pkg name inside
 					String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex( pkgRadioGroup.indexOfChild( radBtnSelected ) ).getInternalFileName( ); //get pkg internal file name to find csv
+					//wordArray.findUserPuzzleTypePreference( ); //stores user puzzle preference inside wordArray
+					
+					//initialize a word array to store puzzle words and preferences
+					RadioGroup radGroup = findViewById( R.id.btn_type );
+					usrPuzzleTypePref[0] = findUserPuzzleTypePreference( radGroup ); //stores user puzzle preference inside wordArray
+					wordArray = new WordArray( usrPuzzleTypePref[0], MAX_CSV_ROW, HINT_CLICK_TO_MAX_PROB );
 					
 					try {
-						int res = initializeWordArray( fileNameSelected ); //based on pkg, initialize the array (select 9 words)
+						//based on pkg, initialize the wordArray (select 'n' words)
+						int res = wordArray.initializeWordArray( MainActivity.this, fileNameSelected );
 						if( res == 1 ){
 							Log.d( "upload", "ERROR: initializeWordArray( ) returned an error" );
 							Toast.makeText(MainActivity.this, "Something went wrong. Could not start Game", Toast.LENGTH_SHORT).show();
-							return;
-						} //error: could not initialize wordArray
+							return; //error: could not initialize wordArray
+						}
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -352,11 +358,11 @@ public class MainActivity extends AppCompatActivity
 					//check to see for language format is correct and available
 					if (usrModePref == 1) {
 						if (usrLangPref == 0) {
-							language = wordArray[9].getTranslation();
+							language = wordArray.getTranslationLang();
 							Log.e("lTTSs", "language is: "+language);
 						}
 						else {
-							language = wordArray[9].getNative();
+							language = wordArray.getNativeLang();
 							Log.e("lTTSs", "language is: "+language);
 						}
 						canStart = false;
@@ -413,9 +419,6 @@ public class MainActivity extends AppCompatActivity
 											removeBtnEnable[0] = true;
 											Button btnResume = findViewById( R.id.button_resume );
 											btnResume.setEnabled( false );
-											//remove all content from wordArray
-											for( int i=0; i<wordArray.length; i++ )
-											{ wordArray[0] = null; }
 										}
 									}
 		);
@@ -482,7 +485,7 @@ public class MainActivity extends AppCompatActivity
 		
 			/** WHEN USER RETURNING FROM UPLOAD ACTIVITY, UPDATE WORD PKG LIST **/
 			
-		FileCSV fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW );
+		FileCSV fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
 		int CURRENT_WORD_PKG_COUNT_RETURN = CURRENT_WORD_PKG_COUNT;
 		try {
 			CURRENT_WORD_PKG_COUNT_RETURN = fileCSV.findCurrentPackageCount( this ); //get current Packages count so far
@@ -563,7 +566,7 @@ public class MainActivity extends AppCompatActivity
 			//if all necessary game preferences are written in memory, then unblock resume button
 			if (resumeSrc.hasExtra("wordArrayGA") && resumeSrc.hasExtra("usrLangPrefGA") && resumeSrc.hasExtra("SudokuArrGA") && resumeSrc.hasExtra("usrModeGA") && resumeSrc.hasExtra("languageGA")) {
 				Log.i("TAG", "resumeSrc has all elements");
-				wordArrayResume = (Word[]) resumeSrc.getSerializableExtra("wordArrayGA");
+				wordArrayResume = (WordArray) resumeSrc.getParcelableExtra("wordArrayGA");
 				usrLangPrefResume = (int) resumeSrc.getSerializableExtra("usrLangPrefGA");
 				usrSudokuArrResume = (SudokuGenerator) resumeSrc.getSerializableExtra("SudokuArrGA");
 				usrModePrefResume = (int) resumeSrc.getSerializableExtra("usrModeGA");
@@ -586,7 +589,7 @@ public class MainActivity extends AppCompatActivity
 		super.onSaveInstanceState(savedInstanceState);
 		savedInstanceState.putInt("state", state);
 		if (state == 1) {
-			savedInstanceState.putSerializable("wordArrayMA", wordArrayResume);
+			savedInstanceState.putParcelable("wordArrayMA", wordArrayResume);
 			savedInstanceState.putInt("usrLangPrefMA", usrLangPrefResume);
 			savedInstanceState.putSerializable("SudokuArrMA", usrSudokuArrResume);
 			savedInstanceState.putInt("usrModeMA", usrModePrefResume);
@@ -598,39 +601,14 @@ public class MainActivity extends AppCompatActivity
 		}
 	}
 	
-	
-	private int initializeWordArray( String fileNameSelected ) throws IOException //
+	private int findUserPuzzleTypePreference( RadioGroup radGroup )
 	{
-		/*
-		 * This function initializes the  word array to 9 words based on pkg selected for user for GameActivity
-		 * Returns 1 if could not generate an array
-		 */
-		
-		/* OPEN PKG FILE TO READ */
-		
-		FileInputStream fileInStream = null; //open file from internal storage
-		try {
-			fileInStream = this.openFileInput( fileNameSelected ); //get internal file name, contained in 10th index of wordArray
-		} catch (FileNotFoundException e) {
-			Log.d( "upload", "ERROR: exception int initializeWordArr( )" );
-			e.printStackTrace();
-		}
-		InputStreamReader inStreamRead = new InputStreamReader( fileInStream );
-		BufferedReader buffRead = new BufferedReader( inStreamRead );
-		
-		Select9Word select9Word = new Select9Word( MAX_CSV_ROW );
-		
-		//call function to modify wordArray[]
-		int res = select9Word.select( wordArray, fileNameSelected, buffRead, HINT_CLICK_TO_MAX_PROB );
-		
-		//// debug ////////
-		for( int i=0; i<9; i++ )
-		{
-			Log.d( "selectW", "wordArr[] " + i + " file line: " + wordArray[i].getInFileLineNum() );
-		}
-		///////////////////
-		
-		return res;
+		//find which puzzle type the user selected
+		int usrPuzzleTypePref = -1;
+		int btnID = radGroup.getCheckedRadioButtonId( );
+		View radioBtn = radGroup.findViewById( btnID );
+		usrPuzzleTypePref = radGroup.indexOfChild( radioBtn );
+		return usrPuzzleTypePref - 1; //-1 because first index is TextView
 	}
 }
 

@@ -1,11 +1,13 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
+
+
 import java.io.Serializable;
 
 public class Word implements Serializable
 {
 	/*
 	 * This Object holds a word in native language and its translation
-	*/
+	 */
 	
 	private String mNative;
 	private String mTranslation;
@@ -13,8 +15,8 @@ public class Word implements Serializable
 	private long mHintClick; //stores the number of times the user had difficulty with a word
 	private boolean alreadyUsedInGame; //stores if the word was already used in game once
 	private boolean allowToDecreaseDifficulty = false; //when true, can decrease difficulty of word; default must be false so difficulty decreased only when word inserted correctly
-
-	//create a word
+	
+	
 	public Word( String wordNative, String wordTranslation, int inFileLineNum, long hintClick )
 	{
 		mNative = wordNative;
@@ -23,25 +25,25 @@ public class Word implements Serializable
 		mHintClick = hintClick;
 		alreadyUsedInGame = false;
 	}
-
+	
 	//get native word
 	public String getNative(  ){ return mNative; }
-
+	
 	//get translation word
 	public String getTranslation(  ){ return mTranslation; }
-
+	
 	//set native word
 	public void setNative(String s) {
 		mNative = s;
 		return;
 	}
+	
 	//set translation word
 	public void setTranslation(String s) {
 		mTranslation = s;
 		return;
 	}
-
-
+	
 	public int getInFileLineNum(  ){ return mInFileLineNum; }
 	
 	public void updateHintClick( int newHintClick ){ mHintClick = newHintClick; }
@@ -62,6 +64,5 @@ public class Word implements Serializable
 	
 	public void setDoNotAllowToDecreaseDifficulty( )
 	{ allowToDecreaseDifficulty = false; }
-	
 	
 }
