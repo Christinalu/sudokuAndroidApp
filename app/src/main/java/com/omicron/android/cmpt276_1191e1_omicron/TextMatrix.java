@@ -13,7 +13,18 @@ public class TextMatrix
 {
 	private float TXT_SIZE_NORMAL;
 	private float TXT_SIZE_ZOOM;
-	private float ZOOM_SCALE;
+	
+	private float TXT_SIZE_RATIO_4x4 = 0.2f; //ratio to determine size of text inside square
+	private float TXT_SIZE_RATIO_6x6 = 0.25f;
+	private float TXT_SIZE_RATIO_9x9 = 0.3846f;
+	private float TXT_SIZE_RATIO_12x12 = 0.3846f;
+	
+	private float ZOOM_SCALE; //puzzle zoom
+	private float ZOOM_SCALE_TXT; //text zoom
+	private float ZOOM_SCALE_RATIO_4x4;
+	private float ZOOM_SCALE_RATIO_6x6;
+	private float ZOOM_SCALE_RATIO_9x9;
+	private float ZOOM_SCALE_RATIO_12x12;
 
 	private RelativeAndPos[][] textViewArr; //holds all text views
 	private Context gameActivity;
@@ -27,7 +38,7 @@ public class TextMatrix
 		/*
 		 * NOTE: individual LinearLayout are required for each TextView to fix issue where
 		 *       changing single setText() resulted in resetting animation for all TextView
-		 *       (because when calling setText() it re-wraps all texts in single Layout, so hat to create multiple Layouts)
+		 *       (because when calling setText() it re-wraps all texts in single Layout, so have to create multiple Layouts)
 		 */
 		
 		puzzleTypeSize = puzzleTypeSize2;
@@ -49,11 +60,27 @@ public class TextMatrix
 		
 		Log.d( "screen", "sqrSizeWidth: " + sqrSizeWidth + " sqrSizeHeight: " +sqrSizeHeight );
 		
-		//adapt text size depending on screen (square) size
-		//TXT_SIZE_NORMAL = sqrSize / 4f; // 7 is arbitrary scaling factors
-		//TXT_SIZE_NORMAL = sqrSize * 0.142857f;
-		TXT_SIZE_NORMAL = sqrSizeHeight * 0.3846f;
-		TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * ( ZOOM_SCALE * 1.0f ); //0.8 means as screen gets bigger so will the text but at a slower rate
+		// NOTE: ZOOM_SCALE should be >=1
+		if( puzzleTypeSize == 4 ){ // if 4x4 puzzle type
+			TXT_SIZE_NORMAL = sqrSizeHeight * TXT_SIZE_RATIO_4x4;
+			ZOOM_SCALE_TXT = (ZOOM_SCALE - 1f)/2f + 1; //when zooming in, increase text font size but at a slower rate than square size, so in zoom mode, it will fit more of a word
+			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
+		}
+		else if( puzzleTypeSize == 6 ){
+			TXT_SIZE_NORMAL = sqrSizeHeight * TXT_SIZE_RATIO_6x6;
+			ZOOM_SCALE_TXT = (ZOOM_SCALE - 1f)/2f + 1;
+			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
+		}
+		else if( puzzleTypeSize == 12 ){
+			TXT_SIZE_NORMAL = sqrSizeHeight * TXT_SIZE_RATIO_12x12;
+			ZOOM_SCALE_TXT = (ZOOM_SCALE - 1f)/2f + 1;
+			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
+		}
+		else {
+			TXT_SIZE_NORMAL = sqrSizeHeight * TXT_SIZE_RATIO_9x9;
+			ZOOM_SCALE_TXT = (ZOOM_SCALE - 1f)/2f + 1;
+			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
+		}
 	}
 
 
