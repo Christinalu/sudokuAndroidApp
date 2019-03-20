@@ -106,10 +106,21 @@ public class GameActivity extends AppCompatActivity
 	private int[] touchYZclick = { 0 };
 	private int[] drag = { 0 }; // 1==user drags on screen
 
-	private final static int SQR_INNER_DIVIDER = 5;
-	private final static int SQR_OUTER_DIVIDER = 15;
-	private final static int BOUNDARY_OFFSET = 40; //puzzle will have some offset for aesthetic reasons near edges
-	private final static float ZOOM_SCALE = 1.5f; // zoom factor of how much to zoom in puzzle in "zoom" mode
+	private static int SQR_INNER_DIVIDER = 5; //space inside block between squares
+	private static int SQR_OUTER_DIVIDER = 15; //space between blocks
+	
+	private static float SQR_OUTER_DIVIDER_RATIO_4x4 = 0.025f; //ratio do determine space depending on screen size and puzzle type
+	private static float SQR_INNER_DIVIDER_RATIO_4x4 = 0.010f;
+	private static float SQR_OUTER_DIVIDER_RATIO_6x6 = 0.014f;
+	private static float SQR_INNER_DIVIDER_RATIO_6x6 = 0.008f;
+	private static float SQR_OUTER_DIVIDER_RATIO_9x9 = 0.014f;
+	private static float SQR_INNER_DIVIDER_RATIO_9x9 = 0.005f;
+	private static float SQR_OUTER_DIVIDER_RATIO_12x12 = 0.011f;
+	private static float SQR_INNER_DIVIDER_RATIO_12x12 = 0.005f;
+	
+	private static int BOUNDARY_OFFSET = 40; //puzzle will have some offset for aesthetic reasons near edges
+	private static float BOUNDARY_OFFSET_SCALE = 0.035f;
+	private static float ZOOM_SCALE = 1.5f; // zoom factor of how much to zoom in puzzle in "zoom" mode
 	private int PUZZLE_FULL_SIZE_WIDTH; // size of full puzzle from left most column pixel to right most column pixel
 	private long STATISTIC_MULTIPLE = 2; //used to multiply by factor the number of "Hint Clicks" a user used, to more likely show these words
 	
@@ -127,7 +138,7 @@ public class GameActivity extends AppCompatActivity
 	private int sqrSizeHeight;
 	
 	private int HINT_CLICK_TO_MAX_PROB;
-	private static final float LANDSCAPE_RATIO = 0.75f; //determines how much of the screen will be dedicated to puzzle in landscape
+	private static final float LANDSCAPE_RATIO = 0.7f; //determines how much of the screen will be dedicated to puzzle in landscape
 	private int WORD_COUNT; //stores the number of words in wordArray
 	private int COL_PER_BLOCK; //stores how many columns will be inside a block; in 9x9 this would be 3
 	private int ROW_PER_BLOCK;
@@ -278,7 +289,7 @@ public class GameActivity extends AppCompatActivity
 		//this is needed as offset in landscape mode to alight rect matrix with textOverlay
 		int barH = getStatusBarHeight();
 		
-		// SET PUZZLE ROW AND COL NUMBER PER BLOCK
+			/* SET PUZZLE ROW AND COL NUMBER PER BLOCK AND DIVIDER SIZE */
 		WORD_COUNT = wordArray.getWordCount( );
 		usrPuzzleTypePref = wordArray.getUsrPuzzleTypePref( );
 		
@@ -287,24 +298,38 @@ public class GameActivity extends AppCompatActivity
 			ROW_PER_BLOCK = 2;
 			VERTICAL_BLOCK = 2;
 			HORIZONTAL_BLOCK = 2;
+			ZOOM_SCALE = 1.2f; //zoom in less
+			BOUNDARY_OFFSET = (int)( bitmapSizeHeight * BOUNDARY_OFFSET_SCALE );
+			SQR_INNER_DIVIDER = (int)( bitmapSizeHeight * SQR_INNER_DIVIDER_RATIO_4x4 );
+			SQR_OUTER_DIVIDER = (int)( bitmapSizeHeight * SQR_OUTER_DIVIDER_RATIO_4x4 );
 		}
 		else if( usrPuzzleTypePref == wordArray.getSize6x6() ){
 			COL_PER_BLOCK = 3;
 			ROW_PER_BLOCK = 2;
 			VERTICAL_BLOCK = 2;
-			HORIZONTAL_BLOCK = 3;
+			HORIZONTAL_BLOCK = 3;BOUNDARY_OFFSET = (int)( bitmapSizeHeight * BOUNDARY_OFFSET_SCALE );
+			SQR_INNER_DIVIDER = (int)( bitmapSizeHeight * SQR_INNER_DIVIDER_RATIO_6x6 );
+			SQR_OUTER_DIVIDER = (int)( bitmapSizeHeight * SQR_OUTER_DIVIDER_RATIO_6x6 );
+			
 		}
 		else if( usrPuzzleTypePref == wordArray.getSize12x12() ){
 			COL_PER_BLOCK = 4;
 			ROW_PER_BLOCK = 3;
 			VERTICAL_BLOCK = 3;
 			HORIZONTAL_BLOCK = 4;
+			ZOOM_SCALE = ZOOM_SCALE + 0.5f; //in 12x12, zoom in more because too small to see
+			HORIZONTAL_BLOCK = 3;BOUNDARY_OFFSET = (int)( bitmapSizeHeight * BOUNDARY_OFFSET_SCALE );
+			SQR_INNER_DIVIDER = (int)( bitmapSizeHeight * SQR_INNER_DIVIDER_RATIO_12x12 );
+			SQR_OUTER_DIVIDER = (int)( bitmapSizeHeight * SQR_OUTER_DIVIDER_RATIO_12x12 );
 		}
 		else{
 			COL_PER_BLOCK = 3;
 			ROW_PER_BLOCK = 3;
 			VERTICAL_BLOCK = 3;
 			HORIZONTAL_BLOCK = 3;
+			BOUNDARY_OFFSET = (int)( bitmapSizeHeight * BOUNDARY_OFFSET_SCALE );
+			SQR_INNER_DIVIDER = (int)( bitmapSizeHeight * SQR_INNER_DIVIDER_RATIO_9x9 );
+			SQR_OUTER_DIVIDER = (int)( bitmapSizeHeight * SQR_OUTER_DIVIDER_RATIO_9x9 );
 		}
 
 		// center bitmap based on orientation
