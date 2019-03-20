@@ -66,9 +66,9 @@ public class SudokuGenerator implements Serializable {
         
         // TODO: remove the following once implementation complete
 	
-		copyarr( testSeed9x9, PuzzleOriginal );
-		copyarr( testSeed9x9, Puzzle );
-		copyarr( testSeed9x9Solution, PuzzleSol );
+		copyarr( PuzzSeedEasy, PuzzleOriginal );
+		copyarr( PuzzSeedEasy, Puzzle );
+		copyarr( PuzzSeedEasySol, PuzzleSol );
     
         // TODO: enable scramble() and copyarr()
         
