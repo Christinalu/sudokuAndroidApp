@@ -6,7 +6,7 @@ import java.io.Serializable;
 public class Word implements Serializable
 {
 	/*
-	 * This Object holds a word in native language and its translation
+	 * This Object holds a word in native language and its translation and its properties
 	 */
 	
 	private String mNative;

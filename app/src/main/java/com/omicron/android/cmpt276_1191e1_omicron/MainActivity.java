@@ -41,11 +41,11 @@ public class MainActivity extends AppCompatActivity
 	private int usrModePref = 0; // 0=standard, 1=speech
 	private int usrLangPref = 0; // 0=eng_fr, 1=fr_eng; 0 == native(squares that cannot be modified); 1 == translation(the words that the user inserts)
 	private int usrDiffPref; //0=easy,1=medium,2=difficult
-	private int usrPuzzleType; //determines if it is a 4x4, 6x6, 9x9 or 12x12 sudoku puzzle
 	private int state = 0; //0=new start, 1=resume
 	private String language;
 	private boolean canStart = true;
-	private int[] usrPuzzleTypePref = { -1 };
+	private int[] usrPuzzleTypePref = { -1 }; //determines if it is a 4x4, 6x6, 9x9 or 12x12 sudoku puzzle
+	private RadioGroup pkgRadioGroup;
 	
 	WordArray wordArrayResume;
 	String[] numArrayResume;
@@ -61,10 +61,8 @@ public class MainActivity extends AppCompatActivity
 	private List<String> lTTScountry = new ArrayList<String>();
 	private List<String> lTTSlangTags = new ArrayList<String>();
 	private List<Locale> localeList = new ArrayList<Locale>();
-	Locale usrlangchoice;
 
 	private WordPackageFileIndex wordPackageFileIndexArr; //stores word packages name and internal file name
-	private String wordPackageName; //stores name of all Word Packages the user has so far
 	private int MAX_WORD_PKG = 50; //max word packages user is allowed to import
 	private int MAX_CSV_ROW = 150; //allow up to 150 pairs per package; IMPORTANT: because of WordArray.selectWord(), too many words may cause an error
 	private int MIN_CSV_ROW = 12; //minimum number of words required in file
@@ -90,7 +88,12 @@ public class MainActivity extends AppCompatActivity
 					new Word( "pkg_n.csv", "", -1, -1 ) //pkg name
 			};*/
 	
+	
+	
 	// TODO: fix buttons in landscape mode
+	
+	// TODO: separate all of Intent activity.putExtra( ) outside of MainActivity in different functions
+	
 	
 	@Override
 	protected void onCreate( Bundle savedInstanceState )
@@ -115,58 +118,15 @@ public class MainActivity extends AppCompatActivity
 		
 		fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
 		
-			/* TEST IF USER JUST INSTALLED APP - IF USER HAS, LOAD DEFAULT FILES */
-		int usrNewInstall = fileCSV.checkIfCurrentWordPkgCountFileExists( this ); //0==files already exist
+		pkgRadioGroup = findViewById( R.id.pkg_radio_group ); //stores all the radio buttons with file names
 		
-		if( usrNewInstall == 0 ) //if app was already installed and has correct files - get current_word_pkg_count
-			try {
-				CURRENT_WORD_PKG_COUNT = fileCSV.findCurrentPackageCount( this ); //get current Packages count so far
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		else //fresh app install
-		{
-			try
-			{
-				fileCSV.importDefaultPkg( this ); //load default Word Package
-				CURRENT_WORD_PKG_COUNT = fileCSV.findCurrentPackageCount( this ); //get current Packages count so far
-			} catch( IOException e ) {
-				e.printStackTrace( );
-			}
-		}
+		int res = checkIfJustInstalledAndSetUpPackagesAlreadyInstalled( );
+		
+		if( res != 0 ) //some exception occurred
+		{ return; }
 		
 		
-		// read all packages the user has uploaded so far, and get an array with name and file
-		try {
-			wordPackageFileIndexArr = new WordPackageFileIndex( this, MAX_WORD_PKG, CURRENT_WORD_PKG_COUNT ); //allow a maximum of X packages
-		} catch( IOException e ){
-			e.printStackTrace( );
-		}
-		
-		
-		// UPDATE THE WORD PKG SCROLL //
-		
-		RadioButton radBtn;
-		final RadioGroup pkgRadioGroup = findViewById( R.id.pkg_radio_group );
-		
-		for( int i=0; i<CURRENT_WORD_PKG_COUNT; i++ )
-		{
-			radBtn = new RadioButton( this );
-				
-			radBtn.setText( wordPackageFileIndexArr.getPackageFileAtIndex( i ).getWordPackageName( ) );
-				
-			pkgRadioGroup.addView(radBtn);
-				
-			if (i == 0) //automatically select first button
-			{
-				( (RadioButton) (pkgRadioGroup.getChildAt(0)) ).setChecked( true );
-				
-			}
-		}
-		
-		
-		
-			// SET LISTENERS TO WHICH PKG IS SELECTED //
+		// SET LISTENERS TO WHICH PKG IS SELECTED //
 		
 		pkgRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
 			@Override
@@ -323,7 +283,6 @@ public class MainActivity extends AppCompatActivity
 
 		
 			/** START GAME BUTTON **/
-			
 		
 		// used to switch to gameActivity
 		Button btnStart = (Button) findViewById( R.id.button_start );
@@ -334,7 +293,6 @@ public class MainActivity extends AppCompatActivity
 				{
 					RadioButton radBtnSelected = findViewById( pkgRadioGroup.getCheckedRadioButtonId() );
 					String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex( pkgRadioGroup.indexOfChild( radBtnSelected ) ).getInternalFileName( ); //get pkg internal file name to find csv
-					//wordArray.findUserPuzzleTypePreference( ); //stores user puzzle preference inside wordArray
 					
 					//initialize a word array to store puzzle words and preferences
 					RadioGroup radGroup = findViewById( R.id.btn_type );
@@ -433,22 +391,7 @@ public class MainActivity extends AppCompatActivity
 		else {
 			removeBtnEnable[0] = false;
 		}
-
-		/*
 		
-		//check if a previous game existed. If it did, unblock resume button
-		final Intent resumeSrc = getIntent( );
-		if (resumeSrc != null) {
-			//if all necessary game preferences are written in memory, then unblock resume button
-			if (resumeSrc.hasExtra("wordArrayGA") && resumeSrc.hasExtra("usrLangPrefGA") && resumeSrc.hasExtra("SudokuArrGA") && resumeSrc.hasExtra("state")) {
-				btnResume.setEnabled(true);
-				
-				//DISABLE "REMOVE PKG" button when game is started
-				removeBtnEnable[0] = false;
-				
-			}
-		}
-		*/
 		
 		//if resume button is unblocked and pressed, it will load previous game preferences
 		btnResume.setOnClickListener(new View.OnClickListener() {
@@ -486,7 +429,7 @@ public class MainActivity extends AppCompatActivity
 			/** WHEN USER RETURNING FROM UPLOAD ACTIVITY, UPDATE WORD PKG LIST **/
 			
 		FileCSV fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
-		int CURRENT_WORD_PKG_COUNT_RETURN = CURRENT_WORD_PKG_COUNT;
+		int CURRENT_WORD_PKG_COUNT_RETURN;
 		try {
 			CURRENT_WORD_PKG_COUNT_RETURN = fileCSV.findCurrentPackageCount( this ); //get current Packages count so far
 		} catch (IOException e) {
@@ -512,49 +455,10 @@ public class MainActivity extends AppCompatActivity
 			e.printStackTrace( );
 		}
 		
-		RadioGroup pkgRadioGroup = findViewById(R.id.pkg_radio_group);
-		RadioButton radBtn;
+		pkgRadioGroup = findViewById(R.id.pkg_radio_group);
 		
-		if( CURRENT_WORD_PKG_COUNT_RETURN > CURRENT_WORD_PKG_COUNT ) //usr uploaded a pkg
-		{
-				/* USER UPLOADED A PKG */
-			
-			CURRENT_WORD_PKG_COUNT = CURRENT_WORD_PKG_COUNT_RETURN; //update pkg count because it increased
-			Log.d("upload", "USER UPLOADED A PKG");
-			//find how many pkg are available and if user user
-			for( int i=pkgRadioGroup.getChildCount(); i<CURRENT_WORD_PKG_COUNT; i++ )
-			{
-				radBtn = new RadioButton(this);
-				
-				//radBtn.setText( allPkgName[i] );
-				radBtn.setText(wordPackageFileIndexArr.getPackageFileAtIndex(i).getWordPackageName());
-				
-				pkgRadioGroup.addView(radBtn);
-				
-			}
-		}
-		else if( CURRENT_WORD_PKG_COUNT_RETURN < CURRENT_WORD_PKG_COUNT )
-		{
-				/* USER DELETED A PKG */
-			
-			Log.d("upload", "USER DELETED A PKG");
-			CURRENT_WORD_PKG_COUNT = CURRENT_WORD_PKG_COUNT_RETURN; //update pkg count because it decreased
-			
-			
-			// IMPORTANT: the following procedure limits to deleting only 1 file at a time
-			//			  to delete multiple files at one, have to delete and re-create all radio buttons in RadioGroup
-			
-			pkgRadioGroup.removeViewAt( indexOfRadBtnToRemove[0] );
-			
-			//reselect top radio btn
-			( (RadioButton) pkgRadioGroup.getChildAt(0)).setChecked( true );
-			
-			
-		}
-		else
-		{
-			Log.d("upload", "USER DID NOT MODIFY A PKG");
-		}
+		//update scroll pkg view
+		updatePkgViewAfterUploadOrRemoval( CURRENT_WORD_PKG_COUNT_RETURN );
 		
 		Log.d( "upload", "onStart() called from MainActivity" );
 	}
@@ -610,37 +514,114 @@ public class MainActivity extends AppCompatActivity
 		usrPuzzleTypePref = radGroup.indexOfChild( radioBtn );
 		return usrPuzzleTypePref - 1; //-1 because first index is TextView
 	}
+	
+	
+	private int checkIfJustInstalledAndSetUpPackagesAlreadyInstalled( )
+	{
+		//return 0 on success
+		
+			/* TEST IF USER JUST INSTALLED APP - IF USER HAS, LOAD DEFAULT FILES */
+			/* ELSE, SET UP wordPackageFileIndexArr to store all packages so far, and create Package Scroll */
+		
+		int usrNewInstall = fileCSV.checkIfCurrentWordPkgCountFileExists( this ); //0==files already exist
+		
+		if( usrNewInstall == 0 ) //if app was already installed and has correct files - get current_word_pkg_count
+			try {
+				CURRENT_WORD_PKG_COUNT = fileCSV.findCurrentPackageCount( this ); //get current Packages count so far
+			} catch (IOException e) {
+				e.printStackTrace();
+				return 1;
+			}
+		else //fresh app install
+		{
+			try
+			{
+				fileCSV.importDefaultPkg( this ); //load default Word Package
+				CURRENT_WORD_PKG_COUNT = fileCSV.findCurrentPackageCount( this ); //get current Packages count so far
+			} catch( IOException e ) {
+				e.printStackTrace( );
+				return 1;
+			}
+		}
+		
+		// read all packages the user has uploaded so far, and get an array with name and file
+		try {
+			wordPackageFileIndexArr = new WordPackageFileIndex( this, MAX_WORD_PKG, CURRENT_WORD_PKG_COUNT ); //allow a maximum of X packages
+		} catch( IOException e ){
+			e.printStackTrace( );
+			return 1;
+		}
+		
+			/* UPDATE THE WORD PKG SCROLL */
+		
+		RadioButton radBtn;
+		
+		for( int i=0; i<CURRENT_WORD_PKG_COUNT; i++ )
+		{
+			radBtn = new RadioButton( this );
+			
+			radBtn.setText( wordPackageFileIndexArr.getPackageFileAtIndex( i ).getWordPackageName( ) );
+			
+			pkgRadioGroup.addView(radBtn);
+		}
+		
+		//automatically select first button
+		( (RadioButton) (pkgRadioGroup.getChildAt(0)) ).setChecked( true );
+		
+		return 0;
+	}
+	
+	
+	private void updatePkgViewAfterUploadOrRemoval( int CURRENT_WORD_PKG_COUNT_RETURN )
+	{
+		/*
+		 * After user returns from Uploading or Removing Activity
+		 * This function updates the user Scroll View with what packages are available after removal/upload
+		 */
+		RadioButton radBtn;
+		
+		if( CURRENT_WORD_PKG_COUNT_RETURN > CURRENT_WORD_PKG_COUNT ) //usr uploaded a pkg
+		{
+			/* USER UPLOADED A PKG */
+			
+			CURRENT_WORD_PKG_COUNT = CURRENT_WORD_PKG_COUNT_RETURN; //update pkg count because it increased
+			Log.d("upload", "USER UPLOADED A PKG");
+			//find how many pkg are available and if user user
+			for( int i=pkgRadioGroup.getChildCount(); i<CURRENT_WORD_PKG_COUNT; i++ )
+			{
+				radBtn = new RadioButton(this);
+				
+				//radBtn.setText( allPkgName[i] );
+				radBtn.setText(wordPackageFileIndexArr.getPackageFileAtIndex(i).getWordPackageName());
+				
+				pkgRadioGroup.addView(radBtn);
+				
+			}
+		}
+		else if( CURRENT_WORD_PKG_COUNT_RETURN < CURRENT_WORD_PKG_COUNT )
+		{
+			/* USER DELETED A PKG */
+			
+			Log.d("upload", "USER DELETED A PKG");
+			CURRENT_WORD_PKG_COUNT = CURRENT_WORD_PKG_COUNT_RETURN; //update pkg count because it decreased
+			
+			
+			// IMPORTANT: the following procedure limits to deleting only 1 file at a time
+			//			  to delete multiple files at one, have to delete and re-create all radio buttons in RadioGroup
+			
+			pkgRadioGroup.removeViewAt( indexOfRadBtnToRemove[0] );
+			
+			//reselect top radio btn
+			( (RadioButton) pkgRadioGroup.getChildAt(0)).setChecked( true );
+			
+			
+		}
+		else
+		{
+			Log.d("upload", "USER DID NOT MODIFY A PKG");
+		}
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

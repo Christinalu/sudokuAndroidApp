@@ -498,7 +498,7 @@ public class WordArray implements Parcelable
 			
 			if( n >= 500000 ) //if exhausted all tries, linearly choose 'n' words
 			{
-				Log.d( "selectW", "WARNING: exhauster all tries in selectWord" );
+				Log.d( "selectW", "WARNING: exhausted all tries in selectWord" );
 				int r = rand.nextInt( ) % lineCount; //get a random position to start
 				//loop linearly and choose 'n' words
 				int c = 0;
