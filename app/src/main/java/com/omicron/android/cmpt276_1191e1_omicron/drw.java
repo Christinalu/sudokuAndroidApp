@@ -82,7 +82,7 @@ public class drw
 	public void reDraw( int[] touchX, int[] touchY, Pair lastRectColoured,
 						Pair currentRectColoured, int usrLangPref )
 	{
-		if (zoomOn[0] == 0)
+		if( zoomOn[0] == 0 )
 		{
 
 				/** DRAW ZOOM OUT MODE **/

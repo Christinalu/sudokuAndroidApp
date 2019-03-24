@@ -121,6 +121,7 @@ public class GameActivity extends AppCompatActivity
 	private static int BOUNDARY_OFFSET = 40; //puzzle will have some offset for aesthetic reasons near edges
 	private static float BOUNDARY_OFFSET_SCALE = 0.035f;
 	private static float ZOOM_SCALE = 1.5f; // zoom factor of how much to zoom in puzzle in "zoom" mode
+	private static float ZOOM_SCALE_ORIGINAL = ZOOM_SCALE;
 	private int PUZZLE_FULL_SIZE_WIDTH; // size of full puzzle from left most column pixel to right most column pixel
 	private long STATISTIC_MULTIPLE = 2; //used to multiply by factor the number of "Hint Clicks" a user used, to more likely show these words
 	
@@ -247,10 +248,9 @@ public class GameActivity extends AppCompatActivity
 
 
 
-			/**  INITIALIZE  **/
+			/** INITIALIZE PUZZLE DIMENSIONS **/
 
 		// get display metrics
-		int orientation = Configuration.ORIENTATION_UNDEFINED;
 		DisplayMetrics displayMetrics = new DisplayMetrics( );
 		Display screen = getWindowManager( ).getDefaultDisplay( ); //get general display
 		screen.getMetrics( displayMetrics );
@@ -258,127 +258,16 @@ public class GameActivity extends AppCompatActivity
 		screenH = displayMetrics.heightPixels;
 		screenW = displayMetrics.widthPixels;
 
-		//find orientation
-		if( screenH > screenW )
-		{
-			orientation = Configuration.ORIENTATION_PORTRAIT;
-		}else {
-			orientation = Configuration.ORIENTATION_LANDSCAPE;
-		}
-
-
-		//find minimum to create square bitmap
-		//note: in Canvas, a bitmap starts from coordinate (0,0), so a bitmap must cover the entire screen size
-		//note: this is not optimized for square screens
-		if( screenH < screenW ){ //landscape
-			bitmapSizeWidth = (int)( screenW * LANDSCAPE_RATIO ); //if in landscape mode, allow puzzle to be rectangle
-			bitmapSizeHeight = screenH;
-		}
-		else {
-			bitmapSizeWidth = screenW; //if in portrait mode, the puzzle will be square
-			bitmapSizeHeight = screenW;
-		}
-
 
 		rectLayout = (RelativeLayout) findViewById( R.id.rect_layout ); //used to detect user touch for matrix drw
 		rectTextLayout = (RelativeLayout) findViewById( R.id.rect_txt_layout ); //used to crop TextViews the same size as bitmap
 		imgView = new ImageView(this);
-
-
-		//status bar height
-		//this is needed as offset in landscape mode to alight rect matrix with textOverlay
-		int barH = getStatusBarHeight();
 		
-			/* SET PUZZLE ROW AND COL NUMBER PER BLOCK AND DIVIDER SIZE */
-		WORD_COUNT = wordArray.getWordCount( );
-		usrPuzzleTypePref = wordArray.getUsrPuzzleTypePref( );
 		
-		if( usrPuzzleTypePref == wordArray.getSize4x4() ) {
-			COL_PER_BLOCK = 2;
-			ROW_PER_BLOCK = 2;
-			VERTICAL_BLOCK = 2;
-			HORIZONTAL_BLOCK = 2;
-			ZOOM_SCALE = 1.2f; //zoom in less
-			BOUNDARY_OFFSET = (int)( bitmapSizeHeight * BOUNDARY_OFFSET_SCALE );
-			SQR_INNER_DIVIDER = (int)( bitmapSizeHeight * SQR_INNER_DIVIDER_RATIO_4x4 );
-			SQR_OUTER_DIVIDER = (int)( bitmapSizeHeight * SQR_OUTER_DIVIDER_RATIO_4x4 );
-		}
-		else if( usrPuzzleTypePref == wordArray.getSize6x6() ){
-			COL_PER_BLOCK = 3;
-			ROW_PER_BLOCK = 2;
-			VERTICAL_BLOCK = 2;
-			HORIZONTAL_BLOCK = 3;BOUNDARY_OFFSET = (int)( bitmapSizeHeight * BOUNDARY_OFFSET_SCALE );
-			SQR_INNER_DIVIDER = (int)( bitmapSizeHeight * SQR_INNER_DIVIDER_RATIO_6x6 );
-			SQR_OUTER_DIVIDER = (int)( bitmapSizeHeight * SQR_OUTER_DIVIDER_RATIO_6x6 );
-			
-		}
-		else if( usrPuzzleTypePref == wordArray.getSize12x12() ){
-			COL_PER_BLOCK = 4;
-			ROW_PER_BLOCK = 3;
-			VERTICAL_BLOCK = 3;
-			HORIZONTAL_BLOCK = 4;
-			ZOOM_SCALE = ZOOM_SCALE + 0.5f; //in 12x12, zoom in more because too small to see
-			HORIZONTAL_BLOCK = 3;BOUNDARY_OFFSET = (int)( bitmapSizeHeight * BOUNDARY_OFFSET_SCALE );
-			SQR_INNER_DIVIDER = (int)( bitmapSizeHeight * SQR_INNER_DIVIDER_RATIO_12x12 );
-			SQR_OUTER_DIVIDER = (int)( bitmapSizeHeight * SQR_OUTER_DIVIDER_RATIO_12x12 );
-		}
-		else{
-			COL_PER_BLOCK = 3;
-			ROW_PER_BLOCK = 3;
-			VERTICAL_BLOCK = 3;
-			HORIZONTAL_BLOCK = 3;
-			BOUNDARY_OFFSET = (int)( bitmapSizeHeight * BOUNDARY_OFFSET_SCALE );
-			SQR_INNER_DIVIDER = (int)( bitmapSizeHeight * SQR_INNER_DIVIDER_RATIO_9x9 );
-			SQR_OUTER_DIVIDER = (int)( bitmapSizeHeight * SQR_OUTER_DIVIDER_RATIO_9x9 );
-		}
-
-		// center bitmap based on orientation
-		// original coordinates of where to start to draw square (LO == Left Original)
-		// key: sqrLO/TO determines where the drawR class will start drawing from
-		if( orientation == Configuration.ORIENTATION_LANDSCAPE ) //if in landscape mode, center bitmap on left side
-		{
-			sqrLO = BOUNDARY_OFFSET;
-			sqrTO = BOUNDARY_OFFSET;
-
-			// find matrix single square size based on screen
-			// barH needed in landscape mode
-			sqrSizeWidth = ( bitmapSizeWidth - 2*BOUNDARY_OFFSET - (VERTICAL_BLOCK*(COL_PER_BLOCK-1))*SQR_INNER_DIVIDER - (VERTICAL_BLOCK-1)*SQR_OUTER_DIVIDER ) / WORD_COUNT;
-			sqrSizeHeight = ( bitmapSizeHeight - barH - 2*BOUNDARY_OFFSET - (HORIZONTAL_BLOCK*(ROW_PER_BLOCK-1))*SQR_INNER_DIVIDER - (HORIZONTAL_BLOCK-1)*SQR_OUTER_DIVIDER ) / WORD_COUNT;
-
-			bitMap = Bitmap.createBitmap( bitmapSizeWidth, bitmapSizeHeight-barH, Bitmap.Config.ARGB_8888 );
-
-			//set rect_txt_layout the same size as the bitmap
-			rectTextLayout.getLayoutParams().width = bitmapSizeWidth;
-			rectTextLayout.getLayoutParams().height = bitmapSizeHeight-barH;
-			
-			//set layout size of where puzzle matrix will be drawn
-			rectLayout.getLayoutParams().width = bitmapSizeWidth;
-			rectLayout.getLayoutParams().height = bitmapSizeHeight-barH;
-		}
-		else //in portrait mode
-		{
-			// find matrix single square size based on screen
-			sqrSizeWidth = ( bitmapSizeWidth - 2*BOUNDARY_OFFSET - (VERTICAL_BLOCK*(COL_PER_BLOCK-1))*SQR_INNER_DIVIDER - (VERTICAL_BLOCK-1)*SQR_OUTER_DIVIDER ) / WORD_COUNT;
-			sqrSizeHeight = sqrSizeWidth;
-			
-			// find entire matrix puzzle size
-			PUZZLE_FULL_SIZE_WIDTH = WORD_COUNT*sqrSizeWidth + (VERTICAL_BLOCK*(COL_PER_BLOCK-1))*SQR_INNER_DIVIDER + (VERTICAL_BLOCK-1)*SQR_OUTER_DIVIDER;
-
-			//if in portrait mode, center puzzle top of screen
-			sqrLO = BOUNDARY_OFFSET + (screenW - 2 * BOUNDARY_OFFSET) / 2 - PUZZLE_FULL_SIZE_WIDTH / 2;
-			sqrTO = BOUNDARY_OFFSET; // no boundary offset - note: boundary offset is already included in bitmapSize because width == height, so sqrSize calculated for sqrLO width assures the offset is included in height sqrTO
-
-			bitMap = Bitmap.createBitmap( bitmapSizeWidth, bitmapSizeHeight, Bitmap.Config.ARGB_8888 );
-			
-			//set rect_txt_layout the same size as the bitmap
-			rectTextLayout.getLayoutParams().width = bitmapSizeWidth;
-			rectTextLayout.getLayoutParams().height = bitmapSizeHeight;
-
-			//note: limiting rectLayout to bitmap size will force a selected square to be deselected only when clicking inside the bitmap
-			//		it wont deselect when clicking outside, say near buttons
-			rectLayout.getLayoutParams().width = bitmapSizeWidth;
-			rectLayout.getLayoutParams().height = bitmapSizeHeight;
-		}
+		//initialize Puzzle Matrix parameters including:
+		//sqrLO, sqrTO, sqrSizeWidth, sqrSizeHeight, bitMap, rectLayout, rectTextLayout
+		initializePuzzleMatrixParameters( );
+		
 		
 		canvas = new Canvas( bitMap );
 		imgView.setImageBitmap( bitMap );
@@ -393,10 +282,7 @@ public class GameActivity extends AppCompatActivity
 		// note: requires sqrSize be determined before call
 		findSqrCoordToZoomInOn = new FindSqrCoordToZoomInOn( touchXZ, touchYZ, currentRectColoured, bitmapSizeWidth, bitmapSizeHeight,
 															 sqrSizeWidth, sqrSizeHeight, textMatrix, ZOOM_SCALE );
-
-
-
-
+		
 
 		// PREDEFINE VARIABLES FOR MATRIX OVERLAY
 		paintblack.setColor(Color.parseColor("#0000ff"));
@@ -420,37 +306,10 @@ public class GameActivity extends AppCompatActivity
 
 
 			/** CREATE RECT MATRIX **/
-
-		for( int i=0; i<WORD_COUNT; i++ ) //row
-		{
-			for( int j=0; j<WORD_COUNT; j++ ) //column
-			{
-				//key: sqrL, sqrT means sqr coordinate top and left; sqrLO/TO means original coordinate sqrL/T
-				//increase square dimensions
-				sqrL = sqrLO + j*(sqrSizeWidth + SQR_INNER_DIVIDER); //define top-left corner
-				sqrT = sqrTO + i*(sqrSizeHeight + SQR_INNER_DIVIDER);
-				sqrR = sqrL + sqrSizeWidth; //define end of bottom-right corner
-				sqrB = sqrT + sqrSizeHeight;
-				
-					//ADD PADDING
-				//padding between rows
-				sqrT = sqrT + (i/ROW_PER_BLOCK)*SQR_OUTER_DIVIDER;
-				sqrB = sqrB + (i/ROW_PER_BLOCK)*SQR_OUTER_DIVIDER;
-				
-				//padding between columns
-				sqrL = sqrL + (j/COL_PER_BLOCK)*SQR_OUTER_DIVIDER;
-				sqrR = sqrR + (j/COL_PER_BLOCK)*SQR_OUTER_DIVIDER;
-				
-
-				rectArr[i][j] = new Block( sqrL, sqrT, sqrR, sqrB ); // create the new square
-				//note: this loop has to be here and cannot be replaced by drw class
-
-				// add text view to relative layout matrix
-				textMatrix.newTextView( sqrL, sqrT, sqrSizeWidth, sqrSizeHeight, i, j, wordArray,
-										usrSudokuArr, usrLangPref );
-				rectTextLayout.addView( textMatrix.getRelativeTextView( i, j ) );
-			}
-		}
+			
+		//initialize all rect and text view in RelativeLayout
+		//and set coordinates for each rect
+		createRectMatrix( );
 
 
 		//draw matrix so far
@@ -521,8 +380,9 @@ public class GameActivity extends AppCompatActivity
 
 			// Legend:
 			// dX : pixel drag on screen non-scaled
-			// touchXZ : pixel coordinate in scaled image ie a 1000p wide bitmap with 2x scale will be 2000p wide,
-			// 			 so touchXZ = 0 will be start, =1000 means center, =2000 means end
+			// touchXZ : pixel coordinate in scaled image ie a 1000p wide bitmap with 2x scale will be 2000p wide (in ZOOM mode),
+			// 			 so touchXZ = 0 will be start top left corner, == 1000 means == 1000 top left corner will start and top right corner
+			// 			 would be 1000 + screen_width
 			// touchXZclick : initial (stored) regular pixel coordinate of where user first clicked
 
 
@@ -534,123 +394,28 @@ public class GameActivity extends AppCompatActivity
 			@Override
 			public boolean onTouch( View v, MotionEvent event )
 			{
+				// when user touches the puzzle, perform action accordingly
+				
 				touchX[0] = (int) event.getX( ); // touch coordinate on actual screen inside RelativeLayout rect_layout - starting from top left corner @ (0,0)
 				touchY[0] = (int) event.getY( );
 
 				switch( event.getAction( ) )
 				{
 					case MotionEvent.ACTION_DOWN:
-
-						//disable safety because by clicking, user updates to new valid coordinates
-						zoomClickSafe[0] = 0;
-						zoomButtonDisableUpdate[0] = 0; //once user clicks, the coordinates are updated and become valid, so let button update sqr clicked
-
-
-						// SAVE ON CLICK COORDINATE
-						if( zoomOn[0] == 1 ) // when zoom mode enabled
-						{
-
-							touchXZclick[0] = (int) ( touchX[0] ); //where user clicked adjusted for translation for zoom
-							touchYZclick[0] = (int) ( touchY[0] ); //ie touchXZ was reference point (where "zoom" matrix was so far), now add extra
-
-							Log.d( "TAG", " -- " );
-							Log.d( "TAG", "touchXZ start: (" + touchXZ[0] + ", " + touchYZ[0] + ")" );
-							Log.d( "TAG", "click down touchXZclick: (" + touchXZclick[0] + ", " + touchYZclick[0] + ")" );
-
-							drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
-						}
-						else
-						{
-							// call function to redraw if user touch detected
-							drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
-							Log.i("TAG", "normal click: (" + touchX[0] + ", " + touchY[0] + ")");
-						}
 						
-						// TEXT TO SPEECH
-						if (usrModePref == 1) {
-							row = currentRectColoured.getRow();
-							col = currentRectColoured.getColumn();
-							
-							// TODO: check if this is correct after adjusting for different puzzle sizes
-							
-							if (row < WORD_COUNT && col < WORD_COUNT && row > -1 && col > -1) {
-								val = usrSudokuArr.PuzzleOriginal[row][col];
-								if (val != 0) {
-									theWord = numArray[val-1];
-									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-										mTTS.speak(theWord, TextToSpeech.QUEUE_FLUSH, null, null);
-									} else {
-										mTTS.speak(theWord, TextToSpeech.QUEUE_FLUSH, null);
-									}
-								}
-							}
-						}
+							actionDown( );
 						
 						break;
 
 					case MotionEvent.ACTION_MOVE:
-
-						if( zoomOn[0] == 1 )
-						{
-							drag[0] = 1; //enable drag
-
-								/* GET 'DRAG' BOUND IN X-AXIS AND BLOCK IF OUT-OF-BOUND */
-							dX[0] = touchX[0] - touchXZclick[0]; // change = initial - final
-
-							//fix out of bounds: LEFT
-							if( touchXZ[0] - dX[0] < 0 ) //detect out of bounds
-							{
-								touchXZ[0] = 0;
-								dX[0] = 0;
-							}
-
-							//fix out of bounds: RIGHT
-							if( touchXZ[0] - dX[0] > bitmapSizeWidth*ZOOM_SCALE - bitmapSizeWidth )
-							{
-								touchXZ[0] = (int)( bitmapSizeWidth*ZOOM_SCALE - bitmapSizeWidth ); //set to max
-								dX[0] = 0;
-							}
-
-								/* GET 'DRAG' BOUND IN Y-AXIS AND BLOCK IF OUT-OF-BOUND */
-							dY[0] = touchY[0] - touchYZclick[0];
-
-							//fix out of bounds: TOP
-							if( touchYZ[0] - dY[0] < 0 ) //detect out of bounds
-							{
-								touchYZ[0] = 0; //reset to zero; before, was using "dY[0] = dYTcopy[0]" but using that was not quick enough at updating and resulting in skipping when going out of the border
-								dY[0] = 0;
-							}
-
-							//fix out of bounds: BOTTOM
-							if( touchYZ[0] - dY[0]  > bitmapSizeHeight*ZOOM_SCALE - bitmapSizeHeight )
-							{
-								touchYZ[0] = (int)(bitmapSizeHeight*ZOOM_SCALE - bitmapSizeHeight); //set to max
-								dY[0] = 0;
-							}
-
-							drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
-						}
+						
+							actionMove( );
 						
 						break;
 
 					case MotionEvent.ACTION_UP:
-
-						if( zoomOn[0] == 1 )
-						{
-							if( drag[0] == 1 )
-							{
-								touchXZ[0] = touchXZ[0] - dX[0]; //update where new touch coordinate ended up when user stops 'touch'
-								touchYZ[0] = touchYZ[0] - dY[0];
-							}
-
-							// reset 'moved' coordinates
-							dX[0] = 0;
-							dY[0] = 0;
-
-							drag[0] = 0; //disable drag
-
-							Log.i( "TAG", "moved dX: (" + dX[0] + ", " + dY[0] + ")" );
-						}
+						
+							actionUp( );
 						
 						break;
 				}
@@ -862,6 +627,325 @@ public class GameActivity extends AppCompatActivity
 		for( int i=0; i<WORD_COUNT; i++ )
 		{
 			wordArray.wordUpdateHintClickAtIndex( i, 0 );
+		}
+	}
+	
+	
+	private void setUpPuzzleRowColBlockDividerCountAndSize( )
+	{
+		/*
+		 * Based on puzzle size type, this function sets up the required
+		 * Block, Column, Row and Boundary sizes
+		 */
+		
+		if( usrPuzzleTypePref == wordArray.getSize4x4() ) {
+			COL_PER_BLOCK = 2;
+			ROW_PER_BLOCK = 2;
+			VERTICAL_BLOCK = 2;
+			HORIZONTAL_BLOCK = 2;
+			ZOOM_SCALE = 1.2f; //zoom in less
+			BOUNDARY_OFFSET = (int)( bitmapSizeHeight * BOUNDARY_OFFSET_SCALE );
+			SQR_INNER_DIVIDER = (int)( bitmapSizeHeight * SQR_INNER_DIVIDER_RATIO_4x4 );
+			SQR_OUTER_DIVIDER = (int)( bitmapSizeHeight * SQR_OUTER_DIVIDER_RATIO_4x4 );
+		}
+		else if( usrPuzzleTypePref == wordArray.getSize6x6() ){
+			COL_PER_BLOCK = 3;
+			ROW_PER_BLOCK = 2;
+			VERTICAL_BLOCK = 2;
+			ZOOM_SCALE = ZOOM_SCALE_ORIGINAL;
+			HORIZONTAL_BLOCK = 3;BOUNDARY_OFFSET = (int)( bitmapSizeHeight * BOUNDARY_OFFSET_SCALE );
+			SQR_INNER_DIVIDER = (int)( bitmapSizeHeight * SQR_INNER_DIVIDER_RATIO_6x6 );
+			SQR_OUTER_DIVIDER = (int)( bitmapSizeHeight * SQR_OUTER_DIVIDER_RATIO_6x6 );
+			
+		}
+		else if( usrPuzzleTypePref == wordArray.getSize12x12() ){
+			COL_PER_BLOCK = 4;
+			ROW_PER_BLOCK = 3;
+			VERTICAL_BLOCK = 3;
+			HORIZONTAL_BLOCK = 4;
+			ZOOM_SCALE = ZOOM_SCALE_ORIGINAL + 0.5f; //in 12x12, zoom in more because too small to see
+			HORIZONTAL_BLOCK = 3;BOUNDARY_OFFSET = (int)( bitmapSizeHeight * BOUNDARY_OFFSET_SCALE );
+			SQR_INNER_DIVIDER = (int)( bitmapSizeHeight * SQR_INNER_DIVIDER_RATIO_12x12 );
+			SQR_OUTER_DIVIDER = (int)( bitmapSizeHeight * SQR_OUTER_DIVIDER_RATIO_12x12 );
+		}
+		else{
+			COL_PER_BLOCK = 3;
+			ROW_PER_BLOCK = 3;
+			VERTICAL_BLOCK = 3;
+			HORIZONTAL_BLOCK = 3;
+			ZOOM_SCALE = ZOOM_SCALE_ORIGINAL;
+			BOUNDARY_OFFSET = (int)( bitmapSizeHeight * BOUNDARY_OFFSET_SCALE );
+			SQR_INNER_DIVIDER = (int)( bitmapSizeHeight * SQR_INNER_DIVIDER_RATIO_9x9 );
+			SQR_OUTER_DIVIDER = (int)( bitmapSizeHeight * SQR_OUTER_DIVIDER_RATIO_9x9 );
+			Log.d( "selectW", "ZOOM_SCALE: " + ZOOM_SCALE );
+		}
+	}
+	
+	
+	private void initializePuzzleMatrixParameters( )
+	{
+		/*
+		 * This function sets up all Puzzle Parameters including:
+		 * 		sqrLO, sqrTO, sqrSizeWidth, sqrSizeHeight, bitMap, rectLayout, rectTextLayout
+		 * It also calls setUpPuzzleRowColBlockDividerCountAndSize( ) to set up
+		 * 		puzzle size type and initialize row, col, block and divider sizes
+		 */
+		
+		int orientation = Configuration.ORIENTATION_UNDEFINED;
+		
+		//find orientation
+		if( screenH > screenW )
+		{
+			orientation = Configuration.ORIENTATION_PORTRAIT;
+		}else {
+			orientation = Configuration.ORIENTATION_LANDSCAPE;
+		}
+		
+		//find minimum to create square bitmap
+		//note: in Canvas, a bitmap starts from coordinate (0,0), so a bitmap must cover the entire screen size
+		//note: this is not optimized for square screens
+		if( screenH < screenW ){ //landscape
+			bitmapSizeWidth = (int)( screenW * LANDSCAPE_RATIO ); //if in landscape mode, allow puzzle to be rectangle
+			bitmapSizeHeight = screenH;
+		}
+		else {
+			bitmapSizeWidth = screenW; //if in portrait mode, the puzzle will be square
+			bitmapSizeHeight = screenW;
+		}
+		
+		//status bar height
+		//this is needed as offset in landscape mode to alight rect matrix with textOverlay
+		int barH = getStatusBarHeight();
+		
+		/* SET PUZZLE ROW AND COL NUMBER PER BLOCK AND DIVIDER SIZE */
+		WORD_COUNT = wordArray.getWordCount( );
+		usrPuzzleTypePref = wordArray.getUsrPuzzleTypePref( );
+		
+		//based on puzzle size type, initialize row, col, block and divider sizes
+		setUpPuzzleRowColBlockDividerCountAndSize( );
+		
+		// center bitmap based on orientation
+		// original coordinates of where to start to draw square (LO == Left Original)
+		// key: sqrLO/TO determines where the drawR class will start drawing from
+		if( orientation == Configuration.ORIENTATION_LANDSCAPE ) //if in landscape mode, center bitmap on left side
+		{
+			sqrLO = BOUNDARY_OFFSET;
+			sqrTO = BOUNDARY_OFFSET;
+			
+			// find matrix single square size based on screen
+			// barH needed in landscape mode
+			sqrSizeWidth = ( bitmapSizeWidth - 2*BOUNDARY_OFFSET - (VERTICAL_BLOCK*(COL_PER_BLOCK-1))*SQR_INNER_DIVIDER - (VERTICAL_BLOCK-1)*SQR_OUTER_DIVIDER ) / WORD_COUNT;
+			sqrSizeHeight = ( bitmapSizeHeight - barH - 2*BOUNDARY_OFFSET - (HORIZONTAL_BLOCK*(ROW_PER_BLOCK-1))*SQR_INNER_DIVIDER - (HORIZONTAL_BLOCK-1)*SQR_OUTER_DIVIDER ) / WORD_COUNT;
+			
+			bitMap = Bitmap.createBitmap( bitmapSizeWidth, bitmapSizeHeight-barH, Bitmap.Config.ARGB_8888 );
+			
+			//set rect_txt_layout the same size as the bitmap
+			rectTextLayout.getLayoutParams().width = bitmapSizeWidth;
+			rectTextLayout.getLayoutParams().height = bitmapSizeHeight-barH;
+			
+			//set layout size of where puzzle matrix will be drawn
+			rectLayout.getLayoutParams().width = bitmapSizeWidth;
+			rectLayout.getLayoutParams().height = bitmapSizeHeight-barH;
+		}
+		else //in portrait mode
+		{
+			// find matrix single square size based on screen
+			sqrSizeWidth = ( bitmapSizeWidth - 2*BOUNDARY_OFFSET - (VERTICAL_BLOCK*(COL_PER_BLOCK-1))*SQR_INNER_DIVIDER - (VERTICAL_BLOCK-1)*SQR_OUTER_DIVIDER ) / WORD_COUNT;
+			sqrSizeHeight = sqrSizeWidth;
+			
+			// find entire matrix puzzle size
+			PUZZLE_FULL_SIZE_WIDTH = WORD_COUNT*sqrSizeWidth + (VERTICAL_BLOCK*(COL_PER_BLOCK-1))*SQR_INNER_DIVIDER + (VERTICAL_BLOCK-1)*SQR_OUTER_DIVIDER;
+			
+			//if in portrait mode, center puzzle top of screen
+			sqrLO = BOUNDARY_OFFSET + (screenW - 2 * BOUNDARY_OFFSET) / 2 - PUZZLE_FULL_SIZE_WIDTH / 2;
+			sqrTO = BOUNDARY_OFFSET; // no boundary offset - note: boundary offset is already included in bitmapSize because width == height, so sqrSize calculated for sqrLO width assures the offset is included in height sqrTO
+			
+			bitMap = Bitmap.createBitmap( bitmapSizeWidth, bitmapSizeHeight, Bitmap.Config.ARGB_8888 );
+			
+			//set rect_txt_layout the same size as the bitmap
+			rectTextLayout.getLayoutParams().width = bitmapSizeWidth;
+			rectTextLayout.getLayoutParams().height = bitmapSizeHeight;
+			
+			//note: limiting rectLayout to bitmap size will force a selected square to be deselected only when clicking inside the bitmap
+			//		it wont deselect when clicking outside, say near buttons
+			rectLayout.getLayoutParams().width = bitmapSizeWidth;
+			rectLayout.getLayoutParams().height = bitmapSizeHeight;
+		}
+	}
+	
+	
+	private void createRectMatrix( )
+	{
+		/*
+		 * Initialize the rectArr storing Blocks with rect parameters
+		 * Initialize TextViews for each rect
+		 * Initialize parameters for each sqr
+		 */
+		
+		for( int i=0; i<WORD_COUNT; i++ ) //row
+		{
+			for( int j=0; j<WORD_COUNT; j++ ) //column
+			{
+				//key: sqrL, sqrT means sqr coordinate top and left; sqrLO/TO means original coordinate sqrL/T
+				//increase square dimensions
+				sqrL = sqrLO + j*(sqrSizeWidth + SQR_INNER_DIVIDER); //define top-left corner
+				sqrT = sqrTO + i*(sqrSizeHeight + SQR_INNER_DIVIDER);
+				sqrR = sqrL + sqrSizeWidth; //define end of bottom-right corner
+				sqrB = sqrT + sqrSizeHeight;
+				
+				//ADD PADDING
+				//padding between rows
+				sqrT = sqrT + (i/ROW_PER_BLOCK)*SQR_OUTER_DIVIDER;
+				sqrB = sqrB + (i/ROW_PER_BLOCK)*SQR_OUTER_DIVIDER;
+				
+				//padding between columns
+				sqrL = sqrL + (j/COL_PER_BLOCK)*SQR_OUTER_DIVIDER;
+				sqrR = sqrR + (j/COL_PER_BLOCK)*SQR_OUTER_DIVIDER;
+				
+				
+				rectArr[i][j] = new Block( sqrL, sqrT, sqrR, sqrB ); // create the new square
+				//note: this loop has to be here and cannot be replaced by drw class
+				
+				// add text view to relative layout matrix
+				textMatrix.newTextView( sqrL, sqrT, sqrSizeWidth, sqrSizeHeight, i, j, wordArray,
+										usrSudokuArr, usrLangPref );
+				rectTextLayout.addView( textMatrix.getRelativeTextView( i, j ) );
+			}
+		}
+	}
+	
+	
+	private void actionDown( )
+	{
+		/*
+		 * This function updates all necessary touchX/Y coordinates and flags
+		 * when user has clicked the screen
+		 */
+		
+		//disable safety because by clicking, user updates to new valid coordinates
+		zoomClickSafe[0] = 0;
+		zoomButtonDisableUpdate[0] = 0; //once user clicks, the coordinates are updated and become valid, so let button update sqr clicked
+		
+		
+		// SAVE ON CLICK COORDINATE
+		if( zoomOn[0] == 1 ) // when zoom mode enabled
+		{
+			
+			touchXZclick[0] = (int) ( touchX[0] ); //where user clicked adjusted for translation for zoom
+			touchYZclick[0] = (int) ( touchY[0] ); //ie touchXZ was reference point (where "zoom" matrix was so far), now add extra
+			
+			Log.d( "TAG", " -- " );
+			Log.d( "TAG", "touchXZ start: (" + touchXZ[0] + ", " + touchYZ[0] + ")" );
+			Log.d( "TAG", "click down touchXZclick: (" + touchXZclick[0] + ", " + touchYZclick[0] + ")" );
+			
+			drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
+		}
+		else
+		{
+			// call function to redraw if user touch detected
+			drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
+			Log.i("TAG", "normal click: (" + touchX[0] + ", " + touchY[0] + ")");
+		}
+		
+		// TEXT TO SPEECH
+		if (usrModePref == 1) {
+			row = currentRectColoured.getRow();
+			col = currentRectColoured.getColumn();
+			
+			if (row < WORD_COUNT && col < WORD_COUNT && row > -1 && col > -1) {
+				val = usrSudokuArr.PuzzleOriginal[row][col];
+				if (val != 0) {
+					theWord = numArray[val-1];
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+						mTTS.speak(theWord, TextToSpeech.QUEUE_FLUSH, null, null);
+					} else {
+						mTTS.speak(theWord, TextToSpeech.QUEUE_FLUSH, null);
+					}
+				}
+			}
+		}
+		
+	}
+	
+	
+	private void actionMove( )
+	{
+		/*
+		 * Whenever the user drags on the screen, this function updates dX dY coordinates
+		 * when user drags a click, the Canvas will be moved as well
+		 * This function only works when Zoom is enabled
+		 */
+		
+		// Note: touchXZ/XY is used as pixel coordinate in scaled image, to represent top left corner
+		//		 coordinate of zoomed Canvas, ie a 1000p wide bitmap in NORMAL_ZOOM with 2x zoom scale will be 2000p wide (in ZOOM),
+		//		 so touchXZ == 0 will be start top left corner, == 1000 top left corner will start and top right corner
+		//		 would be 1000 + screen_width
+		
+		if( zoomOn[0] == 1 )
+		{
+			drag[0] = 1; //enable drag
+			
+			/* GET 'DRAG' BOUND IN X-AXIS AND BLOCK IF OUT-OF-BOUND */
+			dX[0] = touchX[0] - touchXZclick[0]; // change = initial - final
+			
+			//fix out of bounds: LEFT
+			if( touchXZ[0] - dX[0] < 0 ) //detect out of bounds
+			{
+				touchXZ[0] = 0;
+				dX[0] = 0;
+			}
+			
+			//fix out of bounds: RIGHT
+			if( touchXZ[0] - dX[0] > bitmapSizeWidth*ZOOM_SCALE - bitmapSizeWidth )
+			{
+				touchXZ[0] = (int)( bitmapSizeWidth*ZOOM_SCALE - bitmapSizeWidth ); //set to max
+				dX[0] = 0;
+			}
+			
+			/* GET 'DRAG' BOUND IN Y-AXIS AND BLOCK IF OUT-OF-BOUND */
+			dY[0] = touchY[0] - touchYZclick[0];
+			
+			//fix out of bounds: TOP
+			if( touchYZ[0] - dY[0] < 0 ) //detect out of bounds
+			{
+				touchYZ[0] = 0; //reset to zero; before, was using "dY[0] = dYTcopy[0]" but using that was not quick enough at updating and resulting in skipping when going out of the border
+				dY[0] = 0;
+			}
+			
+			//fix out of bounds: BOTTOM
+			if( touchYZ[0] - dY[0] > bitmapSizeHeight*ZOOM_SCALE - bitmapSizeHeight )
+			{
+				touchYZ[0] = (int)(bitmapSizeHeight*ZOOM_SCALE - bitmapSizeHeight); //set to max
+				dY[0] = 0;
+			}
+			
+			drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
+		}
+	}
+	
+	
+	private void actionUp( )
+	{
+		/*
+		 * When ever user performs a ACTION_UP, this function resets drag coordinates
+		 * and saves the touchZX/ZY
+		 */
+		
+		if( zoomOn[0] == 1 )
+		{
+			if( drag[0] == 1 )
+			{
+				touchXZ[0] = touchXZ[0] - dX[0]; //update where new touch coordinate ended up when user stops 'touch'
+				touchYZ[0] = touchYZ[0] - dY[0];
+			}
+			
+			// reset 'moved' coordinates
+			dX[0] = 0;
+			dY[0] = 0;
+			
+			drag[0] = 0; //disable drag
+			
+			Log.i( "TAG", "moved dX: (" + dX[0] + ", " + dY[0] + ")" );
 		}
 	}
 }
