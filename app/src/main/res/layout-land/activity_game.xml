@@ -7,11 +7,36 @@
     android:background="@color/mediumaquamarine"
     tools:context=".GameActivity">
 
-
-
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true">
+
+        <ImageButton
+            android:id="@+id/button_zoom_in"
+            android:layout_width="60dp"
+            android:layout_height="35dp"
+            android:layout_alignBottom="@+id/button_zoom_out"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="40dp"
+            android:layout_toStartOf="@id/btn_keypad"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/zoom_in"
+            android:elevation="10dp"
+            android:scaleType="fitXY"
+            app:srcCompat="@android:drawable/btn_plus" />
+
+        <ImageButton
+            android:id="@+id/button_zoom_out"
+            android:layout_width="60dp"
+            android:layout_height="35dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="24dp"
+            android:layout_toStartOf="@id/btn_keypad"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/zoom_out"
+            android:scaleType="fitXY"
+            app:srcCompat="@android:drawable/btn_minus" />
 
         <RelativeLayout
             android:id="@+id/rect_layout"
@@ -32,157 +57,17 @@
             android:layout_marginStart="0dp"
             android:layout_marginTop="0dp" />
 
-        <!--<ImageButton-->
-            <!--android:id="@+id/button_dictionary"-->
-            <!--android:layout_width="45dp"-->
-            <!--android:layout_height="60dp"-->
-            <!--android:layout_alignParentEnd="true"-->
-            <!--android:layout_marginTop="5dp"-->
-            <!--android:layout_marginEnd="239dp"-->
-            <!--android:background="@color/mediumaquamarine"-->
-            <!--android:baselineAlignBottom="true"-->
-            <!--android:contentDescription="@string/hint"-->
-            <!--android:scaleType="fitXY"-->
-            <!--android:src="@drawable/light_bulb" />-->
-
-        <RelativeLayout
+        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/btn_keypad"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true">
-
-        <ImageButton
-            android:id="@+id/button_zoom_in"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/button_zoom_out"
-            android:layout_marginBottom="50dp"
-            android:layout_toStartOf="@id/keypad"
-            android:background="@color/mediumaquamarine"
-            android:contentDescription="@string/zoom_in"
-            android:scaleType="fitXY"
-            app:srcCompat="@android:drawable/btn_plus" />
-
-        <ImageButton
-            android:id="@+id/button_zoom_out"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginEnd="30dp"
-            android:layout_toStartOf="@id/keypad"
-            android:background="@color/mediumaquamarine"
-            android:contentDescription="@string/zoom_out"
-            android:scaleType="fitXY"
-            app:srcCompat="@android:drawable/btn_minus" />
-
-            <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/keypad"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_alignParentEnd="true"
-                android:layout_gravity="end"
-                android:orientation="vertical"
-                android:useDefaultMargins="true">
-
-                <!--
-                <Button
-                    android:id="@+id/keypad_1"
-                    android:layout_weight="1"
-                    android:background="@drawable/buttons"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:text="@string/keypads"
-                    android:textColor="@android:color/white" />
-
-                <Button
-                    android:id="@+id/keypad_2"
-                    android:layout_weight="1"
-                    android:background="@drawable/buttons"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:text="@string/keypads"
-                    android:textColor="@android:color/white" />
-
-                <Button
-                    android:id="@+id/keypad_3"
-                    android:layout_weight="1"
-                    android:background="@drawable/buttons"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:text="@string/keypads"
-                    android:textColor="@android:color/white" />
-
-                <Button
-                    android:id="@+id/keypad_4"
-                    android:layout_weight="1"
-                    android:background="@drawable/buttons"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:text="@string/keypads"
-                    android:textColor="@android:color/white" />
-
-                <Button
-                    android:id="@+id/keypad_5"
-                    android:layout_weight="1"
-                    android:background="@drawable/buttons"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:text="@string/keypads"
-                    android:textColor="@android:color/white" />
-
-                <Button
-                    android:id="@+id/keypad_6"
-                    android:layout_weight="1"
-                    android:background="@drawable/buttons"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:text="@string/keypads"
-                    android:textColor="@android:color/white" />
-
-                <Button
-                    android:id="@+id/keypad_7"
-                    android:layout_weight="1"
-                    android:background="@drawable/buttons"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:text="@string/keypads"
-                    android:textColor="@android:color/white" />
-
-                <Button
-                    android:id="@+id/keypad_8"
-                    android:layout_weight="1"
-                    android:background="@drawable/buttons"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:text="@string/keypads"
-                    android:textColor="@android:color/white" />
-
-                <Button
-                    android:id="@+id/keypad_9"
-                    android:layout_weight="1"
-                    android:background="@drawable/buttons"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:text="@string/keypads"
-                    android:textColor="@android:color/white" />
-                -->
-
-            </TableLayout>
-
-            <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/btn_keypad"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentEnd="true"
-                android:orientation="vertical"
-                android:stretchColumns="*">
-
-            </TableLayout>
-
-        </RelativeLayout>
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="end"
+            android:orientation="vertical"
+            android:useDefaultMargins="true" />
 
     </RelativeLayout>
+
 
     <TextView
         android:id="@+id/hint_content"

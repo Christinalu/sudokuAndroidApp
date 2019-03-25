@@ -296,12 +296,20 @@ public class GameActivity extends AppCompatActivity
 						 COL_PER_BLOCK, ROW_PER_BLOCK, VERTICAL_BLOCK, HORIZONTAL_BLOCK, WORD_COUNT ); // class used to draw/update square matrix
 		
 		TableLayout tableLayout = findViewById( R.id.btn_keypad );
+
+        int orientation;
+        if( screenH > screenW )
+        {
+            orientation = Configuration.ORIENTATION_PORTRAIT;
+        }else {
+            orientation = Configuration.ORIENTATION_LANDSCAPE;
+        }
 		
 		// call function to set all listeners - needs drawR
 		listeners = new ButtonListener( currentRectColoured, usrSudokuArr,
 										drawR, touchX, touchY, lastRectColoured, usrLangPref, btnClicked,
 										Hint, wordArray,usrModePref,numArray, WORD_COUNT, COL_PER_BLOCK, ROW_PER_BLOCK,
-										this, tableLayout );
+										this, tableLayout, orientation );
 
 
 
