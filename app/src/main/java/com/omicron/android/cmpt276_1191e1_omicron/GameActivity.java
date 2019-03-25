@@ -137,9 +137,10 @@ public class GameActivity extends AppCompatActivity
 	private int bitmapSizeHeight;
 	private int sqrSizeWidth; //size of single square in matrix
 	private int sqrSizeHeight;
+	private int orientation;
 	
 	private int HINT_CLICK_TO_MAX_PROB;
-	private static final float LANDSCAPE_RATIO = 0.7f; //determines how much of the screen will be dedicated to puzzle in landscape
+	private static final float LANDSCAPE_RATIO = 0.75f; //determines how much of the screen will be dedicated to puzzle in landscape
 	private int WORD_COUNT; //stores the number of words in wordArray
 	private int COL_PER_BLOCK; //stores how many columns will be inside a block; in 9x9 this would be 3
 	private int ROW_PER_BLOCK;
@@ -296,14 +297,7 @@ public class GameActivity extends AppCompatActivity
 						 COL_PER_BLOCK, ROW_PER_BLOCK, VERTICAL_BLOCK, HORIZONTAL_BLOCK, WORD_COUNT ); // class used to draw/update square matrix
 		
 		TableLayout tableLayout = findViewById( R.id.btn_keypad );
-
-        int orientation;
-        if( screenH > screenW )
-        {
-            orientation = Configuration.ORIENTATION_PORTRAIT;
-        }else {
-            orientation = Configuration.ORIENTATION_LANDSCAPE;
-        }
+		
 		
 		// call function to set all listeners - needs drawR
 		listeners = new ButtonListener( currentRectColoured, usrSudokuArr,
@@ -699,7 +693,7 @@ public class GameActivity extends AppCompatActivity
 		 * 		puzzle size type and initialize row, col, block and divider sizes
 		 */
 		
-		int orientation = Configuration.ORIENTATION_UNDEFINED;
+		orientation = Configuration.ORIENTATION_UNDEFINED;
 		
 		//find orientation
 		if( screenH > screenW )
