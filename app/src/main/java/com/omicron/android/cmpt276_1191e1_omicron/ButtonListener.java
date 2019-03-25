@@ -7,8 +7,11 @@ import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -31,7 +34,7 @@ public class ButtonListener extends AppCompatActivity
 						  final int[] touchX, final int[] touchY, final Pair lastRectColoured,
 						  final int usrLangPref, final int[] btnClicked, final TextView Hint, final WordArray wordArray,
 						  final int usrModePref, final String[] numArray, int WORD_COUNT, int COL_PER_BLOCK,
-						  int ROW_PER_BLOCK, Context context, TableLayout tableLayout )
+						  int ROW_PER_BLOCK, Context context, TableLayout tableLayout, int orientation)
 	{
 		// pulled out of button listeners
 		final PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
@@ -59,31 +62,69 @@ public class ButtonListener extends AppCompatActivity
 		
 		Log.d( "listener", "rowCount: " + rowCount );
 		Log.d( "listener", "btnCount: " + btnCount );
-		for( int j=0; j<rowCount; j++ ) //add button rows to table
-		{
-			tableRow = new TableRow( context );
-			for( int k=0; k<btnCount; k++ )
+
+		// if it's in PORTRAIT mode
+		if(orientation == 1) {
+			for( int j=0; j<rowCount; j++ ) //add button rows to table
 			{
-				button = new Button( context );
-				if( button == null){ Log.d( "listener", "ERROR: null button" ); }
-				button.setTextColor( Color.WHITE );
-				button.setBackgroundResource( R.drawable.buttons );
-				
-				Log.d( "listener", "sample word from array: " + wordArray.getWordNativeAtIndex( indexArr ) );
-				
-				// choose button text in language based on user preference
-				if( usrLangPref == 0 )
-				{ button.setText( wordArray.getWordNativeAtIndex( indexArr ) ); }
-				else
-				{ button.setText( wordArray.getWordTranslationAtIndex( indexArr ) ); }
-				
+				tableRow = new TableRow(context);
+				for (int k = 0; k < btnCount; k++) {
+					button = new Button(context);
+					if (button == null) {
+						Log.d("listener", "ERROR: null button");
+					}
+					button.setTextColor(Color.WHITE);
+					button.setBackgroundResource(R.drawable.buttons);
+					button.setSingleLine();
+
+					Log.d("listener", "sample word from array: " + wordArray.getWordNativeAtIndex(indexArr));
+
+					// choose button text in language based on user preference
+					if (usrLangPref == 0) {
+						button.setText(wordArray.getWordNativeAtIndex(indexArr));
+					} else {
+						button.setText(wordArray.getWordTranslationAtIndex(indexArr));
+					}
+
+					btnArr[indexArr] = button;
+					tableRow.addView(button);
+					indexArr++;
+				}
+				tableLayout.addView(tableRow);
+			}
+		}
+		// if it's in LANDSCAPE mode
+		else if (orientation == 2){
+			TableLayout.LayoutParams params = new TableLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT,1.0f);
+			for (int k = 0; k < WORD_COUNT; k++) {
+				button = new Button(context);
+				tableLayout.setOrientation(TableLayout.VERTICAL);
+
+				if (button == null) {
+					Log.d("listener", "ERROR: null button");
+				}
+
+				if (usrLangPref == 0) {
+					button.setText(wordArray.getWordNativeAtIndex(indexArr));
+				} else {
+					button.setText(wordArray.getWordTranslationAtIndex(indexArr));
+				}
+
+				button.setTextColor(Color.WHITE);
+				button.setBackgroundResource(R.drawable.buttons);
+				button.setLayoutParams(params);
+				button.setGravity(Gravity.CENTER);
+				button.setPadding(20,0,20,0);
+				button.setSingleLine();
+
+				Log.d("listener", "sample word from array: " + wordArray.getWordNativeAtIndex(indexArr));
+
 				btnArr[indexArr] = button;
-				tableRow.addView( button );
+				tableLayout.addView(button);
 				indexArr++;
 			}
-			tableLayout.addView( tableRow  );
+
 		}
-		
 
 		// loop to set up all keypad buttons
 		for( i=0; i<WORD_COUNT; i++ )
