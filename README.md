@@ -19,6 +19,7 @@ Sudoku Vocabulary App is optimized for:
 # Implemented Features
 * [First iteration] (https://csil-git1.cs.surrey.sfu.ca/eazizika/CMPT276-1191E1-Omicron/wikis/First-Iteration)
 * [Second iteration] (https://csil-git1.cs.surrey.sfu.ca/eazizika/CMPT276-1191E1-Omicron/wikis/Second-Iteration)
+* [Third and final iteration] (https://csil-git1.cs.surrey.sfu.ca/eazizika/CMPT276-1191E1-Omicron/wikis/Third-and-Last-Iteration)
 
 
 # Tests
