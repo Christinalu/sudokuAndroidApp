@@ -62,25 +62,25 @@ public class TextMatrix
 		
 		// NOTE: ZOOM_SCALE should be >=1
 		if( puzzleTypeSize == 4 ){ // if 4x4 puzzle type
-			TXT_SIZE_NORMAL = sqrSizeHeight * TXT_SIZE_RATIO_4x4;
+			TXT_SIZE_NORMAL = 15;//sqrSizeHeight * TXT_SIZE_RATIO_4x4;
 			ZOOM_SCALE_TXT = (ZOOM_SCALE[0] - 1f)/2f + 1; //when zooming in, increase text font size but at a slower rate than square size, so in zoom mode, it will fit more of a word
 			//TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT); //use this when scaling text as well
 			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL; //keep the same text size when zooming
 		}
 		else if( puzzleTypeSize == 6 ){
-			TXT_SIZE_NORMAL = sqrSizeHeight * TXT_SIZE_RATIO_6x6;
+			TXT_SIZE_NORMAL = 15;//sqrSizeHeight * TXT_SIZE_RATIO_6x6;
 			ZOOM_SCALE_TXT = (ZOOM_SCALE[0] - 1f)/2f + 1;
 			//TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
 			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL;
 		}
 		else if( puzzleTypeSize == 12 ){
-			TXT_SIZE_NORMAL = sqrSizeHeight * TXT_SIZE_RATIO_12x12;
+			TXT_SIZE_NORMAL = 15;//sqrSizeHeight * TXT_SIZE_RATIO_12x12;
 			ZOOM_SCALE_TXT = (ZOOM_SCALE[0] - 1f)/2f + 1;
 			//TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
 			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL;
 		}
 		else {
-			TXT_SIZE_NORMAL = sqrSizeHeight * TXT_SIZE_RATIO_9x9;
+			TXT_SIZE_NORMAL = 15;//sqrSizeHeight * TXT_SIZE_RATIO_9x9;
 			ZOOM_SCALE_TXT = (ZOOM_SCALE[0] - 1f)/2f + 1;
 			//TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
 			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL;
@@ -104,7 +104,7 @@ public class TextMatrix
 				textViewArr[i][j].getRelativeLayout().setLayoutParams( parameter );
 
 				//upscale text size
-				( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setTextSize( TypedValue.COMPLEX_UNIT_PX, TXT_SIZE_ZOOM );
+				( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setTextSize( TXT_SIZE_ZOOM );
 			}
 		}
 	}
@@ -213,7 +213,7 @@ public class TextMatrix
 		( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setSingleLine( true ); //limit to single line
 		( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setMarqueeRepeatLimit( -1 ); //makes marquee loop forever
 		textViewArr[i][j].getRelativeLayout().setPadding( 10, 10, 10,10 ); //add padding so text is not shown right at the edge
-		( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setTextSize(TypedValue.COMPLEX_UNIT_PX, TXT_SIZE_NORMAL ); //set text size
+		( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setTextSize( TXT_SIZE_NORMAL ); //set text size
 
 		//add the original sqrT/L coordinates
 		textViewArr[i][j].setCoordinates( sqrT, sqrL );
