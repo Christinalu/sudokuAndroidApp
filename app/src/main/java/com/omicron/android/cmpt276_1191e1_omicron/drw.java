@@ -43,7 +43,7 @@ public class drw
 	private Bitmap bitMap;
 	//private Canvas canvas;
 	private WordArray wordArray;
-	private float ZOOM_SCALE;
+	private float[] ZOOM_SCALE;
 	private int WORD_COUNT; //stores the number of words in wordArray
 	private int COL_PER_BLOCK; //stores how many columns will be inside a block; in 9x9 this would be 3
 	private int ROW_PER_BLOCK;
@@ -67,7 +67,7 @@ public class drw
 				int[] zoomOn2, int[] drag2, int[] dX2, int[] dY2,
 				int[] touchXZ2, int[] touchYZ2, int[] zoomButtonSafe2, int[] zoomClickSafe2,
 				int[] zoomButtonDisableUpdate2, int bitmapSizeWidth2, int bitmapSizeHeight2, WordArray wordArray2, int[] btnClicked2,
-				float ZOOM_SCALE2, int COL_PER_BLOCK2, int ROW_PER_BLOCK2, int VERTICAL_BLOCK2, int HORIZONTAL_BLOCK2,
+				float[] ZOOM_SCALE2, int COL_PER_BLOCK2, int ROW_PER_BLOCK2, int VERTICAL_BLOCK2, int HORIZONTAL_BLOCK2,
 				int WORD_COUNT2, int barH2 )
 	{
 		paint = paint2;
@@ -114,8 +114,8 @@ public class drw
 	}
 	
 	
-	public void reDraw( int[] touchX, int[] touchY, Pair lastRectColoured,
-						Pair currentRectColoured, int usrLangPref )
+	public void setDrawParameters( int[] touchX, int[] touchY, Pair lastRectColoured,
+						Pair currentRectColoured )
 	{
 		if( zoomOn[0] == 0 )
 		{
@@ -123,7 +123,7 @@ public class drw
 				/** DRAW ZOOM OUT MODE **/
 
 			newSqrTouched = false; //reset
-			canvas.drawColor( Color.parseColor( "#5cddb1" ) );
+			//canvas.drawColor( Color.parseColor( "#5cddb1" ) );
 
 
 			// loop to find selected rect
@@ -140,19 +140,8 @@ public class drw
 					{
 						if( rectArr[i][j].getRect( ).contains( touchX[0], touchY[0] )  ) // find if sqr was clicked
 						{
-							lastRectColoured.update(currentRectColoured.getRow(), currentRectColoured.getColumn());
-							if (lastRectColoured.getRow() != -1) //avoid indexing out of array since -1 means nothing was previously selected
-							{
-								// this "if statement" must occur after setting lastRect.update() to currentRect
-								rectArr[lastRectColoured.getRow()][lastRectColoured.getColumn()].deselect(); //deselect prev selected
-							}
-
-							currentRectColoured.update(i, j); // update this (must occur before rectArr.select()
-							if (currentRectColoured.getRow() != -1) //bound check
-							{
-								rectArr[i][j].select(); //update array as well
-							}
-
+							selectDeselectRectArrAtIndex( lastRectColoured, currentRectColoured, i, j );
+							
 							newSqrTouched = true;
 							Log.d("TAG", "--touched-1: [" + i + "] [" + j + "]");
 						}
@@ -169,38 +158,10 @@ public class drw
 				}
 			}
 
+			
+			
 
-			// REDRAW ALL SQUARES IN ZOOM MODE WITH CORRESPONDING SHADES
-			for( int i=0; i<WORD_COUNT; i++ )
-			{
-				for( int j=0; j<WORD_COUNT; j++ )
-				{
-					//set colours; must occur after figuring out is rect contained
-					if (rectArr[i][j].isSelected()) //if a selected rect
-					{
-						//note: if rect selected, choose red and skip rest of colours - so red must be first colour assigned
-						paint.setColor(Color.parseColor("#ff0000"));
-					} else if (usrSudokuArr.PuzzleOriginal[i][j] != 0) // if a element that cannot be modified
-					{
-						paint.setColor(Color.parseColor("#a2a2a2")); // set darker colour for fixed numbers
-					} else {
-						paint.setColor(Color.parseColor("#c2c2c2")); // set lighter colour for fixed numbers
-					}
-
-					canvas.drawRect(rectArr[i][j].getRect( ), paint);
-				}
-			}
-
-
-			// DRAW TEXT OVERLAY
-			if( currentRectColoured.getRow() != -1 && btnClicked[0] == 1 )
-			{
-				//redraw text of currently selected square
-				//note that also having this execute only on "btnClicked[0] == 1" does not reset the sliding animation each time a square is highlighted
-				textMatrix.chooseLangAndDraw( currentRectColoured.getRow(), currentRectColoured.getColumn(), wordArray, usrSudokuArr, usrLangPref );
-			}
-
-			rectLayout.invalidate( ); //required to update to print to screen
+			//rectLayout.invalidate( ); //required to update to print to screen
 		}
 		else if( zoomOn[0] == 1 )
 		{
@@ -210,26 +171,26 @@ public class drw
 			newSqrTouched = false; //reset
 
 			// save and reset canvas
-			canvas.save();
-			canvas.drawColor( Color.parseColor( "#5cddb1" ) );
+			//canvas.save();
+			//canvas.drawColor( Color.parseColor( "#5cddb1" ) );
 
 			if( drag[0] == 0 )
 			{
 				//scale to find square where user clicked
-				px = (int)( ( touchXZ[0] + touchX[0] ) / ZOOM_SCALE ); //divide to scale
-				py = (int)( ( touchYZ[0] + touchY[0] ) / ZOOM_SCALE );
+				px = (int)( ( touchXZ[0] + touchX[0] ) / ZOOM_SCALE[0] ); //divide to scale
+				py = (int)( ( touchYZ[0] + touchY[0] ) / ZOOM_SCALE[0] );
 			}
 
 			Log.d( "TAG-2", " touchXZ: " + touchXZ[0] + ", touchX: " + touchX[0] );
 
 			// if drag enabled, then translate matrix
-			if (drag[0] == 1) {
-				canvas.translate( -touchXZ[0] + dX[0], -touchYZ[0] + dY[0] );
-			} else { //else user only clicked
-				canvas.translate(-touchXZ[0], -touchYZ[0]);
-			}
-
-			canvas.scale( ZOOM_SCALE, ZOOM_SCALE );
+//			if (drag[0] == 1) {
+//				canvas.translate( -touchXZ[0] + dX[0], -touchYZ[0] + dY[0] );
+//			} else { //else user only clicked
+//				canvas.translate(-touchXZ[0], -touchYZ[0]);
+//			}
+//
+//			canvas.scale( ZOOM_SCALE, ZOOM_SCALE );
 
 
 				/* LOOP TO FIND IF TOUCH IS INSIDE SQUARE */
@@ -250,19 +211,8 @@ public class drw
 								// NOTE: this works only for hardcoded bitmap size : should change this code when adapting bitmap to screen size
 								break; // do not count click (outside bound)
 							}
-
-							lastRectColoured.update(currentRectColoured.getRow(), currentRectColoured.getColumn());
-							if (lastRectColoured.getRow() != -1) //avoid indexing out of array since -1 means nothing was previously selected
-							{
-								// this "if statement" must occur after setting lastRect.update() to currentRect
-								rectArr[lastRectColoured.getRow()][lastRectColoured.getColumn()].deselect(); //deselect prev selected
-							}
-
-							currentRectColoured.update(i, j); // update this (must occur before rectArr.select()
-							if (currentRectColoured.getRow() != -1) //bound check
-							{
-								rectArr[i][j].select(); //update array as well
-							}
+							
+							selectDeselectRectArrAtIndex( lastRectColoured, currentRectColoured, i, j );
 
 							newSqrTouched = true;
 							Log.d("TAG", "--touched-2: [" + i + "] [" + j + "]");
@@ -278,45 +228,89 @@ public class drw
 					currentRectColoured.update(-1, -1);
 				}
 			}
+			
+			//canvas.restore( );
 
-
-			// redraw all squares in zoom/scale mode with corresponding shade
-			for( int i=0; i<WORD_COUNT; i++ )
-			{
-				for( int j=0; j<WORD_COUNT; j++ )
-				{
-					//set colours; must occur after figuring out is rect contained
-					if (rectArr[i][j].isSelected()) //if a selected rect
-					{
-						//note: if rect selected, choose red and skip rest of colours - so red must be first colour assigned
-						paint.setColor(Color.parseColor("#ff0000"));
-					} else if (usrSudokuArr.PuzzleOriginal[i][j] != 0) // if a element that cannot be modified
-					{
-						paint.setColor(Color.parseColor("#a2a2a2")); // set darker colour for fixed numbers
-					} else {
-						paint.setColor(Color.parseColor("#c2c2c2")); // set lighter colour for fixed numbers
-					}
-
-					canvas.drawRect(rectArr[i][j].getRect(), paint);
-				}
-			}
-
-
-			// DRAW TEXT OVERLAY + RESTORE
-			// update text of currently selected square on button click
-			if( currentRectColoured.getRow() != -1 && btnClicked[0] == 1 )
-			{
-				//note that also having this execute only on "btnClicked[0] == 1" does not reset the sliding animation each time a square is highlighted
-				//note: animation will reset each time a button is clicked because
-				textMatrix.chooseLangAndDraw( currentRectColoured.getRow(), currentRectColoured.getColumn(), wordArray, usrSudokuArr, usrLangPref );
-			}
-
-
-			textMatrix.reDrawTextZoom(touchXZ, touchYZ, dX, dY);
-
-			canvas.restore( );
-
-			rectLayout.invalidate( );
+			//rectLayout.invalidate( );
 		}
+	}
+	
+	
+	private void selectDeselectRectArrAtIndex( Pair lastRectColoured, Pair currentRectColoured, int i, int j )
+	{
+		lastRectColoured.update(currentRectColoured.getRow(), currentRectColoured.getColumn());
+		if (lastRectColoured.getRow() != -1) //avoid indexing out of array since -1 means nothing was previously selected
+		{
+			// this "if statement" must occur after setting lastRect.update() to currentRect
+			rectArr[lastRectColoured.getRow()][lastRectColoured.getColumn()].deselect(); //deselect prev selected
+		}
+		
+		currentRectColoured.update(i, j); // update this (must occur before rectArr.select()
+		if (currentRectColoured.getRow() != -1) //bound check
+		{
+			rectArr[i][j].select(); //update array as well
+		}
+	}
+	
+	
+	public void reDraw( Pair currentRectColoured, int usrLangPref )
+	{
+		/*
+		 * After all coordinates and parameters were set, draw the rectangles
+		 */
+		
+		if( zoomOn[0] == 1 ){
+			canvas.save();
+			
+			//translate the canvas when zoomed
+			if (drag[0] == 1) { //translate as the user drags the canvas
+				canvas.translate( -touchXZ[0] + dX[0], -touchYZ[0] + dY[0] );
+			} else { //else user only clicked
+				canvas.translate(-touchXZ[0], -touchYZ[0]);
+			}
+			
+			canvas.scale( ZOOM_SCALE[0], ZOOM_SCALE[0] );
+		}
+		
+		canvas.drawColor( Color.parseColor( "#5cddb1" ) ); //reset all canvas to colour
+		
+		// redraw all squares in zoom/scale mode with corresponding shade
+		for( int i=0; i<WORD_COUNT; i++ )
+		{
+			for( int j=0; j<WORD_COUNT; j++ )
+			{
+				//set colours; must occur after figuring out is rect contained
+				if (rectArr[i][j].isSelected()) //if a selected rect
+				{
+					//note: if rect selected, choose red and skip rest of colours - so red must be first colour assigned
+					paint.setColor(Color.parseColor("#ff0000"));
+				} else if (usrSudokuArr.PuzzleOriginal[i][j] != 0) // if a element that cannot be modified
+				{
+					paint.setColor(Color.parseColor("#a2a2a2")); // set darker colour for fixed numbers
+				} else {
+					paint.setColor(Color.parseColor("#c2c2c2")); // set lighter colour for fixed numbers
+				}
+				
+				canvas.drawRect(rectArr[i][j].getRect(), paint);
+			}
+		}
+		
+		// DRAW TEXT OVERLAY + RESTORE
+		// update text of currently selected square on button click
+		if( currentRectColoured.getRow() != -1 && btnClicked[0] == 1 )
+		{
+			//note that also having this execute only on "btnClicked[0] == 1" does not reset the sliding animation each time a square is highlighted
+			//note: animation will reset each time a button is clicked because
+			textMatrix.chooseLangAndDraw( currentRectColoured.getRow(), currentRectColoured.getColumn(),
+					  					  wordArray, usrSudokuArr, usrLangPref );
+		}
+		
+		if( zoomOn[0] == 1 )
+		{
+			textMatrix.reDrawTextZoom(touchXZ, touchYZ, dX, dY);
+			canvas.restore( ); //return canvas back to original before zoom
+		}
+		
+		rectLayout.invalidate( );
 	}
 }

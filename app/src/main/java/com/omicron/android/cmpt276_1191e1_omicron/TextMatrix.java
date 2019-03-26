@@ -14,12 +14,12 @@ public class TextMatrix
 	private float TXT_SIZE_NORMAL;
 	private float TXT_SIZE_ZOOM;
 	
-	private float TXT_SIZE_RATIO_4x4 = 0.2f; //ratio to determine size of text inside square
+	private float TXT_SIZE_RATIO_4x4 = 0.16f; //ratio to determine size of text inside square
 	private float TXT_SIZE_RATIO_6x6 = 0.25f;
 	private float TXT_SIZE_RATIO_9x9 = 0.3846f;
-	private float TXT_SIZE_RATIO_12x12 = 0.3846f;
+	private float TXT_SIZE_RATIO_12x12 = 0.45f;
 	
-	private float ZOOM_SCALE; //puzzle zoom
+	private float[] ZOOM_SCALE; //puzzle zoom
 	private float ZOOM_SCALE_TXT; //text zoom
 	private float ZOOM_SCALE_RATIO_4x4;
 	private float ZOOM_SCALE_RATIO_6x6;
@@ -32,7 +32,7 @@ public class TextMatrix
 	private int sqrSizeHeight;
 	private int puzzleTypeSize; //stores number or row/col a puzzle has
 
-	public TextMatrix( Context context, int sqrSizeWidth2, int sqrSizeHeight2, float ZOOM_SCALE2,
+	public TextMatrix( Context context, int sqrSizeWidth2, int sqrSizeHeight2, float[] ZOOM_SCALE2,
 					   int puzzleTypeSize2 )
 	{
 		/*
@@ -62,29 +62,33 @@ public class TextMatrix
 		
 		// NOTE: ZOOM_SCALE should be >=1
 		if( puzzleTypeSize == 4 ){ // if 4x4 puzzle type
-			TXT_SIZE_NORMAL = sqrSizeHeight * TXT_SIZE_RATIO_4x4;
-			ZOOM_SCALE_TXT = (ZOOM_SCALE - 1f)/2f + 1; //when zooming in, increase text font size but at a slower rate than square size, so in zoom mode, it will fit more of a word
-			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
+			TXT_SIZE_NORMAL = 15;//sqrSizeHeight * TXT_SIZE_RATIO_4x4;
+			ZOOM_SCALE_TXT = (ZOOM_SCALE[0] - 1f)/2f + 1; //when zooming in, increase text font size but at a slower rate than square size, so in zoom mode, it will fit more of a word
+			//TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT); //use this when scaling text as well
+			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL; //keep the same text size when zooming
 		}
 		else if( puzzleTypeSize == 6 ){
-			TXT_SIZE_NORMAL = sqrSizeHeight * TXT_SIZE_RATIO_6x6;
-			ZOOM_SCALE_TXT = (ZOOM_SCALE - 1f)/2f + 1;
-			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
+			TXT_SIZE_NORMAL = 15;//sqrSizeHeight * TXT_SIZE_RATIO_6x6;
+			ZOOM_SCALE_TXT = (ZOOM_SCALE[0] - 1f)/2f + 1;
+			//TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
+			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL;
 		}
 		else if( puzzleTypeSize == 12 ){
-			TXT_SIZE_NORMAL = sqrSizeHeight * TXT_SIZE_RATIO_12x12;
-			ZOOM_SCALE_TXT = (ZOOM_SCALE - 1f)/2f + 1;
-			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
+			TXT_SIZE_NORMAL = 15;//sqrSizeHeight * TXT_SIZE_RATIO_12x12;
+			ZOOM_SCALE_TXT = (ZOOM_SCALE[0] - 1f)/2f + 1;
+			//TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
+			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL;
 		}
 		else {
-			TXT_SIZE_NORMAL = sqrSizeHeight * TXT_SIZE_RATIO_9x9;
-			ZOOM_SCALE_TXT = (ZOOM_SCALE - 1f)/2f + 1;
-			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
+			TXT_SIZE_NORMAL = 15;//sqrSizeHeight * TXT_SIZE_RATIO_9x9;
+			ZOOM_SCALE_TXT = (ZOOM_SCALE[0] - 1f)/2f + 1;
+			//TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
+			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL;
 		}
 	}
 
 
-	public void scaleTextZoomIn(  )
+	public void scaleTextZoom( float ZOOM_SCALE )
 	{
 		RelativeLayout.LayoutParams parameter = new RelativeLayout.LayoutParams( (int)( sqrSizeWidth*ZOOM_SCALE),
 													(int)( sqrSizeHeight*ZOOM_SCALE ) );//height and width are in pixel
@@ -94,19 +98,19 @@ public class TextMatrix
 		{
 			for( int j=0; j<puzzleTypeSize; j++ )
 			{
-				textViewArr[i][j].getRelativeLayout().setX( textViewArr[i][j].getRelativeLayout().getX( ) * ZOOM_SCALE ); //set x,y coordinate to multiple of 2
+				textViewArr[i][j].getRelativeLayout().setX( textViewArr[i][j].getRelativeLayout().getX( ) * ZOOM_SCALE ); //set x,y coordinate to multiple of zoom
 				textViewArr[i][j].getRelativeLayout().setY( textViewArr[i][j].getRelativeLayout().getY( ) * ZOOM_SCALE );
 
 				textViewArr[i][j].getRelativeLayout().setLayoutParams( parameter );
 
 				//upscale text size
-				( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setTextSize( TypedValue.COMPLEX_UNIT_PX, TXT_SIZE_ZOOM );
+				( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setTextSize( TXT_SIZE_ZOOM );
 			}
 		}
 	}
 
 
-	public void scaleTextZoomOut(  )
+	/*public void scaleTextZoomOut( float ZOOM_SCALE )
 	{
 		RelativeLayout.LayoutParams parameter = new RelativeLayout.LayoutParams( (int)(sqrSizeWidth), (int)(sqrSizeHeight) );//height and width are in pixel
 
@@ -124,7 +128,7 @@ public class TextMatrix
 				( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setTextSize( TypedValue.COMPLEX_UNIT_PX, TXT_SIZE_NORMAL );
 			}
 		}
-	}
+	}*/
 
 
 	public void reDrawTextZoom( int[] touchXZ, int[] touchYZ, int[] dX, int[] dY )
@@ -137,8 +141,8 @@ public class TextMatrix
 		{
 			for( int j=0; j<puzzleTypeSize; j++ )
 			{
-				textViewArr[i][j].getRelativeLayout().setX( textViewArr[i][j].getSqrL() * ZOOM_SCALE + ( -touchXZ[0] + dX[0] ) ); //set x,y coordinate
-				textViewArr[i][j].getRelativeLayout().setY( textViewArr[i][j].getSqrT() * ZOOM_SCALE + ( -touchYZ[0] + dY[0] ) );
+				textViewArr[i][j].getRelativeLayout().setX( textViewArr[i][j].getSqrL() * ZOOM_SCALE[0] + ( -touchXZ[0] + dX[0] ) ); //set x,y coordinate
+				textViewArr[i][j].getRelativeLayout().setY( textViewArr[i][j].getSqrT() * ZOOM_SCALE[0] + ( -touchYZ[0] + dY[0] ) );
 			}
 		}
 	}
@@ -209,7 +213,7 @@ public class TextMatrix
 		( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setSingleLine( true ); //limit to single line
 		( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setMarqueeRepeatLimit( -1 ); //makes marquee loop forever
 		textViewArr[i][j].getRelativeLayout().setPadding( 10, 10, 10,10 ); //add padding so text is not shown right at the edge
-		( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setTextSize(TypedValue.COMPLEX_UNIT_PX, TXT_SIZE_NORMAL ); //set text size
+		( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setTextSize( TXT_SIZE_NORMAL ); //set text size
 
 		//add the original sqrT/L coordinates
 		textViewArr[i][j].setCoordinates( sqrT, sqrL );
