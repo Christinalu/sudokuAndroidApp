@@ -44,7 +44,8 @@ public class ButtonListener extends AppCompatActivity
 		int btnCount;
 		int indexArr = 0;
 		
-			/** SET BUTTON LISTENERS **/
+		
+			/** SET BUTTON LAYOUT **/
 		
 		btnArr = new Button[WORD_COUNT]; // set buttons as an array
 		
@@ -125,7 +126,9 @@ public class ButtonListener extends AppCompatActivity
 			}
 
 		}
-
+		
+			/** SET BUTTON LISTENERS **/
+		
 		// loop to set up all keypad buttons
 		for( i=0; i<WORD_COUNT; i++ )
 		{
