@@ -71,7 +71,7 @@ public class GameActivity extends AppCompatActivity
 	private RelativeLayout rectTextLayout;
 	private View.OnTouchListener handleTouch;
 	private SudokuGenerator usrSudokuArr;
-	private FindSqrCoordToZoomInOn findSqrCoordToZoomInOn;
+	//private FindSqrCoordToZoomInOn findSqrCoordToZoomInOn;
 
 	private int sqrLO; // original left coordinate of where puzzle starts
 	private int sqrTO; // original top coordinate of where puzzle starts
@@ -120,8 +120,20 @@ public class GameActivity extends AppCompatActivity
 	
 	private static int BOUNDARY_OFFSET = 40; //puzzle will have some offset for aesthetic reasons near edges
 	private static float BOUNDARY_OFFSET_SCALE = 0.035f;
-	private static float ZOOM_SCALE = 1.5f; // zoom factor of how much to zoom in puzzle in "zoom" mode
-	private static float ZOOM_SCALE_ORIGINAL = ZOOM_SCALE;
+	private static float[] ZOOM_SCALE = { 1f }; //zoom scale that will be used after initialized from 4x4 or 6x6 or ... zoom scale
+	private static float[] ZOOM_SCALE_OLD = { 1f };
+	private static boolean[] ZOOM_FIRST_TIME = { true };
+	private static float ZOOM_SCALE_ORIGINAL;
+	private static float ZOOM_SCALE_4x4 = 1.2f; // zoom factor of how much to zoom in puzzle in "zoom" mode
+	private static float ZOOM_SCALE_4x4_ORIGINAL = ZOOM_SCALE_4x4;
+	private static float ZOOM_SCALE_6x6 = 1.4f; // zoom factor of how much to zoom in puzzle in "zoom" mode
+	private static float ZOOM_SCALE_6x6_ORIGINAL = ZOOM_SCALE_6x6;
+	private static float ZOOM_SCALE_9x9 = 1.5f; // zoom factor of how much to zoom in puzzle in "zoom" mode
+	private static float ZOOM_SCALE_9x9_ORIGINAL = ZOOM_SCALE_9x9;
+	private static float ZOOM_SCALE_12x12 = 2.0f;
+	private static float ZOOM_SCALE_12x12_ORIGINAL = ZOOM_SCALE_12x12;
+	private int[] zoomLevel = { 0 }; //0== no zoom; 1== default zoom; 2==twice default zoom
+	private int zoomLevel_MAX = 3; //max allowed to zoom
 	private int PUZZLE_FULL_SIZE_WIDTH; // size of full puzzle from left most column pixel to right most column pixel
 	private long STATISTIC_MULTIPLE = 2; //used to multiply by factor the number of "Hint Clicks" a user used, to more likely show these words
 	
@@ -155,6 +167,7 @@ public class GameActivity extends AppCompatActivity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_game);
 		
+		ZOOM_FIRST_TIME[0] = true;
 
 		//set intent to receive word array from Main Activity
 		if (savedInstanceState != null) {
@@ -289,8 +302,8 @@ public class GameActivity extends AppCompatActivity
 
 		// set up object to translate to selected square in "zoom" mode
 		// note: requires sqrSize be determined before call
-		findSqrCoordToZoomInOn = new FindSqrCoordToZoomInOn( touchXZ, touchYZ, currentRectColoured, bitmapSizeWidth, bitmapSizeHeight,
-															 sqrSizeWidth, sqrSizeHeight, textMatrix, ZOOM_SCALE );
+		//findSqrCoordToZoomInOn = new FindSqrCoordToZoomInOn( touchXZ, touchYZ, currentRectColoured, bitmapSizeWidth, bitmapSizeHeight,
+		//													 sqrSizeWidth, sqrSizeHeight, textMatrix, ZOOM_SCALE );
 		
 
 		// PREDEFINE VARIABLES FOR MATRIX OVERLAY
@@ -309,11 +322,15 @@ public class GameActivity extends AppCompatActivity
 		
 		
 		// call function to set all listeners - needs drawR
-		listeners = new ButtonListener( currentRectColoured, usrSudokuArr,
-										drawR, touchX, touchY, lastRectColoured, usrLangPref, btnClicked,
-										Hint, wordArray,usrModePref,numArray, WORD_COUNT, COL_PER_BLOCK, ROW_PER_BLOCK,
-										this, tableLayout, orientation );
-
+		
+		// TODO: add here the finishedGame variable to stop listeners from being re activated
+		// TODO: to prevent bug where when user finishes game then resumes game, the user can still play
+		
+		listeners = new ButtonListener(currentRectColoured, usrSudokuArr,
+					drawR, touchX, touchY, lastRectColoured, usrLangPref, btnClicked,
+					Hint, wordArray, usrModePref, numArray, WORD_COUNT, COL_PER_BLOCK, ROW_PER_BLOCK,
+					this, tableLayout, orientation);
+		
 
 
 			/** CREATE RECT MATRIX **/
@@ -324,7 +341,8 @@ public class GameActivity extends AppCompatActivity
 
 
 		//draw matrix so far
-		drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
+		drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
+		drawR.reDraw( currentRectColoured, usrLangPref );
 
 
 			/* ZOOM IN BUTTON */
@@ -337,25 +355,47 @@ public class GameActivity extends AppCompatActivity
 				{
 					if( zoomInBtnOn[0] == 1 ) //only allow btn to be clicked when activated
 					{
+						// set zoom scale
+						zoomLevel[0]++;
+						
+						if( ZOOM_FIRST_TIME[0] == true ) //detect if game just started; solves bug where ZOOM_OLD was not 1
+						{
+							ZOOM_SCALE_OLD[0] = 1;
+							ZOOM_FIRST_TIME[0] = false;
+						}
+						else
+						{
+							ZOOM_SCALE_OLD[0] = ZOOM_SCALE[0];
+						}
+						
+						ZOOM_SCALE[0] = 1f + (ZOOM_SCALE_ORIGINAL - 1) * zoomLevel[0];
+						
 						zoomOn[0] = 1; //set zoom as activated
 						zoomButtonSafe[0] = 1; //zoomSafe needed
 						zoomClickSafe[0] = 1;
 						zoomButtonDisableUpdate[0] = 1; //do not let button update coordinate when switching modes due to zoomX scaling
 
-						textMatrix.scaleTextZoomIn( );
+						textMatrix.scaleTextZoom( ZOOM_SCALE[0] );
 						textMatrix.reDrawTextZoom( touchXZ, touchYZ, dX, dY ); // call this because .scaleTextZoom() only scales Layouts, so call this to place them in correct (drag) position
 
+						/*
 						touchXZ[0] = 0;
 						touchYZ[0] = 0;
-
+						*/
+						
 						// on zoom in, calculate coordinate to zoom on selected square
-						findSqrCoordToZoomInOn.findSqrCoordToZoomInOn( );
-
-						drawR.reDraw(touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref);
-
+						//findSqrCoordToZoomInOn.findSqrCoordToZoomInOn( );
+						findSqrCoordToZoomInOn( ZOOM_SCALE_OLD );
+						
+						drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
+						drawR.reDraw( currentRectColoured, usrLangPref );
+						
 						zoomButtonSafe[0] = 0; //zoomSafe needed
+						
 						zoomOutBtnOn[0] = 1; //activate other zoom btn
-						zoomInBtnOn[0] = 0; //deactivate this btn so text not scaled multiple times
+						if( zoomLevel[0] >= zoomLevel_MAX ){ //do not allow to zoom more, disable zoom in btn
+							zoomInBtnOn[0] = 0; //deactivate this btn so text not scaled multiple times
+						}
 					}
 				}
 			}
@@ -372,17 +412,35 @@ public class GameActivity extends AppCompatActivity
 						{
 							if( zoomOutBtnOn[0] == 1 )//only allow btn to be clicked when activated
 							{
-								zoomOn[0] = 0; //set zoom as inactivated
+								zoomLevel[0]--; //should not reach -1, because it will be disabled by zoomOutBtnOn[]
+								ZOOM_SCALE_OLD[0] = ZOOM_SCALE[0];
+								ZOOM_SCALE[0] = 1f + (ZOOM_SCALE_ORIGINAL - 1) * zoomLevel[0];
+								
+								zoomOn[0] = 1; //set zoom as activated
 								zoomButtonSafe[0] = 1; // do not update sqr on button click
 								zoomClickSafe[0] = 1;
 								zoomButtonDisableUpdate[0] = 1; //do not let button update coordinate when switching modes due to zoomX scaling
-
-								drawR.reDraw(touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref);
-								textMatrix.scaleTextZoomOut( );
+								
+								textMatrix.scaleTextZoom( ZOOM_SCALE[0] );
+								textMatrix.reDrawTextZoom( touchXZ, touchYZ, dX, dY ); // call this because .scaleTextZoom() only scales Layouts, so call this to place them in correct (drag) position
+								
+								/*
+								touchXZ[0] = 0;
+								touchYZ[0] = 0;
+								*/
+								
+								// on zoom, calculate coordinate to zoom on selected square
+								//findSqrCoordToZoomInOn.findSqrCoordToZoomInOn( );
+								findSqrCoordToZoomInOn( ZOOM_SCALE_OLD );
+								
+								drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
+								drawR.reDraw( currentRectColoured, usrLangPref );
 
 								zoomButtonSafe[0] = 0;
 								zoomInBtnOn[0] = 1; //activate other zoom btn
-								zoomOutBtnOn[0] = 0; //deactivate this btn so text not scaled multiple times
+								if( zoomLevel[0] <= 0 ){ //do not allow to zoom more than normal zoom
+									zoomOutBtnOn[0] = 0; //deactivate this btn so text not scaled multiple times
+								}
 							}
 						}
 					}
@@ -654,7 +712,8 @@ public class GameActivity extends AppCompatActivity
 			ROW_PER_BLOCK = 2;
 			VERTICAL_BLOCK = 2;
 			HORIZONTAL_BLOCK = 2;
-			ZOOM_SCALE = 1.2f; //zoom in less
+			ZOOM_SCALE[0] = ZOOM_SCALE_4x4;
+			ZOOM_SCALE_ORIGINAL = ZOOM_SCALE[0];
 			BOUNDARY_OFFSET = (int)( bitmapSizeHeight * BOUNDARY_OFFSET_SCALE );
 			SQR_INNER_DIVIDER = (int)( bitmapSizeHeight * SQR_INNER_DIVIDER_RATIO_4x4 );
 			SQR_OUTER_DIVIDER = (int)( bitmapSizeHeight * SQR_OUTER_DIVIDER_RATIO_4x4 );
@@ -663,8 +722,10 @@ public class GameActivity extends AppCompatActivity
 			COL_PER_BLOCK = 3;
 			ROW_PER_BLOCK = 2;
 			VERTICAL_BLOCK = 2;
-			ZOOM_SCALE = ZOOM_SCALE_ORIGINAL;
-			HORIZONTAL_BLOCK = 3;BOUNDARY_OFFSET = (int)( bitmapSizeHeight * BOUNDARY_OFFSET_SCALE );
+			HORIZONTAL_BLOCK = 3;
+			ZOOM_SCALE[0] = ZOOM_SCALE_6x6;
+			ZOOM_SCALE_ORIGINAL = ZOOM_SCALE[0];
+			BOUNDARY_OFFSET = (int)( bitmapSizeHeight * BOUNDARY_OFFSET_SCALE );
 			SQR_INNER_DIVIDER = (int)( bitmapSizeHeight * SQR_INNER_DIVIDER_RATIO_6x6 );
 			SQR_OUTER_DIVIDER = (int)( bitmapSizeHeight * SQR_OUTER_DIVIDER_RATIO_6x6 );
 			
@@ -674,8 +735,9 @@ public class GameActivity extends AppCompatActivity
 			ROW_PER_BLOCK = 3;
 			VERTICAL_BLOCK = 3;
 			HORIZONTAL_BLOCK = 4;
-			ZOOM_SCALE = ZOOM_SCALE_ORIGINAL + 0.5f; //in 12x12, zoom in more because too small to see
-			HORIZONTAL_BLOCK = 3;BOUNDARY_OFFSET = (int)( bitmapSizeHeight * BOUNDARY_OFFSET_SCALE );
+			ZOOM_SCALE[0] = ZOOM_SCALE_12x12; //in 12x12, zoom in more because too small to see
+			ZOOM_SCALE_ORIGINAL = ZOOM_SCALE[0];
+			BOUNDARY_OFFSET = (int)( bitmapSizeHeight * BOUNDARY_OFFSET_SCALE );
 			SQR_INNER_DIVIDER = (int)( bitmapSizeHeight * SQR_INNER_DIVIDER_RATIO_12x12 );
 			SQR_OUTER_DIVIDER = (int)( bitmapSizeHeight * SQR_OUTER_DIVIDER_RATIO_12x12 );
 		}
@@ -684,12 +746,14 @@ public class GameActivity extends AppCompatActivity
 			ROW_PER_BLOCK = 3;
 			VERTICAL_BLOCK = 3;
 			HORIZONTAL_BLOCK = 3;
-			ZOOM_SCALE = ZOOM_SCALE_ORIGINAL;
+			ZOOM_SCALE[0] = ZOOM_SCALE_9x9;
+			ZOOM_SCALE_ORIGINAL = ZOOM_SCALE[0];
 			BOUNDARY_OFFSET = (int)( bitmapSizeHeight * BOUNDARY_OFFSET_SCALE );
 			SQR_INNER_DIVIDER = (int)( bitmapSizeHeight * SQR_INNER_DIVIDER_RATIO_9x9 );
 			SQR_OUTER_DIVIDER = (int)( bitmapSizeHeight * SQR_OUTER_DIVIDER_RATIO_9x9 );
-			Log.d( "selectW", "ZOOM_SCALE: " + ZOOM_SCALE );
 		}
+		
+		Log.d( "selectW", "ZOOM_SCALE: " + ZOOM_SCALE );
 	}
 	
 	
@@ -851,15 +915,14 @@ public class GameActivity extends AppCompatActivity
 			Log.d( "TAG", " -- " );
 			Log.d( "TAG", "touchXZ start: (" + touchXZ[0] + ", " + touchYZ[0] + ")" );
 			Log.d( "TAG", "click down touchXZclick: (" + touchXZclick[0] + ", " + touchYZclick[0] + ")" );
-			
-			drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
 		}
 		else
 		{
-			// call function to redraw if user touch detected
-			drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
 			Log.i("TAG", "normal click: (" + touchX[0] + ", " + touchY[0] + ")");
 		}
+		
+		drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
+		drawR.reDraw( currentRectColoured, usrLangPref );
 		
 		// TEXT TO SPEECH
 		if (usrModePref == 1) {
@@ -910,9 +973,9 @@ public class GameActivity extends AppCompatActivity
 			}
 			
 			//fix out of bounds: RIGHT
-			if( touchXZ[0] - dX[0] > bitmapSizeWidth*ZOOM_SCALE - bitmapSizeWidth )
+			if( touchXZ[0] - dX[0] > bitmapSizeWidth*ZOOM_SCALE[0] - bitmapSizeWidth )
 			{
-				touchXZ[0] = (int)( bitmapSizeWidth*ZOOM_SCALE - bitmapSizeWidth ); //set to max
+				touchXZ[0] = (int)( bitmapSizeWidth*ZOOM_SCALE[0] - bitmapSizeWidth ); //set to max
 				dX[0] = 0;
 			}
 			
@@ -927,13 +990,14 @@ public class GameActivity extends AppCompatActivity
 			}
 			
 			//fix out of bounds: BOTTOM
-			if( touchYZ[0] - dY[0] > bitmapSizeHeight*ZOOM_SCALE - bitmapSizeHeight )
+			if( touchYZ[0] - dY[0] > bitmapSizeHeight*ZOOM_SCALE[0] - bitmapSizeHeight )
 			{
-				touchYZ[0] = (int)(bitmapSizeHeight*ZOOM_SCALE - bitmapSizeHeight); //set to max
+				touchYZ[0] = (int)(bitmapSizeHeight*ZOOM_SCALE[0] - bitmapSizeHeight); //set to max
 				dY[0] = 0;
 			}
 			
-			drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
+			drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
+			drawR.reDraw( currentRectColoured, usrLangPref );
 		}
 	}
 	
@@ -961,6 +1025,91 @@ public class GameActivity extends AppCompatActivity
 			
 			Log.i( "TAG", "moved dX: (" + dX[0] + ", " + dY[0] + ")" );
 		}
+	}
+	
+	private void findSqrCoordToZoomInOn( float[] ZOOM_SCALE_OLD )
+	{
+		/*
+		 * This function adjusts the coordinates touchXZ[] of where to zoom in
+		 * Say a user is in "zoom out" mode, then clicks on a square,
+		 * then when user switched to "zoom in" mode, this will calculate
+		 * coordinates to zoom in onto that selected square
+		 *
+		 * If no square selected, it will zoom in to center by default
+		 */
+		
+		int topX; //x-coordinate of top left corner of where the view relative to zoomed canvas
+		int topY;
+		
+		// TRANSLATE COORDINATE ONLY IF A SQUARE IS SELECTED
+		if( currentRectColoured.getRow() != -1 )
+		{
+			int i = currentRectColoured.getRow( ); //row coordinate of selected square
+			int j = currentRectColoured.getColumn( );
+			
+			//get coordinates of top left corner of square
+			//get position of selected square (then scale)
+			topX = (int) (( (textMatrix.getRelativeAndPos())[i][j] ).getSqrL( )*ZOOM_SCALE[0]);
+			topY = (int) (( (textMatrix.getRelativeAndPos())[i][j] ).getSqrT( )*ZOOM_SCALE[0]);
+			
+			//translate from corner of square to corner of zoom view area
+			//note: "zoom view area" is the square field of view, ie the only rectangular area that is visible in zoom mode out of whole puzzle
+			topX = topX - (int)( (bitmapSizeWidth-sqrSizeWidth*ZOOM_SCALE[0]) / 2 );
+			topY = topY - (int)( (bitmapSizeHeight-sqrSizeHeight*ZOOM_SCALE[0]) / 2 );
+			
+		}
+		else
+		{
+//			if( touchXZ[0] == 0 && touchYZ[0] == 0 ) //start of game
+//			{
+//				// default: translate to center of matrix
+//				topX = (int) (bitmapSizeWidth * ZOOM_SCALE[0] / 2 - bitmapSizeWidth / 2);
+//				topY = (int) (bitmapSizeHeight * ZOOM_SCALE[0] / 2 - bitmapSizeHeight / 2);
+//			}
+//			else
+//			{
+				/*//default: no square selected
+				//assume square in center selected
+				//find coordinates of top left square corner
+				topX = (int)( ( (touchXZ[0] + bitmapSizeWidth / 2f) - (sqrSizeWidth * ZOOM_SCALE_OLD / 2) ) / ZOOM_SCALE_OLD * ZOOM_SCALE[0] );
+				topY = (int)( ( (touchYZ[0] + bitmapSizeHeight / 2f) - (sqrSizeHeight * ZOOM_SCALE_OLD / 2) ) / ZOOM_SCALE_OLD * ZOOM_SCALE[0] );
+				
+				//translate from corner of square to corner of zoom view area
+				//note: "zoom view area" is the square field of view, ie the only rectangular area that is visible in zoom mode out of whole puzzle
+				topX = topX - (int) ((bitmapSizeWidth - sqrSizeWidth * ZOOM_SCALE[0]) / 2);
+				topY = topY - (int) ((bitmapSizeHeight - sqrSizeHeight * ZOOM_SCALE[0]) / 2);
+				*/
+			Log.d( "zoom", "touchXZ: " + touchXZ[0] + " bitmapSizeWidth: " + bitmapSizeWidth + " ZOOM_SCALE_OLD: " + ZOOM_SCALE_OLD[0] + " ZOOM_SCALE[]: " + ZOOM_SCALE[0] );
+			
+			topX = (int)( (touchXZ[0] + bitmapSizeWidth/2)/ZOOM_SCALE_OLD[0]*ZOOM_SCALE[0] - bitmapSizeWidth/2 );
+			topY = (int)( (touchYZ[0] + bitmapSizeHeight/2)/ZOOM_SCALE_OLD[0]*ZOOM_SCALE[0] - bitmapSizeHeight/2 );
+//			}
+			
+			Log.d( "zoom", "topX: " + topX + " topY: " + topY );
+		}
+		
+			// FIX OUT-OF-BOUNDS
+		//ie: if calculated coordinates of selected square is too close to top left corner, set view at (0,0)
+		if( topX < 0 ) //if too close left
+		{
+			topX = 0;
+		}
+		else if( topX > bitmapSizeWidth*ZOOM_SCALE[0] - bitmapSizeWidth ) //if too close to right
+		{
+			topX = (int)( bitmapSizeWidth*ZOOM_SCALE[0] - bitmapSizeWidth );
+		}
+		
+		if( topY < 0 ) //if too close to top
+		{
+			topY = 0;
+		}
+		else if( topY > bitmapSizeHeight*ZOOM_SCALE[0] - bitmapSizeHeight ) //if too close to bottom
+		{
+			topY = (int)( bitmapSizeHeight*ZOOM_SCALE[0] - bitmapSizeHeight );
+		}
+		
+		touchXZ[0] = topX;
+		touchYZ[0] = topY;
 	}
 }
 

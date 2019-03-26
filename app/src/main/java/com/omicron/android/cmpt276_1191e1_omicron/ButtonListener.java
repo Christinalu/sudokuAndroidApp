@@ -197,7 +197,8 @@ public class ButtonListener extends AppCompatActivity
 
 													 // redraw square matrix and text overlay
 													 btnClicked[0] = 1; //this flag allows (for efficiency) class drw to update TextView as well in zoom mode
-													 drawR.reDraw( touchX, touchY, lastRectColoured, currentRectColoured, usrLangPref );
+													 drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
+													 drawR.reDraw( currentRectColoured, usrLangPref );
 													 btnClicked[0] = 0;
 													 //textOverlay.reDrawText( usrLangPref );
 													 
@@ -224,6 +225,8 @@ public class ButtonListener extends AppCompatActivity
 														 track.checkPuzzle( usrSudokuArr, check, v, btnArr );
 													 }
 												 }
+												 
+												 //debug
 												 //usrSudokuArr.printCurrent( );
 											 }
 										 }

@@ -10,8 +10,7 @@ public class SudokuGenerator implements Serializable {
     /*
      *    -- IMPORTANT --
      *  This generating function can generate UNIQUE puzzles based on
-     *  pre-defined unique puzzles. One 9x9 puzzle can be used to
-     *  generate approximately (3!)^8 = 1679616 new puzzles
+     *  pre-defined unique puzzles.
     */
 
     //This class accepts a hardcoded Puzzle and randomizes it to generate a new puzzle which is guaranteed to be unique and the same difficulty and the puzzle taken in as the argument.
@@ -20,7 +19,7 @@ public class SudokuGenerator implements Serializable {
     public int[][] Puzzle; //stores user input changes
     public int[][] PuzzleSol; //stores puzzle solution
     
-    private int[][] testSeed9x9 = {{0,0,0,0,0,0,0,0,0},{6,4,5,8,7,3,2,1,9},{3,8,9,2,6,1,7,4,5},{4,9,6,3,2,7,8,5,1},{8,1,3,4,5,6,9,7,2},{2,5,7,1,9,8,4,3,6},{9,6,4,7,1,5,3,2,8},{7,3,1,6,8,2,5,9,4},{5,2,8,9,3,4,1,6,7}};
+    private int[][] testSeed9x9 = {{0,0,2,5,4,9,6,8,3},{6,4,5,8,7,3,2,1,9},{3,8,9,2,6,1,7,4,5},{4,9,6,3,2,7,8,5,1},{8,1,3,4,5,6,9,7,2},{2,5,7,1,9,8,4,3,6},{9,6,4,7,1,5,3,2,8},{7,3,1,6,8,2,5,9,4},{5,2,8,9,3,4,1,6,7}};
 	private int[][] testSeed9x9Solution = {{1,7,2,5,4,9,6,8,3},{6,4,5,8,7,3,2,1,9},{3,8,9,2,6,1,7,4,5},{4,9,6,3,2,7,8,5,1},{8,1,3,4,5,6,9,7,2},{2,5,7,1,9,8,4,3,6},{9,6,4,7,1,5,3,2,8},{7,3,1,6,8,2,5,9,4},{5,2,8,9,3,4,1,6,7}};
 	private int[][] testSeed6x6 = {{0,0,0,0,6,0},{3,0,0,0,0,0},{0,2,0,0,3,0,},{6,0,0,4,0,0,},{0,1,0,3,0,4},{0,0,0,0,0,5}};
 	private int[][] testSeed6x6Solution = {{1,5,4,2,6,3},{3,6,2,5,4,1},{4,2,5,1,3,6,},{6,3,1,4,5,2},{5,1,6,3,2,4},{2,4,3,6,1,5}};
@@ -46,7 +45,7 @@ public class SudokuGenerator implements Serializable {
 
         
 	
-		size = 9;
+		size = 12;
 		PuzzleOriginal = new int[size][size];
 		Puzzle = new int[size][size];
 		PuzzleSol = new int[size][size];
@@ -66,9 +65,9 @@ public class SudokuGenerator implements Serializable {
         
         // TODO: remove the following once implementation complete
 	
-		copyarr( PuzzSeedEasy, PuzzleOriginal );
-		copyarr( PuzzSeedEasy, Puzzle );
-		copyarr( PuzzSeedEasySol, PuzzleSol );
+		copyarr( testSeed12x12, PuzzleOriginal );
+		copyarr( testSeed12x12, Puzzle );
+		copyarr( testSeed12x12Solution, PuzzleSol );
     
         // TODO: enable scramble() and copyarr()
         
