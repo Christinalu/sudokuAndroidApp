@@ -64,9 +64,9 @@ public class GameActivity extends AppCompatActivity
 	private int val;
 
 	private Paint paint = new Paint( );
-	private Bitmap bitMap;
-	private Canvas canvas;
-	private ImageView imgView;
+	//private Bitmap bitMap;
+	//private Canvas canvas;
+	//private ImageView imgView;
 	private RelativeLayout rectLayout;
 	private RelativeLayout rectTextLayout;
 	private View.OnTouchListener handleTouch;
@@ -138,6 +138,7 @@ public class GameActivity extends AppCompatActivity
 	private int sqrSizeWidth; //size of single square in matrix
 	private int sqrSizeHeight;
 	private int orientation;
+	private int barH; //stores size of top bar in pixels
 	
 	private int HINT_CLICK_TO_MAX_PROB;
 	private static final float LANDSCAPE_RATIO = 0.75f; //determines how much of the screen will be dedicated to puzzle in landscape
@@ -262,19 +263,26 @@ public class GameActivity extends AppCompatActivity
 
 		rectLayout = (RelativeLayout) findViewById( R.id.rect_layout ); //used to detect user touch for matrix drw
 		rectTextLayout = (RelativeLayout) findViewById( R.id.rect_txt_layout ); //used to crop TextViews the same size as bitmap
-		imgView = new ImageView(this);
 		
+		drawR = new drw( this, rectLayout ); //declare only
 		
 		//initialize Puzzle Matrix parameters including:
 		//sqrLO, sqrTO, sqrSizeWidth, sqrSizeHeight, bitMap, rectLayout, rectTextLayout
 		initializePuzzleMatrixParameters( );
 		
 		
-		canvas = new Canvas( bitMap );
-		imgView.setImageBitmap( bitMap );
+		
 		paint.setColor(Color.parseColor("#c2c2c2"));
 
-		rectLayout.addView( imgView );
+		
+		
+		
+		
+		
+		
+		
+		
+		
 
 		textMatrix = new TextMatrix( this, sqrSizeWidth, sqrSizeHeight, ZOOM_SCALE, WORD_COUNT );
 
@@ -291,10 +299,11 @@ public class GameActivity extends AppCompatActivity
 		
 		rectArr = new Block[WORD_COUNT][WORD_COUNT]; // stores all squares in a 2D array
 		
-		drawR = new drw( rectArr, paint, canvas, rectLayout, rectTextLayout, textMatrix, usrSudokuArr, zoomOn, drag,
+		drawR.drwInitialize( rectArr, paint, rectTextLayout, textMatrix, usrSudokuArr, zoomOn, drag,
 						 dX, dY, touchXZ, touchYZ, zoomButtonSafe, zoomClickSafe, zoomButtonDisableUpdate,
 						 bitmapSizeWidth, bitmapSizeHeight, wordArray, btnClicked, ZOOM_SCALE,
-						 COL_PER_BLOCK, ROW_PER_BLOCK, VERTICAL_BLOCK, HORIZONTAL_BLOCK, WORD_COUNT ); // class used to draw/update square matrix
+						 COL_PER_BLOCK, ROW_PER_BLOCK, VERTICAL_BLOCK, HORIZONTAL_BLOCK, WORD_COUNT,
+						 barH ); // class used to draw/update square matrix
 		
 		TableLayout tableLayout = findViewById( R.id.btn_keypad );
 		
@@ -717,7 +726,7 @@ public class GameActivity extends AppCompatActivity
 		
 		//status bar height
 		//this is needed as offset in landscape mode to alight rect matrix with textOverlay
-		int barH = getStatusBarHeight();
+		barH = getStatusBarHeight();
 		
 		/* SET PUZZLE ROW AND COL NUMBER PER BLOCK AND DIVIDER SIZE */
 		WORD_COUNT = wordArray.getWordCount( );
@@ -739,7 +748,9 @@ public class GameActivity extends AppCompatActivity
 			sqrSizeWidth = ( bitmapSizeWidth - 2*BOUNDARY_OFFSET - (VERTICAL_BLOCK*(COL_PER_BLOCK-1))*SQR_INNER_DIVIDER - (VERTICAL_BLOCK-1)*SQR_OUTER_DIVIDER ) / WORD_COUNT;
 			sqrSizeHeight = ( bitmapSizeHeight - barH - 2*BOUNDARY_OFFSET - (HORIZONTAL_BLOCK*(ROW_PER_BLOCK-1))*SQR_INNER_DIVIDER - (HORIZONTAL_BLOCK-1)*SQR_OUTER_DIVIDER ) / WORD_COUNT;
 			
-			bitMap = Bitmap.createBitmap( bitmapSizeWidth, bitmapSizeHeight-barH, Bitmap.Config.ARGB_8888 );
+			drawR.createBitmap( bitmapSizeWidth, bitmapSizeHeight, barH );
+			
+			//bitMap = Bitmap.createBitmap( bitmapSizeWidth, bitmapSizeHeight-barH, Bitmap.Config.ARGB_8888 );
 			
 			//set rect_txt_layout the same size as the bitmap
 			rectTextLayout.getLayoutParams().width = bitmapSizeWidth;
@@ -762,7 +773,8 @@ public class GameActivity extends AppCompatActivity
 			sqrLO = BOUNDARY_OFFSET + (screenW - 2 * BOUNDARY_OFFSET) / 2 - PUZZLE_FULL_SIZE_WIDTH / 2;
 			sqrTO = BOUNDARY_OFFSET; // no boundary offset - note: boundary offset is already included in bitmapSize because width == height, so sqrSize calculated for sqrLO width assures the offset is included in height sqrTO
 			
-			bitMap = Bitmap.createBitmap( bitmapSizeWidth, bitmapSizeHeight, Bitmap.Config.ARGB_8888 );
+			drawR.createBitmap( bitmapSizeWidth, bitmapSizeHeight, 0 );
+			//bitMap = Bitmap.createBitmap( bitmapSizeWidth, bitmapSizeHeight, Bitmap.Config.ARGB_8888 );
 			
 			//set rect_txt_layout the same size as the bitmap
 			rectTextLayout.getLayoutParams().width = bitmapSizeWidth;

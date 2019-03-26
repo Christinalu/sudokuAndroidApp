@@ -1,6 +1,7 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -8,6 +9,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -36,6 +38,10 @@ public class drw
 	private int[] btnClicked;
 	private int bitmapSizeWidth;
 	private int bitmapSizeHeight;
+	private int barH;
+	private ImageView imgView;
+	private Bitmap bitMap;
+	//private Canvas canvas;
 	private WordArray wordArray;
 	private float ZOOM_SCALE;
 	private int WORD_COUNT; //stores the number of words in wordArray
@@ -43,18 +49,31 @@ public class drw
 	private int ROW_PER_BLOCK;
 	private int VERTICAL_BLOCK; //stores how many (vertical) blocks are in a puzzle; in 9x9 this would be 3 blocks
 	private int HORIZONTAL_BLOCK;
-
-	public drw( Block[][] rectArr2, Paint paint2, Canvas canvas2,
-				RelativeLayout rectLayout2, RelativeLayout rectTextLayout2, TextMatrix textMatrix2, SudokuGenerator usrSudokuArr2,
+	private Context context; //context of GameActivity
+	
+	
+	public drw( Context context2, RelativeLayout rectLayout2 )
+	{
+		//only declare at this point
+		//no initialization because not enough parameters were calculated
+		//but this class was needed to store View objects Bitmap, ImageView and Canvas
+		context = context2;
+		rectLayout = rectLayout2;
+	}
+	
+	
+	public void drwInitialize( Block[][] rectArr2, Paint paint2, //Canvas canvas2,
+				RelativeLayout rectTextLayout2, TextMatrix textMatrix2, SudokuGenerator usrSudokuArr2,
 				int[] zoomOn2, int[] drag2, int[] dX2, int[] dY2,
 				int[] touchXZ2, int[] touchYZ2, int[] zoomButtonSafe2, int[] zoomClickSafe2,
 				int[] zoomButtonDisableUpdate2, int bitmapSizeWidth2, int bitmapSizeHeight2, WordArray wordArray2, int[] btnClicked2,
-				float ZOOM_SCALE2, int COL_PER_BLOCK2, int ROW_PER_BLOCK2, int VERTICAL_BLOCK2, int HORIZONTAL_BLOCK2, int WORD_COUNT2 )
+				float ZOOM_SCALE2, int COL_PER_BLOCK2, int ROW_PER_BLOCK2, int VERTICAL_BLOCK2, int HORIZONTAL_BLOCK2,
+				int WORD_COUNT2, int barH2 )
 	{
 		paint = paint2;
 		rectArr = rectArr2;
-		canvas = canvas2;
-		rectLayout = rectLayout2;
+		//canvas = canvas2;
+		
 		rectTextLayout = rectTextLayout2;
 		textMatrix = textMatrix2;
 		usrSudokuArr = usrSudokuArr2;
@@ -77,8 +96,24 @@ public class drw
 		VERTICAL_BLOCK = VERTICAL_BLOCK2;
 		HORIZONTAL_BLOCK = HORIZONTAL_BLOCK2;
 		WORD_COUNT = WORD_COUNT2;
+		barH = barH2;
+		
 	}
 
+	
+	public void createBitmap( int bitmapSizeWidth, int bitmapSizeHeight, int barH )
+	{
+			// INITIALIZE VIEW
+		bitMap = Bitmap.createBitmap( bitmapSizeWidth, bitmapSizeHeight-barH, Bitmap.Config.ARGB_8888 );
+		
+		imgView = new ImageView(context);
+		canvas = new Canvas( bitMap );
+		imgView.setImageBitmap( bitMap );
+		rectLayout.addView( imgView );
+		
+	}
+	
+	
 	public void reDraw( int[] touchX, int[] touchY, Pair lastRectColoured,
 						Pair currentRectColoured, int usrLangPref )
 	{
