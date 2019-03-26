@@ -342,7 +342,7 @@ public class GameActivity extends AppCompatActivity
 
 		//draw matrix so far
 		drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
-		drawR.reDraw( currentRectColoured, usrLangPref );
+		drawR.reDraw( currentRectColoured, usrLangPref, 0 );
 
 
 			/* ZOOM IN BUTTON */
@@ -388,7 +388,7 @@ public class GameActivity extends AppCompatActivity
 						findSqrCoordToZoomInOn( ZOOM_SCALE_OLD );
 						
 						drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
-						drawR.reDraw( currentRectColoured, usrLangPref );
+						drawR.reDraw( currentRectColoured, usrLangPref, 0 );
 						
 						zoomButtonSafe[0] = 0; //zoomSafe needed
 						
@@ -434,7 +434,7 @@ public class GameActivity extends AppCompatActivity
 								findSqrCoordToZoomInOn( ZOOM_SCALE_OLD );
 								
 								drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
-								drawR.reDraw( currentRectColoured, usrLangPref );
+								drawR.reDraw( currentRectColoured, usrLangPref, 0 );
 
 								zoomButtonSafe[0] = 0;
 								zoomInBtnOn[0] = 1; //activate other zoom btn
@@ -922,7 +922,26 @@ public class GameActivity extends AppCompatActivity
 		}
 		
 		drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
-		drawR.reDraw( currentRectColoured, usrLangPref );
+		
+		/////////////////
+		//
+		// TODO: here add the check for testing for conflict on select and highlighting
+		// TODO: make sure check function called only when currentRectColoured != -1
+		//
+		/////////////////
+		
+		int currentSelectedIsCorrect;
+		if( currentRectColoured.getRow() != -1 ) {
+			
+			// 0 == nothing selected; 1 == selected and correct; 2 == selected but incorrect
+			currentSelectedIsCorrect = 1; // TODO: here call check funciton
+		}
+		else
+		{
+			currentSelectedIsCorrect = 0;
+		}
+		
+		drawR.reDraw( currentRectColoured, usrLangPref, currentSelectedIsCorrect );
 		
 		// TEXT TO SPEECH
 		if (usrModePref == 1) {
@@ -997,7 +1016,7 @@ public class GameActivity extends AppCompatActivity
 			}
 			
 			drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
-			drawR.reDraw( currentRectColoured, usrLangPref );
+			drawR.reDraw( currentRectColoured, usrLangPref, 0 );
 		}
 	}
 	

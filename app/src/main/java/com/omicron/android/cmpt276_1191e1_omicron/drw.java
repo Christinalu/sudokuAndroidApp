@@ -253,7 +253,7 @@ public class drw
 	}
 	
 	
-	public void reDraw( Pair currentRectColoured, int usrLangPref )
+	public void reDraw( Pair currentRectColoured, int usrLangPref, int currentSelectedIsCorrect )
 	{
 		/*
 		 * After all coordinates and parameters were set, draw the rectangles
@@ -274,6 +274,8 @@ public class drw
 		
 		canvas.drawColor( Color.parseColor( "#5cddb1" ) ); //reset all canvas to colour
 		
+		boolean highlight = true;
+		
 		// redraw all squares in zoom/scale mode with corresponding shade
 		for( int i=0; i<WORD_COUNT; i++ )
 		{
@@ -282,8 +284,26 @@ public class drw
 				//set colours; must occur after figuring out is rect contained
 				if (rectArr[i][j].isSelected()) //if a selected rect
 				{
+					Log.d( "highlight", "selected" );
+					if( usrSudokuArr.PuzzleOriginal[i][j] != 0 ) //if an element that cannot be modified
+					{
+						paint.setColor(Color.parseColor("#727272")); //colour if selected a predefined word
+						canvas.drawRect(rectArr[i][j].getRect(), paint);
+						highlight = false;
+						continue;
+					}
+					
 					//note: if rect selected, choose red and skip rest of colours - so red must be first colour assigned
-					paint.setColor(Color.parseColor("#ff0000"));
+					if( currentSelectedIsCorrect == 1 ) //selected is correct
+					{
+						paint.setColor(Color.parseColor("#00ff00"));
+					}
+					else if( currentSelectedIsCorrect == 2 ) //selected is incorrect
+					{
+						paint.setColor(Color.parseColor("#ff0000"));
+						
+					}
+
 				} else if (usrSudokuArr.PuzzleOriginal[i][j] != 0) // if a element that cannot be modified
 				{
 					paint.setColor(Color.parseColor("#a2a2a2")); // set darker colour for fixed numbers
@@ -292,6 +312,81 @@ public class drw
 				}
 				
 				canvas.drawRect(rectArr[i][j].getRect(), paint);
+			}
+		}
+		
+		//loop and highlight row and column if correct or wrong
+		if( currentRectColoured.getRow() != -1 && highlight == true && usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] != 0 && zoomClickSafe[0] == 0 )
+		{
+			int i = currentRectColoured.getRow();
+			//loop column in constant row
+			for (int j = 0; j < WORD_COUNT; j++)
+			{
+				
+				if( currentRectColoured.getColumn() == j ) { // if colouring the selected square
+					//void - keep same colour so far
+					continue;
+				}
+				
+				if (usrSudokuArr.PuzzleOriginal[i][j] != 0) //if a predefined word
+				{
+					if( currentSelectedIsCorrect == 1 ) //selected is correct
+					{
+						paint.setColor(Color.parseColor("#00cc00")); //colour darker
+					}
+					else if( currentSelectedIsCorrect == 2 ) //selected is incorrect
+					{
+						paint.setColor(Color.parseColor("#cc0000")); //colour darker
+					}
+					
+				}
+				else
+				{
+					if( currentSelectedIsCorrect == 1 ) //selected is correct
+					{
+						paint.setColor(Color.parseColor("#22ff22")); //colour lighter
+					}
+					else if( currentSelectedIsCorrect == 2 ) //selected is incorrect
+					{
+						paint.setColor(Color.parseColor("#ff0000")); //colour darker
+					}
+				}
+				canvas.drawRect(rectArr[i][j].getRect(), paint);
+			}
+			
+			int j = currentRectColoured.getColumn();
+			//loop column in constant row
+			for (int k = 0; k < WORD_COUNT; k++)
+			{
+				
+				if( currentRectColoured.getRow() == k ) { // if colouring the selected square
+					//void - keep same colour so far
+					continue;
+				}
+				
+				if (usrSudokuArr.PuzzleOriginal[k][j] != 0) //if a predefined word
+				{
+					if( currentSelectedIsCorrect == 1 ) //selected is correct
+					{
+						paint.setColor(Color.parseColor("#00cc00")); //colour darker
+					}
+					else if( currentSelectedIsCorrect == 2 ) //selected is incorrect
+					{
+						paint.setColor(Color.parseColor("#cc0000")); //colour darker
+					}
+				}
+				else
+				{
+					if( currentSelectedIsCorrect == 1 ) //selected is correct
+					{
+						paint.setColor(Color.parseColor("#22ff22")); //colour lighter
+					}
+					else if( currentSelectedIsCorrect == 2 ) //selected is incorrect
+					{
+						paint.setColor(Color.parseColor("#ff0000")); //colour darker
+					}
+				}
+				canvas.drawRect(rectArr[k][j].getRect(), paint);
 			}
 		}
 		
