@@ -199,6 +199,7 @@ public class ButtonListener extends AppCompatActivity
 													 btnClicked[0] = 1; //this flag allows (for efficiency) class drw to update TextView as well in zoom mode
 													 drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
 													
+													 // CHECK INPUT FOR DUPLICATES
 													 int currentSelectedIsCorrect;
 													 if( currentRectColoured.getRow() != -1 ) {
 														

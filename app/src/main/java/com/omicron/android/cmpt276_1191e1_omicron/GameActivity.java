@@ -383,12 +383,27 @@ public class GameActivity extends AppCompatActivity
 						touchYZ[0] = 0;
 						*/
 						
+						// CHECK INPUT FOR DUPLICATES
+						int currentSelectedIsCorrect;
+						if( currentRectColoured.getRow() != -1 ) {
+							
+							// 0 == nothing selected; 1 == selected and correct; 2 == selected but incorrect
+							
+							
+							// TODO: here add the check for testing for conflict on select and highlighting
+							currentSelectedIsCorrect = 1; // TODO: here call check funciton
+						}
+						else
+						{
+							currentSelectedIsCorrect = 0;
+						}
+						
 						// on zoom in, calculate coordinate to zoom on selected square
 						//findSqrCoordToZoomInOn.findSqrCoordToZoomInOn( );
 						findSqrCoordToZoomInOn( ZOOM_SCALE_OLD );
 						
 						drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
-						drawR.reDraw( currentRectColoured, usrLangPref, 0 );
+						drawR.reDraw( currentRectColoured, usrLangPref, currentSelectedIsCorrect );
 						
 						zoomButtonSafe[0] = 0; //zoomSafe needed
 						
@@ -429,12 +444,27 @@ public class GameActivity extends AppCompatActivity
 								touchYZ[0] = 0;
 								*/
 								
+								// CHECK INPUT FOR DUPLICATES
+								int currentSelectedIsCorrect;
+								if( currentRectColoured.getRow() != -1 ) {
+									
+									// 0 == nothing selected; 1 == selected and correct; 2 == selected but incorrect
+									
+									
+									// TODO: here add the check for testing for conflict on select and highlighting
+									currentSelectedIsCorrect = 1; // TODO: here call check funciton
+								}
+								else
+								{
+									currentSelectedIsCorrect = 0;
+								}
+								
 								// on zoom, calculate coordinate to zoom on selected square
 								//findSqrCoordToZoomInOn.findSqrCoordToZoomInOn( );
 								findSqrCoordToZoomInOn( ZOOM_SCALE_OLD );
 								
 								drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
-								drawR.reDraw( currentRectColoured, usrLangPref, 0 );
+								drawR.reDraw( currentRectColoured, usrLangPref, currentSelectedIsCorrect );
 
 								zoomButtonSafe[0] = 0;
 								zoomInBtnOn[0] = 1; //activate other zoom btn

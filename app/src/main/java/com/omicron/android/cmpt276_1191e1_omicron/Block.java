@@ -15,6 +15,7 @@ public class Block
 	private Rect sqr; //rectangle
 	private boolean selected; //indicates if rect is the one user selected
 	private TextView textView;
+	private String lastColour = "#000000";
 
 	public Block( int sqrL, int sqrT, int sqrR, int sqrB )
 	{
@@ -44,5 +45,6 @@ public class Block
 	{
 		return sqr;
 	}
-
+	public void setLastColour( String str ){ lastColour = str; }
+	public String getLastColour( ){ return lastColour; }
 }
