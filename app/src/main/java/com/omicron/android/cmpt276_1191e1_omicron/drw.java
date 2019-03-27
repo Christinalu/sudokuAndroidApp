@@ -278,7 +278,7 @@ public class drw
 		
 		boolean highlight = true;
 		String selectPredefionedWord = "#626262";
-		String selectEmptySquare = "#8ac075";
+		String selectEmptySquare = "#79b064";
 		String selectCorrect = "#228b22";
 		String selectIncorrect = "#ff7f50";
 		String selectFixedSquareDark = "#a2a2a2";
