@@ -50,6 +50,7 @@ public class drw
 	private int VERTICAL_BLOCK; //stores how many (vertical) blocks are in a puzzle; in 9x9 this would be 3 blocks
 	private int HORIZONTAL_BLOCK;
 	private Context context; //context of GameActivity
+	private String lastColour;
 	
 	
 	public drw( Context context2, RelativeLayout rectLayout2 )
@@ -182,18 +183,10 @@ public class drw
 			}
 
 			Log.d( "TAG-2", " touchXZ: " + touchXZ[0] + ", touchX: " + touchX[0] );
-
-			// if drag enabled, then translate matrix
-//			if (drag[0] == 1) {
-//				canvas.translate( -touchXZ[0] + dX[0], -touchYZ[0] + dY[0] );
-//			} else { //else user only clicked
-//				canvas.translate(-touchXZ[0], -touchYZ[0]);
-//			}
-//
-//			canvas.scale( ZOOM_SCALE, ZOOM_SCALE );
-
+			
 
 				/* LOOP TO FIND IF TOUCH IS INSIDE SQUARE */
+			
 			// note: this loop must be separate; cannot be combined with colour loop (see above for reason)
 
 			if( drag[0] == 0 && zoomButtonDisableUpdate[0] == 0 ) // do not update on button click (zoomSafe == 0 means only test after going in "zoom" mode, that is, do not check the 'click coordinate' until user touches screen again because those coordinates do not count as a click)
@@ -229,9 +222,6 @@ public class drw
 				}
 			}
 			
-			//canvas.restore( );
-
-			//rectLayout.invalidate( );
 		}
 	}
 	
@@ -253,10 +243,11 @@ public class drw
 	}
 	
 	
-	public void reDraw( Pair currentRectColoured, int usrLangPref )
+	public void reDraw( Pair currentRectColoured, int usrLangPref, int currentSelectedIsCorrect )
 	{
 		/*
 		 * After all coordinates and parameters were set, draw the rectangles
+		 * 		currentSelectedIsCorrect represents if sqr that is currently selected, is correct (==1) or incorrect (==2); ==0 is treated as outlier
 		 */
 		
 		if( zoomOn[0] == 1 ){
@@ -274,7 +265,17 @@ public class drw
 		
 		canvas.drawColor( Color.parseColor( "#5cddb1" ) ); //reset all canvas to colour
 		
-		// redraw all squares in zoom/scale mode with corresponding shade
+		boolean highlight = true;
+		String selectPredefionedWord = "#626262";
+		String selectEmptySquare = "#79b064";
+		String selectCorrect = "#228b22";
+		String selectIncorrect = "#ff7f50";
+		String selectFixedSquareDark = "#a2a2a2";
+		String selectFixedSquareLight = "#c2c2c2";
+		
+		
+			/**REDRAW ALL SQUARES IN ZOOM WITH CORRESPONDING COLOUR **/
+			
 		for( int i=0; i<WORD_COUNT; i++ )
 		{
 			for( int j=0; j<WORD_COUNT; j++ )
@@ -282,17 +283,109 @@ public class drw
 				//set colours; must occur after figuring out is rect contained
 				if (rectArr[i][j].isSelected()) //if a selected rect
 				{
-					//note: if rect selected, choose red and skip rest of colours - so red must be first colour assigned
-					paint.setColor(Color.parseColor("#ff0000"));
+					Log.d( "highlight", "selected" );
+					if( usrSudokuArr.PuzzleOriginal[i][j] != 0 ) //if an element that cannot be modified
+					{
+						paint.setColor(Color.parseColor( selectPredefionedWord )); //colour if selected a predefined word
+						canvas.drawRect(rectArr[i][j].getRect(), paint);
+						highlight = false;
+						continue;
+					}
+					else if( usrSudokuArr.Puzzle[i][j] == 0 ) //if square selected is empty (no input so far)
+					{
+						paint.setColor(Color.parseColor( selectEmptySquare )); //colour if selected a empty sqr
+						canvas.drawRect(rectArr[i][j].getRect(), paint);
+						highlight = false;
+						continue;
+					}
+					
+					if( currentSelectedIsCorrect == 1 ) //selected is correct
+					{
+						paint.setColor(Color.parseColor( selectCorrect ));
+						rectArr[i][j].setConflict( false );
+						rectArr[i][j].setLastColour( selectCorrect );
+					}
+					else if( currentSelectedIsCorrect == 2 ) //selected is incorrect
+					{
+						paint.setColor(Color.parseColor( selectIncorrect ));
+						rectArr[i][j].setConflict( true );
+						rectArr[i][j].setLastColour( selectIncorrect );
+					}
+					else
+					{
+						//paint.setColor(Color.parseColor("#000000"));
+						paint.setColor( Color.parseColor( rectArr[i][j].getLastColour( ) ) ); //on drag, use previous colour of selected rect
+					}
+
 				} else if (usrSudokuArr.PuzzleOriginal[i][j] != 0) // if a element that cannot be modified
 				{
-					paint.setColor(Color.parseColor("#a2a2a2")); // set darker colour for fixed numbers
+					paint.setColor(Color.parseColor( selectFixedSquareDark )); // set darker colour for fixed numbers
 				} else {
-					paint.setColor(Color.parseColor("#c2c2c2")); // set lighter colour for fixed numbers
+					
+					if( rectArr[i][j].getConflict() == true ) //if a word has conflict, preserve incorrect colour
+					{
+						paint.setColor(Color.parseColor( selectIncorrect )); // set already filled with incorrect colour
+					}
+					else
+					{
+						paint.setColor(Color.parseColor( selectFixedSquareLight )); // set lighter colour for fixed numbers
+					}
 				}
 				
 				canvas.drawRect(rectArr[i][j].getRect(), paint);
 			}
+		}
+		
+		
+		String highlightPredefinedDarker = "#828282";
+		String highlightConflictDarker = "#dd5d2e";
+		String highlightRegularDarker = "#8ac075";
+		
+		
+			/** HIGHLIGHT ROW AND COL **/
+		
+		// loop and highlight row and column of whatever sqr is selected
+		if( currentRectColoured.getRow() != -1 )
+		{
+			int i;
+			int j;
+			int k;
+			for( int n=0; n<2; n++ ) // loop twice to cover col and row
+			{
+				// get row or col index
+				// 	n==0 means loop through col
+				// 	n==1 means loop through row
+				
+				if( n == 0 ){
+					i = currentRectColoured.getRow( ); //loop though col; get fixed row
+					//j=0;
+					k = currentRectColoured.getColumn( );
+				} else {
+					i = currentRectColoured.getColumn( ); //loop through row; get fixed col
+					//i=0;
+					k = currentRectColoured.getRow( );
+				}
+				
+				for ( j = 0; j<WORD_COUNT; j++)
+				{
+					// n==0 means j is col (k == col)
+					// n==1 means j is row (k == row)
+					
+					if( k == j ){ // omit colouring square the user has selected
+						continue; //void - keep same colour so far
+					}
+					
+					if( n == 0 ) {
+						loopHighlight( i, j, highlightPredefinedDarker, highlightConflictDarker,
+								highlightRegularDarker );
+					} else if( n == 1 ){
+						loopHighlight( j, i, highlightPredefinedDarker, highlightConflictDarker, //switch i,j
+								highlightRegularDarker );
+					}
+					
+				}
+			}
+			
 		}
 		
 		// DRAW TEXT OVERLAY + RESTORE
@@ -313,4 +406,66 @@ public class drw
 		
 		rectLayout.invalidate( );
 	}
+	
+	private void loopHighlight( int i, int j, String highlightPredefinedDarker,
+								String highlightConflictDarker, String highlightRegularDarker )
+	{
+		/*
+		 * This function is an extension to reDraw(), in the HIGHLIGHT section
+		 * It was placed as a separate function so that col/row index can be switched, and not use two identical loops
+		 * The variables here follow similar structure to HIGHLIGHT part, except that i,j may be switched
+		 */
+		
+		if( usrSudokuArr.PuzzleOriginal[i][j] != 0 ) //if a predefined word
+		{
+			paint.setColor( Color.parseColor( highlightPredefinedDarker ) ); //colour predefined darker
+			
+		} else { //else a regular sqr
+			
+			if( rectArr[i][j].getConflict( )  == true ) // if sqr with conflict, set conflict colour to darker shade
+			{
+				paint.setColor (Color.parseColor( highlightConflictDarker ) ); //colour conflict darker
+			}
+			else //assume a regular sqr
+			{
+				paint.setColor (Color.parseColor( highlightRegularDarker ) ); //colour regular darker
+			}
+		}
+		
+		canvas.drawRect(rectArr[i][j].getRect(), paint);
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

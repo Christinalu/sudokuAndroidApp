@@ -45,7 +45,7 @@ public class SudokuGenerator implements Serializable {
 
         
 	
-		size = 12;
+		size = 9;
 		PuzzleOriginal = new int[size][size];
 		Puzzle = new int[size][size];
 		PuzzleSol = new int[size][size];
@@ -65,9 +65,9 @@ public class SudokuGenerator implements Serializable {
         
         // TODO: remove the following once implementation complete
 	
-		copyarr( testSeed12x12, PuzzleOriginal );
-		copyarr( testSeed12x12, Puzzle );
-		copyarr( testSeed12x12Solution, PuzzleSol );
+		copyarr( PuzzSeedEasy, PuzzleOriginal );
+		copyarr( PuzzSeedEasy, Puzzle );
+		copyarr( PuzzSeedEasySol, PuzzleSol );
     
         // TODO: enable scramble() and copyarr()
         
