@@ -207,7 +207,7 @@ public class ButtonListener extends AppCompatActivity
 														 
 														 
 														 // TODO: here add the check for testing for conflict on select and highlighting
-														 currentSelectedIsCorrect = 1; // TODO: here call check funciton
+														 currentSelectedIsCorrect = 2; // TODO: here call check funciton
 													 }
 													 else
 													 {

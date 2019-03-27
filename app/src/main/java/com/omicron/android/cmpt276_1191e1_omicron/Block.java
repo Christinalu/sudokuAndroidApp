@@ -16,6 +16,7 @@ public class Block
 	private boolean selected; //indicates if rect is the one user selected
 	private TextView textView;
 	private String lastColour = "#000000";
+	private boolean conflict = false; //if word has row/col/block conflict; no conflict does not guarantee correct solution
 
 	public Block( int sqrL, int sqrT, int sqrR, int sqrB )
 	{
@@ -47,4 +48,6 @@ public class Block
 	}
 	public void setLastColour( String str ){ lastColour = str; }
 	public String getLastColour( ){ return lastColour; }
+	public void setConflict(  boolean c ){ conflict = c; }
+	public boolean getConflict( ){ return conflict; }
 }

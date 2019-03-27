@@ -391,7 +391,7 @@ public class GameActivity extends AppCompatActivity
 							
 							
 							// TODO: here add the check for testing for conflict on select and highlighting
-							currentSelectedIsCorrect = 1; // TODO: here call check funciton
+							currentSelectedIsCorrect = 2; // TODO: here call check funciton
 						}
 						else
 						{
@@ -452,7 +452,7 @@ public class GameActivity extends AppCompatActivity
 									
 									
 									// TODO: here add the check for testing for conflict on select and highlighting
-									currentSelectedIsCorrect = 1; // TODO: here call check funciton
+									currentSelectedIsCorrect = 2; // TODO: here call check funciton
 								}
 								else
 								{
@@ -960,11 +960,13 @@ public class GameActivity extends AppCompatActivity
 		//
 		/////////////////
 		
+		// TODO: also add this code in Button listener and Zoom buttons
+		
 		int currentSelectedIsCorrect;
 		if( currentRectColoured.getRow() != -1 ) {
 			
 			// 0 == nothing selected; 1 == selected and correct; 2 == selected but incorrect
-			currentSelectedIsCorrect = 1; // TODO: here call check funciton
+			currentSelectedIsCorrect = 2; // TODO: here call check function
 		}
 		else
 		{
