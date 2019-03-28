@@ -7,8 +7,8 @@
         android:topLeftRadius="10dp"
         android:radius="20dp"></corners>
 
-    <solid android:color="@color/colorPrimary" />
+    <solid android:color="@color/overcast" />
     <stroke android:width="4dp"
-        android:color="@android:color/transparent"/>
+        android:color="@color/overcast"/>
 
 </shape>

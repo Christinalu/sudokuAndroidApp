@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.support.annotation.ColorInt;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
@@ -74,7 +75,7 @@ public class ButtonListener extends AppCompatActivity
 					if (button == null) {
 						Log.d("listener", "ERROR: null button");
 					}
-					button.setTextColor(Color.WHITE);
+					button.setTextColor(Color.parseColor("#00293C"));
 					button.setBackgroundResource(R.drawable.buttons);
 					button.setSingleLine();
 

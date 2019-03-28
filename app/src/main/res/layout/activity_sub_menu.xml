@@ -5,201 +5,260 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@android:color/transparent"
-    tools:context=".MainActivity">
-
-    <LinearLayout
-        android:id="@+id/linearLayout2"
+    tools:context=".SubMenuActivity">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.645"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.364">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <RadioGroup
-            android:id="@+id/button_level"
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/linearLayoutdifficultyLevel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/difficulty_level"
-                android:textSize="17sp" />
-
-            <RadioButton
-                android:id="@+id/button_easy"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="@string/easy_level"
-                android:textSize="17sp" />
-
-            <RadioButton
-                android:id="@+id/button_medium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/medium_level"
-                android:textSize="17sp" />
-
-            <RadioButton
-                android:id="@+id/button_hard"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/hard_level"
-                android:textSize="17sp" />
-
-        </RadioGroup>
-
-        <RadioGroup
-            android:id="@+id/button_language"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:orientation="vertical"
-            android:textSize="17sp">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/language_selection"
-                android:textSize="17sp" />
-
-
-            <RadioButton
-                android:id="@+id/button_eng_fr"
+                android:textSize="20dp"
+                android:text="@string/difficulty_level"/>
+            <RadioGroup
+                android:id="@+id/button_level"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="@string/native_trans"
-                android:textSize="17sp" />
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
-            <RadioButton
-                android:id="@+id/button_fr_eng"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/trans_native"
-                android:textSize="17sp" />
+                <RadioButton
+                    android:id="@+id/button_easy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="@string/easy_level"
+                    android:textSize="17sp"
+                    android:buttonTint="@color/navy"/>
 
-        </RadioGroup>
+                <RadioButton
+                    android:id="@+id/button_medium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/medium_level"
+                    android:textSize="17sp"
+                    android:buttonTint="@color/navy"/>
 
-        <RadioGroup
-            android:id="@+id/button_mode"
+                <RadioButton
+                    android:id="@+id/button_hard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/hard_level"
+                    android:textSize="17sp"
+                    android:buttonTint="@color/navy"/>
+
+            </RadioGroup>
+
+        </LinearLayout>
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/linearLayoutLanguageSelection"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:orientation="vertical"
-            android:textSize="17sp">
-
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/mode_selection"
-                android:textSize="17sp" />
-
-            <RadioButton
-                android:id="@+id/button_mStandard"
+                android:textSize="20dp"
+                android:text="@string/language_selection"/>
+            <RadioGroup
+                android:id="@+id/button_language"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="@string/mStandard"
-                android:textSize="17sp" />
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:textSize="17sp">
 
-            <RadioButton
-                android:id="@+id/button_mSpeech"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/mSpeech"
-                android:textSize="17sp" />
 
-        </RadioGroup>
 
-        <RadioGroup
-            android:id="@+id/btn_type"
+                <RadioButton
+                    android:id="@+id/button_eng_fr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="@string/native_trans"
+                    android:textSize="17sp"
+                    android:buttonTint="@color/navy"/>
+
+                <RadioButton
+                    android:id="@+id/button_fr_eng"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/trans_native"
+                    android:textSize="17sp"
+                    android:buttonTint="@color/navy"/>
+
+            </RadioGroup>
+        </LinearLayout>
+
+
+
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/linearLayoutModeSelection"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:text="@string/mode_selection"/>
+            <RadioGroup
+                android:id="@+id/button_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:textSize="17sp">
+
+
+                <RadioButton
+                    android:id="@+id/button_mStandard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="@string/mStandard"
+                    android:textSize="17sp"
+                    android:buttonTint="@color/navy"/>
+
+                <RadioButton
+                    android:id="@+id/button_mSpeech"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/mSpeech"
+                    android:textSize="17sp"
+                    android:buttonTint="@color/navy"/>
+
+            </RadioGroup>
+
+
+        </LinearLayout>
+
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/linearLayoutPuzzleType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="20dp"
+                android:text="Puzzle Type" />
+
+            <RadioGroup
+                android:id="@+id/btn_type"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:buttonTint="@color/navy"
+                android:orientation="horizontal"
+                android:textSize="17sp">
+
+
+
+                <RadioButton
+                    android:id="@+id/btn_4x4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/navy"
+                    android:checked="false"
+                    android:text="4x4"
+                    android:textSize="17sp" />
+
+                <RadioButton
+                    android:id="@+id/btn_6x6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/navy"
+                    android:checked="false"
+                    android:text="6x6"
+                    android:textSize="17sp" />
+
+                <RadioButton
+                    android:id="@+id/btn_9x9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/navy"
+                    android:checked="true"
+                    android:text="9x9"
+                    android:textSize="17sp" />
+
+                <RadioButton
+                    android:id="@+id/btn_12x12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/navy"
+                    android:checked="false"
+                    android:text="12x12"
+                    android:textSize="17sp" />
+
+            </RadioGroup>
+
+        </LinearLayout>
+
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/linearLayoutsSubmenuSelection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
             android:orientation="horizontal"
-            android:textSize="17sp">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
+            <Button
+                android:id="@+id/btn_remove"
+                android:background="@drawable/hint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Puzzle Type"
-                android:textSize="17sp" />
-
-            <RadioButton
-                android:id="@+id/btn_4x4"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="@+string/Cancel" />
+            <Button
+                android:id="@+id/btn_upload"
+                android:background="@drawable/hint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="false"
-                android:text="4x4"
-                android:textSize="17sp" />
-
-            <RadioButton
-                android:id="@+id/btn_6x6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:text="6x6"
-                android:textSize="17sp" />
-
-            <RadioButton
-                android:id="@+id/btn_9x9"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="9x9"
-                android:textSize="17sp" />
-
-            <RadioButton
-                android:id="@+id/btn_12x12"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:text="12x12"
-                android:textSize="17sp" />
-
-        </RadioGroup>
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="@string/start" />
 
 
-    </LinearLayout>
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/linearLayoutsSubmenuSelection"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="@id/linearLayout2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
-
-        <Button
-            android:id="@+id/btn_remove"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:text="@string/cancel" />
-
-        <Button
-            android:id="@+id/btn_upload"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:text="@string/start" />
-
-
+        </LinearLayout>
     </LinearLayout>
 
 

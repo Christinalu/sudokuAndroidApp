@@ -20,5 +20,10 @@
     <color name="indigo">#4B0082</color>
     <color name="mediumturquoise">#48D1CC</color>
     <color name="darkslateblue">#483D8B</color>
-
+    <color name="overcast">#F1F1F2</color>
+    <color name="warmgray">#BCBABE</color>
+    <color name="ice">#A1D6E2</color>
+    <color name="glacierblue">#1995AD</color>
+    <color name="navy">#00293C</color>
+    <color name="redpepper">#C60000</color>
 </resources>
