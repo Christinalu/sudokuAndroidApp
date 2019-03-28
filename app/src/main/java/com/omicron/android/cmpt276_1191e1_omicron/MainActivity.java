@@ -288,9 +288,12 @@ public class MainActivity extends AppCompatActivity
 		Button btnStart = (Button) findViewById( R.id.button_start );
 		btnStart.setOnClickListener( new View.OnClickListener(  )
 			{
+
 				@Override
 				public void onClick( View v )
 				{
+
+					//setContentView( R.layout.activity_sub_menu );
 					RadioButton radBtnSelected = findViewById( pkgRadioGroup.getCheckedRadioButtonId() );
 					String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex( pkgRadioGroup.indexOfChild( radBtnSelected ) ).getInternalFileName( ); //get pkg internal file name to find csv
 					
@@ -363,7 +366,16 @@ public class MainActivity extends AppCompatActivity
 				}
 			}
 		);
-		
+
+
+
+
+
+
+
+
+
+
 		
 		//implement STOP btn
 		Button btnStop = (Button) findViewById( R.id.button_stop );

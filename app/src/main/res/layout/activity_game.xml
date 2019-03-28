@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/mediumaquamarine"
+    android:background="@color/overcast"
     tools:context=".GameActivity">
 
     <RelativeLayout
@@ -35,7 +35,7 @@
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="153dp"
             android:layout_toStartOf="@id/button_zoom_in"
-            android:background="@color/mediumaquamarine"
+            android:background="@color/overcast"
             android:contentDescription="@string/zoom_out"
             android:scaleType="fitXY"
             app:srcCompat="@android:drawable/btn_minus" />
@@ -48,7 +48,7 @@
             android:layout_alignBottom="@id/btn_keypad"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="153dp"
-            android:background="@color/mediumaquamarine"
+            android:background="@color/overcast"
             android:contentDescription="@string/zoom_in"
             android:scaleType="fitXY"
             app:srcCompat="@android:drawable/btn_plus" />
