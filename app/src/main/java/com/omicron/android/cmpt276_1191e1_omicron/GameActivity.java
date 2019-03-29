@@ -175,17 +175,7 @@ public class GameActivity extends AppCompatActivity
 		//set intent to receive word array from Main Activity
 		if (savedInstanceState != null) {
 			//a state had been saved, load it
-			state = (int) savedInstanceState.getSerializable("state");
-			wordArray = (WordArray) savedInstanceState.getParcelable("wordArrayGA");
-			usrLangPref = savedInstanceState.getInt("usrLangPrefGA");
-			usrSudokuArr = (SudokuGenerator) savedInstanceState.get("SudokuArrGA");
-			usrModePref = (int) savedInstanceState.getSerializable("usrModeGA");
-			language = (String) savedInstanceState.getSerializable("languageGA");
-			HINT_CLICK_TO_MAX_PROB = savedInstanceState.getInt( "HINT_CLICK_TO_MAX_PROB" );
-			if (usrModePref == 1) {
-				numArray = (String[]) savedInstanceState.getSerializable("numArrayGA");
-				orderArr = (int[]) savedInstanceState.getIntArray("orderArrGA");
-			}
+			savetheInstanceState (0, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr);
 		}
 		else {
 			Intent gameSrc = getIntent();
@@ -194,25 +184,26 @@ public class GameActivity extends AppCompatActivity
 				//check state: if 1 then we are resuming a previous game, otherwise state == 0 and we are starting a new game
 				if (state > 0) {
 					//we are resuming a game
-					wordArray = (WordArray) gameSrc.getParcelableExtra("wordArrayMA");
-					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPrefMA");
-					usrSudokuArr = (SudokuGenerator) gameSrc.getSerializableExtra("SudokuArrMA");
-					usrModePref = (int) gameSrc.getSerializableExtra("usrModeMA");
-					language = (String) gameSrc.getSerializableExtra("languageMA");
-					HINT_CLICK_TO_MAX_PROB = (int) gameSrc.getSerializableExtra( "HINT_CLICK_TO_MAX_PROB" );
-					if (usrModePref == 1) {
-						numArray = (String[]) gameSrc.getStringArrayExtra("numArrayMA");
-						orderArr = (int[]) gameSrc.getIntArrayExtra("orderArrMA");
-					}
-				} else {
-					//we are starting a new game
 					wordArray = (WordArray) gameSrc.getParcelableExtra("wordArray");
 					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPref");
-					usrDiffPref = (int) gameSrc.getSerializableExtra("usrDiffPref");
-					usrModePref = (int) gameSrc.getSerializableExtra("usrModeMA");
-					usrPuzzSize = (int) gameSrc.getSerializableExtra("usrPuzzSizeMA");
-					state = 1; //set game available to resume
+					usrModePref = (int) gameSrc.getSerializableExtra("usrMode");
+					language = (String) gameSrc.getSerializableExtra("language");
 					HINT_CLICK_TO_MAX_PROB = (int) gameSrc.getSerializableExtra( "HINT_CLICK_TO_MAX_PROB" );
+					usrSudokuArr = (SudokuGenerator) gameSrc.getSerializableExtra("SudokuArr");
+					if (usrModePref == 1) {
+						numArray = (String[]) gameSrc.getStringArrayExtra("numArray");
+						orderArr = (int[]) gameSrc.getIntArrayExtra("orderArr");
+					}
+				}
+				else {
+					//we are starting a new game
+					state = 1; //set game available to resume
+					wordArray = (WordArray) gameSrc.getParcelableExtra("wordArray");
+					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPref");
+					usrModePref = (int) gameSrc.getSerializableExtra("usrMode");
+					HINT_CLICK_TO_MAX_PROB = (int) gameSrc.getSerializableExtra( "HINT_CLICK_TO_MAX_PROB" );
+					usrDiffPref = (int) gameSrc.getSerializableExtra("usrDiffPref");
+					usrPuzzSize = (int) gameSrc.getSerializableExtra("usrPuzzSize");
 					if (usrModePref == 1) {
 						//create separate array to draw from for this mode
 						WORD_COUNT = wordArray.getWordCount( );
@@ -231,7 +222,7 @@ public class GameActivity extends AppCompatActivity
 								wordArray.setWordNativeAtIndex( i, Integer.toString(i + 1) );
 							}
 						}
-						language = (String) gameSrc.getSerializableExtra("languageMA");
+						language = (String) gameSrc.getSerializableExtra("language");
 					}
 					usrSudokuArr = new SudokuGenerator(usrDiffPref, usrPuzzSize);
 				}
@@ -287,19 +278,7 @@ public class GameActivity extends AppCompatActivity
 		//sqrLO, sqrTO, sqrSizeWidth, sqrSizeHeight, bitMap, rectLayout, rectTextLayout
 		initializePuzzleMatrixParameters( );
 		
-		
-		
 		paint.setColor(Color.parseColor("#c2c2c2"));
-
-		
-		
-		
-		
-		
-		
-		
-		
-		
 
 		textMatrix = new TextMatrix( this, sqrSizeWidth, sqrSizeHeight, ZOOM_SCALE, WORD_COUNT );
 
@@ -548,19 +527,7 @@ public class GameActivity extends AppCompatActivity
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
-		savedInstanceState.putParcelable("wordArrayGA", wordArray);
-		savedInstanceState.putInt( "usrLangPrefGA", usrLangPref );
-		savedInstanceState.putSerializable("SudokuArrGA", usrSudokuArr);
-		if (usrSudokuArr.isCorrect) {
-			state = 2;
-		}
-		savedInstanceState.putInt("state", state);
-		savedInstanceState.putInt("usrModeGA", usrModePref);
-		savedInstanceState.putString("languageGA", language);
-		if (usrModePref == 1) {
-			savedInstanceState.putStringArray("numArrayGA", numArray);
-			savedInstanceState.putIntArray("orderArrGA", orderArr);
-		}
+		savetheInstanceState (1, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr);
 	}
 
 	@Override
@@ -569,18 +536,18 @@ public class GameActivity extends AppCompatActivity
 		onStopAlreadyCalled[0] = 1; //stop onStop() from being called again
 		Log.i("selectW", "back pressed");
 		Intent resumeSrc = new Intent( GameActivity.this, MainActivity.class );
-		resumeSrc.putExtra( "wordArrayGA", wordArray );
-		resumeSrc.putExtra( "usrLangPrefGA", usrLangPref );
-		resumeSrc.putExtra("SudokuArrGA", usrSudokuArr);
+		resumeSrc.putExtra( "wordArray", wordArray );
+		resumeSrc.putExtra( "usrLangPref", usrLangPref );
+		resumeSrc.putExtra("SudokuArr", usrSudokuArr);
 		if (usrSudokuArr.isCorrect) {
 			state = 2;
 		}
 		resumeSrc.putExtra("state", state);
-		resumeSrc.putExtra("usrModeGA", usrModePref);
-		resumeSrc.putExtra("languageGA", language);
+		resumeSrc.putExtra("usrMode", usrModePref);
+		resumeSrc.putExtra("language", language);
 		if (usrModePref == 1) {
-			resumeSrc.putExtra("numArrayGA", numArray);
-			resumeSrc.putExtra("orderArrGA", orderArr);
+			resumeSrc.putExtra("numArray", numArray);
+			resumeSrc.putExtra("orderArr", orderArr);
 		}
 		//resumeSrc.putExtra("countryGA", country);
 		Log.i("TAG", "Result about to be stored");
@@ -1193,6 +1160,40 @@ public class GameActivity extends AppCompatActivity
 				arr[i] = randPos; // put rand num back in arr
 				numUsed[randPos] = 1; // mark as used
 				i++; // by putting i++ here this only moves on until it find valid num
+			}
+		}
+	}
+	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int [] sis_orderArr) {
+		if (RorS == 0) {
+			//we are receiving
+			//a state had been saved, load it
+			state = (int) savedInstanceState.getSerializable("state");
+			wordArray = (WordArray) savedInstanceState.getParcelable("wordArray");
+			usrLangPref = savedInstanceState.getInt("usrLangPref");
+			usrSudokuArr = (SudokuGenerator) savedInstanceState.get("SudokuArr");
+			usrModePref = (int) savedInstanceState.getSerializable("usrMode");
+			language = (String) savedInstanceState.getSerializable("language");
+			HINT_CLICK_TO_MAX_PROB = savedInstanceState.getInt( "HINT_CLICK_TO_MAX_PROB" );
+			if (usrModePref == 1) {
+				numArray = (String[]) savedInstanceState.getSerializable("numArray");
+				orderArr = (int[]) savedInstanceState.getIntArray("orderArr");
+			}
+		}
+		else {
+			//we are sending
+			savedInstanceState.putInt("state", sis_state);
+			savedInstanceState.putParcelable("wordArray", sis_wordArray);
+			savedInstanceState.putInt( "usrLangPref", sis_usrLangPref );
+			savedInstanceState.putSerializable("SudokuArr", sis_usrSudokuArr);
+			if (sis_usrSudokuArr.isCorrect) {
+				sis_state = 2;
+			}
+			savedInstanceState.putInt("state", sis_state);
+			savedInstanceState.putInt("usrMode", sis_usrModePref);
+			savedInstanceState.putString("language", sis_language);
+			if (sis_usrModePref == 1) {
+				savedInstanceState.putStringArray("numArray", sis_numArray);
+				savedInstanceState.putIntArray("orderArr", sis_orderArr);
 			}
 		}
 	}

@@ -39,7 +39,9 @@ public class SudokuGenerator implements Serializable {
     private int sqrFilled;
 
 	//
+    //TODO: Remove the first 3D array (the test array) before submitting for iteration 3
 	//TEST Puzzle Seed array. USE THIS ONE TO RUN TESTS AND DISABLE THE puzz_seeds ARRAY DIRECTLY BELOW, feel free to edit values. Currently the puzz_seeds == puzz_seedSols, except first 2 values are set to empty
+    /*
     private int[][][] puzz_seeds = {
             {
                     //4x4 easy difficulty
@@ -90,8 +92,7 @@ public class SudokuGenerator implements Serializable {
                     {0, 0, 7, 11, 5, 2, 6, 4, 12, 1, 3, 9}, {6, 4, 3, 2, 10, 9, 1, 12, 11, 5, 7, 8}, {9, 1, 5, 12, 3, 11, 7, 8, 6, 4, 2, 10}, {7, 3, 6, 8, 12, 10, 2, 11, 5, 9, 1, 4}, {4, 10, 2, 5, 6, 1, 3, 9, 8, 11, 12, 7}, {1, 11, 12, 9, 7, 8, 4, 5, 3, 2, 10, 6}, {5, 2, 10, 7, 9, 12, 8, 6, 1, 3, 4, 11}, {11, 9, 4, 3, 2, 5, 10, 1, 7, 6, 8, 12}, {8, 12, 1, 6, 4, 7, 11, 3, 2, 10, 9, 5}, {3, 7, 8, 1, 11, 4, 5, 10, 9, 12, 6, 2}, {2, 5, 9, 4, 1, 6, 12, 7, 10, 8, 11, 3}, {12, 6, 11, 10, 8, 3, 9, 2, 4, 7, 5, 1}
             }
     };
-    //
-    /*
+    */
     private int[][][] puzz_seeds = {
             {
                     //4x4 easy difficulty seed
@@ -142,7 +143,6 @@ public class SudokuGenerator implements Serializable {
                     {0, 0, 0, 11, 0, 2, 6, 4, 12, 0, 0, 0}, {0, 0, 3, 0, 0, 9, 0, 12, 11, 5, 0, 0}, {9, 1, 5, 0, 0, 11, 0, 8, 6, 0, 0, 0}, {7, 3, 0, 0, 0, 0, 0, 0, 0, 9, 1, 0}, {0, 10, 0, 5, 0, 0, 3, 9, 0, 11, 0, 7}, {0, 0, 0, 0, 0, 8, 4, 0, 0, 2, 0, 0}, {5, 0, 0, 0, 0, 12, 8, 6, 1, 3, 4, 0}, {0, 9, 4, 3, 0, 0, 10, 1, 0, 0, 8, 12}, {0, 0, 1, 6, 4, 7, 11, 0, 2, 0, 9, 5}, {0, 7, 8, 0, 11, 0, 0, 0, 0, 0, 0, 2}, {2, 0, 0, 4, 1, 0, 0, 0, 0, 0, 0, 3}, {0, 0, 0, 0, 8, 3, 0, 0, 0, 7, 5, 1}
             },
     };
-    */
     private int[][][] puzz_seedSols = {
             {
                     //4x4 easy difficulty
