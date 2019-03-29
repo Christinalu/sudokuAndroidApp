@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity
 	
 	WordArray wordArrayResume;
 	String[] numArrayResume;
+	int[] orderArrResume;
 	private int usrLangPrefResume;
 	private SudokuGenerator usrSudokuArrResume;
 	int usrModePrefResume;
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity
 		if (savedInstanceState != null) {
 			//a state had been saved, load it. if state == 0, there is nothing to load.
 			state = (int) savedInstanceState.getSerializable("state");
-			if (state == 1) {
+			if (state > 0) {
 				wordArrayResume = (WordArray) savedInstanceState.getParcelable("wordArrayMA");
 				usrLangPrefResume = savedInstanceState.getInt("usrLangPrefMA");
 				usrSudokuArrResume = (SudokuGenerator) savedInstanceState.get("SudokuArrMA");
@@ -112,6 +113,7 @@ public class MainActivity extends AppCompatActivity
 				languageResume = (String) savedInstanceState.getSerializable("languageMA");
 				if (usrModePrefResume == 1) {
 					numArrayResume = (String[]) savedInstanceState.getSerializable("numArrayMA");
+					orderArrResume = (int[]) savedInstanceState.getSerializable("orderArrMA");
 				}
 			}
 		}
@@ -255,7 +257,7 @@ public class MainActivity extends AppCompatActivity
 					//For optional implementations
 					String TTSlanguage;
 					String TTScountry;
-					int counter = 0;
+					//int counter = 0;
 					for (Locale LO : thelocale) {
 						int res = lTTS.isLanguageAvailable(LO);
 						if (res == TextToSpeech.LANG_COUNTRY_AVAILABLE) {
@@ -271,7 +273,7 @@ public class MainActivity extends AppCompatActivity
 							TTScountry = LO.getDisplayCountry();
 							lTTScountry.add(TTScountry);
 							//Log.e("lTTS", "Language and Country is: "+lTTSlanguage.get(counter)+" - "+lTTScountry.get(counter));
-							counter++;
+							//counter++;
 						}
 					}
 				}
@@ -342,6 +344,7 @@ public class MainActivity extends AppCompatActivity
 							gameActivity.putExtra("state", state);
 							gameActivity.putExtra("usrModeMA", usrModePref);
 							gameActivity.putExtra("languageMA", language);
+							gameActivity.putExtra("usrPuzzSizeMA", usrPuzzleTypePref[0]);
 							gameActivity.putExtra( "HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB );
 							startActivityForResult(gameActivity,0);
 						}
@@ -357,6 +360,7 @@ public class MainActivity extends AppCompatActivity
 						gameActivity.putExtra("state", state);
 						gameActivity.putExtra("usrModeMA", usrModePref);
 						gameActivity.putExtra("languageMA", language);
+						gameActivity.putExtra("usrPuzzSizeMA", usrPuzzleTypePref[0]);
 						gameActivity.putExtra( "HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB );
 						startActivityForResult(gameActivity,0);
 					}
@@ -397,7 +401,7 @@ public class MainActivity extends AppCompatActivity
 		btnResume.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (state==1) {
+				if (state > 0) {
 					//load previous game preferences to prepare for export to new Game Activity
 					Intent resumeActivity = new Intent(MainActivity.this, GameActivity.class);
 					//save preferences for Game Activity to read
@@ -408,6 +412,7 @@ public class MainActivity extends AppCompatActivity
 					resumeActivity.putExtra("usrModeMA", usrModePrefResume);
 					if (usrModePrefResume == 1) {
 						resumeActivity.putExtra("numArrayMA", numArrayResume);
+						resumeActivity.putExtra("orderArrMA", orderArrResume);
 					}
 					resumeActivity.putExtra("languageMA", languageResume);
 					resumeActivity.putExtra( "HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB );
@@ -462,23 +467,32 @@ public class MainActivity extends AppCompatActivity
 		
 		Log.d( "upload", "onStart() called from MainActivity" );
 	}
-	
-	
+
+	@Override
+	public void onDestroy() {
+		if (lTTS != null) {
+			lTTS.stop();
+			lTTS.shutdown();
+		}
+		super.onDestroy();
+	}
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent resumeSrc) {
 		if (resumeSrc != null) {
 			//if all necessary game preferences are written in memory, then unblock resume button
 			if (resumeSrc.hasExtra("wordArrayGA") && resumeSrc.hasExtra("usrLangPrefGA") && resumeSrc.hasExtra("SudokuArrGA") && resumeSrc.hasExtra("usrModeGA") && resumeSrc.hasExtra("languageGA")) {
 				Log.i("TAG", "resumeSrc has all elements");
+				state = (int) resumeSrc.getSerializableExtra("state");
 				wordArrayResume = (WordArray) resumeSrc.getParcelableExtra("wordArrayGA");
 				usrLangPrefResume = (int) resumeSrc.getSerializableExtra("usrLangPrefGA");
 				usrSudokuArrResume = (SudokuGenerator) resumeSrc.getSerializableExtra("SudokuArrGA");
 				usrModePrefResume = (int) resumeSrc.getSerializableExtra("usrModeGA");
 				if (usrModePrefResume == 1) {
 					numArrayResume = (String[]) resumeSrc.getStringArrayExtra("numArrayGA");
+					orderArrResume = (int[]) resumeSrc.getIntArrayExtra("orderArrGA");
 				}
 				languageResume = (String) resumeSrc.getSerializableExtra("languageGA");
-				state = 1;
 				Button btnResume = (Button) findViewById(R.id.button_resume);
 				btnResume.setEnabled(true);
 				Button btnRemove = (Button) findViewById(R.id.btn_remove); //block user from deleting pkg while playing game
@@ -492,7 +506,8 @@ public class MainActivity extends AppCompatActivity
 	public void onSaveInstanceState (Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
 		savedInstanceState.putInt("state", state);
-		if (state == 1) {
+		if (state > 0) {
+			//if there was a previous game, load it's contents
 			savedInstanceState.putParcelable("wordArrayMA", wordArrayResume);
 			savedInstanceState.putInt("usrLangPrefMA", usrLangPrefResume);
 			savedInstanceState.putSerializable("SudokuArrMA", usrSudokuArrResume);
@@ -501,6 +516,7 @@ public class MainActivity extends AppCompatActivity
 			savedInstanceState.putInt( "HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB );
 			if (usrModePrefResume == 1) {
 				savedInstanceState.putStringArray("numArrayMA", numArrayResume);
+				savedInstanceState.putIntArray("orderArrMA", orderArrResume);
 			}
 		}
 	}
