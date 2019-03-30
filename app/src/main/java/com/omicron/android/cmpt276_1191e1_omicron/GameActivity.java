@@ -11,6 +11,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.speech.tts.TextToSpeech;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -175,7 +176,7 @@ public class GameActivity extends AppCompatActivity
 		//set intent to receive word array from Main Activity
 		if (savedInstanceState != null) {
 			//a state had been saved, load it
-			savetheInstanceState (0, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr);
+			savetheInstanceState (0, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr, HINT_CLICK_TO_MAX_PROB, currentRectColoured);
 		}
 		else {
 			Intent gameSrc = getIntent();
@@ -466,9 +467,23 @@ public class GameActivity extends AppCompatActivity
 			// 			 so touchXZ = 0 will be start top left corner, == 1000 means == 1000 top left corner will start and top right corner
 			// 			 would be 1000 + screen_width
 			// touchXZclick : initial (stored) regular pixel coordinate of where user first clicked
+		//TODO: REMOVE ONCE SS DONE FOR CURRENT RECTANGLE COLOURED
+		/*
+		if (touchX[0] != 0 || touchY[0] != 0) {
 
+			long downTime = SystemClock.uptimeMillis();
+			long eventTime = SystemClock.uptimeMillis()+100;
+			float x = (float) touchX[0];
+			float y = (float) touchY[0];
+			int metaState = 0;
+			MotionEvent motionEvent = MotionEvent.obtain(downTime,eventTime,MotionEvent.ACTION_UP,x,y,metaState);
+			View view = R.layout.activity_game;
+			view.dispatchTouchEvent(motionEvent);
 
-
+			actionDown();
+			actionUp();
+		}
+		*/
 			/** ON-TOUCH **/
 
 		handleTouch = new View.OnTouchListener( )
@@ -527,7 +542,7 @@ public class GameActivity extends AppCompatActivity
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
-		savetheInstanceState (1, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr);
+		savetheInstanceState (1, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr, HINT_CLICK_TO_MAX_PROB, currentRectColoured);
 	}
 
 	@Override
@@ -1163,7 +1178,7 @@ public class GameActivity extends AppCompatActivity
 			}
 		}
 	}
-	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int [] sis_orderArr) {
+	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP, Pair sis_currentRectColoured) {
 		if (RorS == 0) {
 			//we are receiving
 			//a state had been saved, load it
@@ -1174,6 +1189,12 @@ public class GameActivity extends AppCompatActivity
 			usrModePref = (int) savedInstanceState.getSerializable("usrMode");
 			language = (String) savedInstanceState.getSerializable("language");
 			HINT_CLICK_TO_MAX_PROB = savedInstanceState.getInt( "HINT_CLICK_TO_MAX_PROB" );
+			//TODO REMOVE
+			/*
+			touchX = (int[]) savedInstanceState.getIntArray("touchX");
+			touchY = (int[]) savedInstanceState.getIntArray("touchY");
+			*/
+			currentRectColoured = (Pair) savedInstanceState.getSerializable("currentRectColoured");
 			if (usrModePref == 1) {
 				numArray = (String[]) savedInstanceState.getSerializable("numArray");
 				orderArr = (int[]) savedInstanceState.getIntArray("orderArr");
@@ -1191,6 +1212,13 @@ public class GameActivity extends AppCompatActivity
 			savedInstanceState.putInt("state", sis_state);
 			savedInstanceState.putInt("usrMode", sis_usrModePref);
 			savedInstanceState.putString("language", sis_language);
+			savedInstanceState.putInt("HINT_CLICK_TO_MAX_PROB", sis_HCTMP);
+			//TODO REMOVE
+			/*
+			savedInstanceState.putIntArray("touchX", touchx);
+			savedInstanceState.putIntArray("touchY", touchy);
+			*/
+			savedInstanceState.putSerializable("currentRectColoured", sis_currentRectColoured);
 			if (sis_usrModePref == 1) {
 				savedInstanceState.putStringArray("numArray", sis_numArray);
 				savedInstanceState.putIntArray("orderArr", sis_orderArr);

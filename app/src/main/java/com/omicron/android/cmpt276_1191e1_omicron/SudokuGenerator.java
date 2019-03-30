@@ -5,7 +5,9 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import static java.lang.Math.sqrt;
 
@@ -37,6 +39,8 @@ public class SudokuGenerator implements Serializable {
     public boolean isCorrect;
     public boolean enableCheck;
     private int sqrFilled;
+
+    private List<Entry> duplicateList;
 
 	//
     //TODO: Remove the first 3D array (the test array) before submitting for iteration 3
@@ -209,6 +213,8 @@ public class SudokuGenerator implements Serializable {
 		isCorrect = false;
 		enableCheck = false;
 		sqrFilled = 0;
+
+        duplicateList = new ArrayList<Entry>();
 
         copyarr(puzz_seeds[pindex], Puzzle);
         copyarr(puzz_seedSols[pindex], PuzzleSol);
@@ -394,6 +400,10 @@ public class SudokuGenerator implements Serializable {
 	public int[][] getSolution( )
 	{ return PuzzleSol; }
 
+	public int[][] getPuzzle() { return Puzzle;}
+
+	public List<Entry> getduplicateList () { return duplicateList; }
+
     public void track(Pair currentRectColoured) {
         if( Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] == 0 ) //if sqr selected was not selected so far
         {
@@ -440,30 +450,98 @@ public class SudokuGenerator implements Serializable {
     public boolean checkDuplicate (int x, int y) {
         //check row for duplicates
         int input = Puzzle[x][y];
-        //temporarily set Puzzle[x][y] to 0 so we can check with loops
-        Puzzle[x][y] = 0;
-        for (int i=0; i<size; i++) {
-            if (input == Puzzle[i][y] || input == Puzzle[x][i]) {
-                Puzzle[x][y] = input;
+        if (input > 0 && PuzzleOriginal[x][y] == 0) {
+            int duplicateFound = 0;
+            int duplicate_val;
+            Pair duplicate_coor;
+            Entry duplicate;
+            //find (x,y) of the section currently selected
+            int sec_x = x / sec_numRows;
+            sec_x = sec_x * sec_numRows;
+            //Log.d("TESTI", "x coordinate of section is: "+sec_x);
+            int sec_y = y / sec_numCols;
+            sec_y = sec_y * sec_numCols;
+            //temporarily set Puzzle[x][y] to 0 so we can check with loops
+            Puzzle[x][y] = 0;
+
+            int count = 0;
+            int loopCount = (sec_x + sec_numRows)%size;
+            while (loopCount != sec_x) {
+                //check row for duplicates
+                if (input == Puzzle[x][loopCount]) {
+                    duplicate_val = Puzzle[x][loopCount];
+                    duplicate_coor = new Pair(x, loopCount);
+                    duplicate = new Entry(duplicate_val, duplicate_coor);
+                    //check if entry is already in the list
+                    if (notinList(duplicate)) {
+                        duplicateList.add(duplicate);
+                    }
+                    duplicateFound = 1;
+                }
+                count++;
+                loopCount = (loopCount + 1)%size;
+            }
+            count = 0;
+            loopCount = (sec_y + sec_numCols)%size;
+            while (loopCount != sec_y) {
+                //check col for duplicates
+                if (input == Puzzle[loopCount][y]) {
+                    duplicate_val = Puzzle[loopCount][y];
+                    duplicate_coor = new Pair(loopCount, y);
+                    duplicate = new Entry(duplicate_val, duplicate_coor);
+                    //check if entry is already in the list
+                    if (notinList(duplicate)) {
+                        duplicateList.add(duplicate);
+                    }
+                    duplicateFound = 1;
+                }
+                count++;
+                loopCount = (loopCount + 1)%size;
+            }
+            //Log.d("TESTI", "y coordinate of section is: "+sec_y);
+            for (int i = sec_x; i < sec_numRows + sec_x; i++) {
+                for (int j = sec_y; j < sec_numCols + sec_y; j++) {
+                    //check section for duplicates
+                    if (input == Puzzle[i][j]) {
+                        //Log.d("TESTI", "duplicate found in: ("+i+", "+j+")");
+                        duplicate_val = Puzzle[i][j];
+                        duplicate_coor = new Pair(i, j);
+                        duplicate = new Entry(duplicate_val, duplicate_coor);
+                        //check if entry is already in the list
+                        if (notinList(duplicate)) {
+                            duplicateList.add(duplicate);
+                        }
+                        duplicateFound = 1;
+                    }
+                    count++;
+                }
+            }
+            Log.d("TESTI", "section count is: "+count);
+            Puzzle[x][y] = input;
+            if (duplicateFound == 1) {
+                duplicate_val = input;
+                duplicate_coor = new Pair(x,y);
+                duplicate = new Entry(duplicate_val, duplicate_coor);
+                //Log.d("TESTI", "duplicate found in: ("+x+", "+y+")");
+                if (notinList(duplicate)) {
+                    duplicateList.add(duplicate);
+                }
+                //FOR DEBUGGING
+                int size = duplicateList.size();
+                for (int i = 0; i < size; i++) {
+                    duplicateList.get(i).print();
+                }
                 return true;
             }
         }
-        //find (x,y) of the section currently selected
-        int sec_x = x/sec_numRows;
-        sec_x = sec_x*sec_numRows;
-        Log.d("TESTI", "x coordinate of section is: "+sec_x);
-        int sec_y = y/sec_numCols;
-        sec_y = sec_y*sec_numCols;
-        Log.d("TESTI", "y coordinate of section is: "+sec_y);
-        for (int i=sec_x; i<sec_numRows+sec_x; i++) {
-            for (int j=sec_y; j<sec_numCols+sec_y; j++) {
-                if (input == Puzzle[i][j]) {
-                    Puzzle[x][y] = input;
-                    return true;
-                }
+        return false;
+    }
+    public boolean notinList(Entry e) {
+        for (int i=0; i<duplicateList.size(); i++) {
+            if (e.getCoordinate().isEqual(duplicateList.get(i).getCoordinate())) {
+                return false;
             }
         }
-        Puzzle[x][y] = input;
-        return false;
+        return true;
     }
 }

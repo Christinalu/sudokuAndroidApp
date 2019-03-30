@@ -17,6 +17,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.List;
 import java.util.Random;
 
 
@@ -30,6 +31,7 @@ public class ButtonListener extends AppCompatActivity
 
 	private int i;
 	private Button [] btnArr;
+	private boolean notZero;
 	
 	
 	public ButtonListener(final Pair currentRectColoured, final SudokuGenerator usrSudokuArr, final drw drawR,
@@ -220,6 +222,11 @@ public class ButtonListener extends AppCompatActivity
 														 // increase the count of inserted numbers if needed
 														 usrSudokuArr.track(currentRectColoured); //important, 'track' must occur before 'usrSudokuArr.Puzzle[][] = x'
 
+														 //TODO: implement duplicateList
+														 if (usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] != 0) {
+														 	notZero = true;
+														 }
+
 														 // set the cell in the Puzzle to corresponding number based on button user input
 														 //if( zoomButtonDisableUpdate[0] == 0 ) // do not update entry when switching modes - causes errors
 														 usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = var;
@@ -239,8 +246,14 @@ public class ButtonListener extends AppCompatActivity
 															 Log.d("TESTI", "No duplicate detected");
 															 currentSelectedisCorrect = 1;
 														 }
-
 														 drawR.reDraw(currentRectColoured, usrLangPref, currentSelectedisCorrect);
+
+														 //TODO: implement duplicateList
+														 //if entry replaced a value, check and remove any duplicates from the row/col/section
+														 if (notZero) {
+
+														 }
+
 														 btnClicked[0] = 0;
 														 //textOverlay.reDrawText( usrLangPref );
 
@@ -276,4 +289,19 @@ public class ButtonListener extends AppCompatActivity
 			}
 		}
 	}
+	/*
+	//DEBUG REMOVE AFTER
+	int size = duplicateList.size();
+		for (int i = 0; i < size; i++) {
+	duplicateList.get(i).print();
+}
+	private boolean checkinList(SudokuGenerator s, int value, int x, int y) {
+		List<Entry> duplicateList = s.getduplicateList();
+		for (int i=0; i<duplicateList.size(); i++) {
+			if (duplicateList.get(i).getValue() == value) {
+
+			}
+		}
+	}
+	*/
 }
