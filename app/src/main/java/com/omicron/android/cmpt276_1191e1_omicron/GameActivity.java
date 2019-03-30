@@ -167,6 +167,11 @@ public class GameActivity extends AppCompatActivity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_game);
 		
+		
+		// TODO: test if highlighting is preserved when zooming
+		
+		
+		
 		ZOOM_FIRST_TIME[0] = true;
 
 		//set intent to receive word array from Main Activity
@@ -384,8 +389,8 @@ public class GameActivity extends AppCompatActivity
 						*/
 						
 						// CHECK INPUT FOR DUPLICATES
-						int currentSelectedIsCorrect;
-						if( currentRectColoured.getRow() != -1 ) {
+						int currentSelectedIsCorrect = 0;
+						/*if( currentRectColoured.getRow() != -1 ) {
 							
 							// 0 == nothing selected; 1 == selected and correct; 2 == selected but incorrect
 							
@@ -396,7 +401,7 @@ public class GameActivity extends AppCompatActivity
 						else
 						{
 							currentSelectedIsCorrect = 0;
-						}
+						}*/
 						
 						// on zoom in, calculate coordinate to zoom on selected square
 						//findSqrCoordToZoomInOn.findSqrCoordToZoomInOn( );
@@ -445,8 +450,8 @@ public class GameActivity extends AppCompatActivity
 								*/
 								
 								// CHECK INPUT FOR DUPLICATES
-								int currentSelectedIsCorrect;
-								if( currentRectColoured.getRow() != -1 ) {
+								int currentSelectedIsCorrect = 0;
+								/*if( currentRectColoured.getRow() != -1 ) {
 									
 									// 0 == nothing selected; 1 == selected and correct; 2 == selected but incorrect
 									
@@ -457,7 +462,7 @@ public class GameActivity extends AppCompatActivity
 								else
 								{
 									currentSelectedIsCorrect = 0;
-								}
+								}*/
 								
 								// on zoom, calculate coordinate to zoom on selected square
 								//findSqrCoordToZoomInOn.findSqrCoordToZoomInOn( );
@@ -930,6 +935,14 @@ public class GameActivity extends AppCompatActivity
 		 * when user has clicked the screen
 		 */
 		
+		/////////////// TEST ///////////
+//		for( int a=0; a<WORD_COUNT; a++ ) //highlight top 2 rows for conflict
+//		{
+//			drawR.setConflictAtIndex( 0, a );
+//			drawR.setConflictAtIndex( 1, a );
+//		}
+		////////////////////////////////
+		
 		//disable safety because by clicking, user updates to new valid coordinates
 		zoomClickSafe[0] = 0;
 		zoomButtonDisableUpdate[0] = 0; //once user clicks, the coordinates are updated and become valid, so let button update sqr clicked
@@ -962,8 +975,8 @@ public class GameActivity extends AppCompatActivity
 		
 		// TODO: also add this code in Button listener and Zoom buttons
 		
-		int currentSelectedIsCorrect;
-		if( currentRectColoured.getRow() != -1 ) {
+		int currentSelectedIsCorrect = 0;
+		/*if( currentRectColoured.getRow() != -1 ) {
 			
 			// 0 == nothing selected; 1 == selected and correct; 2 == selected but incorrect
 			currentSelectedIsCorrect = 2; // TODO: here call check function
@@ -971,7 +984,7 @@ public class GameActivity extends AppCompatActivity
 		else
 		{
 			currentSelectedIsCorrect = 0;
-		}
+		}*/
 		
 		drawR.reDraw( currentRectColoured, usrLangPref, currentSelectedIsCorrect );
 		

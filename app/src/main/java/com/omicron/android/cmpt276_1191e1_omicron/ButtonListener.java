@@ -200,7 +200,7 @@ public class ButtonListener extends AppCompatActivity
 													 drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
 													
 													 // CHECK INPUT FOR DUPLICATES
-													 int currentSelectedIsCorrect;
+													 int currentSelectedIsCorrect = 0;
 													 if( currentRectColoured.getRow() != -1 ) {
 														
 														 // 0 == nothing selected; 1 == selected and correct; 2 == selected but incorrect
