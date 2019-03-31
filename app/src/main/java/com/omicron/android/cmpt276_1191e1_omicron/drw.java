@@ -51,8 +51,7 @@ public class drw
 	private int HORIZONTAL_BLOCK;
 	private Context context; //context of GameActivity
 	private String lastColour;
-	private int[][] conflictArr; //stores 0,1; 1 == that cell has a conflict in col/row/block and should be highlighted
-	
+
 	
 	public drw( Context context2, RelativeLayout rectLayout2 )
 	{
@@ -99,7 +98,7 @@ public class drw
 		HORIZONTAL_BLOCK = HORIZONTAL_BLOCK2;
 		WORD_COUNT = WORD_COUNT2;
 		barH = barH2;
-		conflictArr = new int[WORD_COUNT][WORD_COUNT];
+		
 	}
 
 	
@@ -282,10 +281,10 @@ public class drw
 			for( int j=0; j<WORD_COUNT; j++ )
 			{
 				//for each word, mark if there is conflict
-				if( conflictArr[i][j] == 1 )
+				if( usrSudokuArr.getconflictArr()[i][j] == 1 )
 				{ rectArr[i][j].setConflict( true ); }
 				else{ rectArr[i][j].setConflict( false ); } //no conflict
-				
+
 				//set colours; must occur after figuring out is rect contained
 				if( rectArr[i][j].isSelected( ) ) //if a selected rect
 				{
@@ -309,22 +308,22 @@ public class drw
 					{
 						paint.setColor(Color.parseColor( selectCorrect ));
 						rectArr[i][j].setConflict( false );
-						conflictArr[i][j] = 0; //mark as no conflict
+						usrSudokuArr.getconflictArr()[i][j] = 0; //mark as no conflict
 						rectArr[i][j].setLastColour( selectCorrect );
 					}
 					else if( currentSelectedIsCorrect == 2 ) //selected is incorrect
 					{
 						paint.setColor(Color.parseColor( selectIncorrect ));
 						rectArr[i][j].setConflict( true );
-						conflictArr[i][j] = 1; //mark conflict
+						usrSudokuArr.getconflictArr()[i][j] = 1; //mark conflict
 						rectArr[i][j].setLastColour( selectIncorrect );
 					}
 					else
 					{
 						//paint.setColor(Color.parseColor("#000000"));
 						//paint.setColor( Color.parseColor( rectArr[i][j].getLastColour( ) ) ); //on drag, use previous colour of selected rect
-					
-						
+
+
 						//if no button clicked, then currentSelectedIsCorrect == 0, so draw colour that was so far
 						if( rectArr[i][j].getConflict() == true ) //if a word has conflict, preserve incorrect colour
 						{
@@ -453,10 +452,10 @@ public class drw
 		
 		canvas.drawRect(rectArr[i][j].getRect(), paint);
 	}
-	
-	
+
+	/*
 	public int[][] getConflictArr( ){ return  conflictArr; }
-	
+
 	public void setConflictArr( int[][] arr ){ conflictArr = arr; }
 
 	public int setConflictAtIndex( int i, int j ){
@@ -465,13 +464,14 @@ public class drw
 		conflictArr[i][j] = 1;
 		return 0;
 	}
-	
+
 	public int removeConflictAtIndex( int i, int j ){
 		//returns 1 on incorrect index
 		if( i < 0 || j < 0 || i >= WORD_COUNT || j >= WORD_COUNT ){ return 1; }
 		conflictArr[i][j] = 0;
 		return 0;
 	}
+	*/
 }
 
 

@@ -6,7 +6,9 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.widget.TextView;
 
-public class Block
+import java.io.Serializable;
+
+public class Block implements Serializable
 {
 	/*
 	 * This class holds a single puzzle rectangle and contains certain attributes

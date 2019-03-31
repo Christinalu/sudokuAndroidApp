@@ -9,8 +9,10 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.speech.tts.TextToSpeech;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -40,6 +42,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Locale;
+import java.util.Random;
 
 public class GameActivity extends AppCompatActivity
 {
@@ -50,11 +53,13 @@ public class GameActivity extends AppCompatActivity
 
 	private WordArray wordArray;
 	private String[] numArray;
+	private int[] orderArr;
 	private int usrLangPref;
 	private int usrDiffPref = 0;
-	private int state; //0=new start, 1=resume
+	private int state; //0=new start, 1=resume, 2=completed
 	private int usrModePref; //0=standard, 1=speech
-	private int usrPuzzleTypePref; //stores puzzle size 4x4 ...
+	private int usrPuzzSize; //stores puzzle size
+	private int usrPuzzleTypePref; //stores puzzle size 4x4 ... 1 = 4x4, 2 = 6x6, 3 = 9x9, 4 = 12x12
 
 	private TextToSpeech mTTS;
 	private String theWord;
@@ -79,6 +84,8 @@ public class GameActivity extends AppCompatActivity
 	private drw drawR; // class that draws the squares either highlighted or not, based on touch
 	private Pair lastRectColoured = new Pair( -1, -1 ); // stores the last coloured square coordinates
 	private Pair currentRectColoured = new Pair( -1, -1 ); // stores the current coloured square
+	private int currentSelectedIsCorrect = 0;
+	//TODO TESTING
 	
 	private Paint paintblack = new Paint();
 	private TextMatrix textMatrix; //stores the TextView for drawing the text
@@ -160,63 +167,61 @@ public class GameActivity extends AppCompatActivity
 	private int VERTICAL_BLOCK; //stores how many (vertical) blocks are in a puzzle; in 9x9 this would be 3 blocks
 	private int HORIZONTAL_BLOCK;
 	
-
+	private int[] rotation = { 0 };
+	
 	@Override
 	protected void onCreate( Bundle savedInstanceState )
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_game);
 		
-		
+
 		// TODO: test if highlighting is preserved when zooming
-		
-		
-		
+
+
+
 		ZOOM_FIRST_TIME[0] = true;
 
 		//set intent to receive word array from Main Activity
 		if (savedInstanceState != null) {
 			//a state had been saved, load it
-			state = 1;
-			wordArray = (WordArray) savedInstanceState.getParcelable("wordArrayGA");
-			usrLangPref = savedInstanceState.getInt("usrLangPrefGA");
-			usrSudokuArr = (SudokuGenerator) savedInstanceState.get("SudokuArrGA");
-			usrModePref = (int) savedInstanceState.getSerializable("usrModeGA");
-			language = (String) savedInstanceState.getSerializable("languageGA");
-			HINT_CLICK_TO_MAX_PROB = savedInstanceState.getInt( "HINT_CLICK_TO_MAX_PROB" );
-			if (usrModePref == 1) {
-				numArray = (String[]) savedInstanceState.getSerializable("numArrayGA");
-			}
+            //TODO: add currentSelectedisCorrect
+			savetheInstanceState (0, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect, touchX, touchY);
+			rotation[0] = 1;
 		}
 		else {
 			Intent gameSrc = getIntent();
 			if (gameSrc != null) {
 				state = (int) gameSrc.getSerializableExtra("state");
 				//check state: if 1 then we are resuming a previous game, otherwise state == 0 and we are starting a new game
-				if (state == 1) {
-					wordArray = (WordArray) gameSrc.getParcelableExtra("wordArrayMA");
-					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPrefMA");
-					usrSudokuArr = (SudokuGenerator) gameSrc.getSerializableExtra("SudokuArrMA");
-					usrModePref = (int) gameSrc.getSerializableExtra("usrModeMA");
-					language = (String) gameSrc.getSerializableExtra("languageMA");
-					HINT_CLICK_TO_MAX_PROB = (int) gameSrc.getSerializableExtra( "HINT_CLICK_TO_MAX_PROB" );
-					if (usrModePref == 1) {
-						numArray = (String[]) gameSrc.getStringArrayExtra("numArrayMA");
-					}
-				} else {
+				if (state > 0) {
+					//we are resuming a game
 					wordArray = (WordArray) gameSrc.getParcelableExtra("wordArray");
 					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPref");
-					usrDiffPref = (int) gameSrc.getSerializableExtra("usrDiffPref");
-					usrModePref = (int) gameSrc.getSerializableExtra("usrModeMA");
+					usrModePref = (int) gameSrc.getSerializableExtra("usrMode");
+					language = (String) gameSrc.getSerializableExtra("language");
 					HINT_CLICK_TO_MAX_PROB = (int) gameSrc.getSerializableExtra( "HINT_CLICK_TO_MAX_PROB" );
+					usrSudokuArr = (SudokuGenerator) gameSrc.getSerializableExtra("SudokuArr");
+					if (usrModePref == 1) {
+						numArray = (String[]) gameSrc.getStringArrayExtra("numArray");
+						orderArr = (int[]) gameSrc.getIntArrayExtra("orderArr");
+					}
+				}
+				else {
+					//we are starting a new game
+					//state = 1; //set game available to resume
+					wordArray = (WordArray) gameSrc.getParcelableExtra("wordArray");
+					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPref");
+					usrModePref = (int) gameSrc.getSerializableExtra("usrMode");
+					HINT_CLICK_TO_MAX_PROB = (int) gameSrc.getSerializableExtra( "HINT_CLICK_TO_MAX_PROB" );
+					usrDiffPref = (int) gameSrc.getSerializableExtra("usrDiffPref");
+					usrPuzzSize = (int) gameSrc.getSerializableExtra("usrPuzzSize");
 					if (usrModePref == 1) {
 						//create separate array to draw from for this mode
-						
-						
-						// TODO: fix the following to adapt to different puzzle types
-						
 						WORD_COUNT = wordArray.getWordCount( );
 						numArray = new String[WORD_COUNT];
+						orderArr = new int[WORD_COUNT];
+						randomizeOrder(orderArr);
 						if (usrLangPref == 0) {
 							for (int i = 0; i < WORD_COUNT; i++) {
 								numArray[i] = wordArray.getWordTranslationAtIndex( i );
@@ -229,12 +234,11 @@ public class GameActivity extends AppCompatActivity
 								wordArray.setWordNativeAtIndex( i, Integer.toString(i + 1) );
 							}
 						}
+						language = (String) gameSrc.getSerializableExtra("language");
 					}
-					usrSudokuArr = new SudokuGenerator(usrDiffPref);
-					language = (String) gameSrc.getSerializableExtra("languageMA");
+					usrSudokuArr = new SudokuGenerator(usrDiffPref, usrPuzzSize);
 				}
 
-				
 				//debug wordArray
 				Log.d( "upload", " @ WORD_ARRAY ON RESUME GAME:" );
 				for( int i=0; i<WORD_COUNT; i++ )
@@ -243,6 +247,8 @@ public class GameActivity extends AppCompatActivity
 				}
 			}
 		}
+		
+		Log.d( "debug-1", "currentRectColoured: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );
 
 		if (usrModePref == 1) {
 			mTTS = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
@@ -263,7 +269,7 @@ public class GameActivity extends AppCompatActivity
 			});
 		}
 
-		
+
 		TextView Hint=(TextView) findViewById(R.id.hint_content);
 
 
@@ -288,19 +294,7 @@ public class GameActivity extends AppCompatActivity
 		//sqrLO, sqrTO, sqrSizeWidth, sqrSizeHeight, bitMap, rectLayout, rectTextLayout
 		initializePuzzleMatrixParameters( );
 		
-		
-		
 		paint.setColor(Color.parseColor("#c2c2c2"));
-
-		
-		
-		
-		
-		
-		
-		
-		
-		
 
 		textMatrix = new TextMatrix( this, sqrSizeWidth, sqrSizeHeight, ZOOM_SCALE, WORD_COUNT );
 
@@ -314,7 +308,7 @@ public class GameActivity extends AppCompatActivity
 		// PREDEFINE VARIABLES FOR MATRIX OVERLAY
 		paintblack.setColor(Color.parseColor("#0000ff"));
 		paintblack.setTextSize(30);
-		
+
 		rectArr = new Block[WORD_COUNT][WORD_COUNT]; // stores all squares in a 2D array
 		
 		drawR.drwInitialize( rectArr, paint, rectTextLayout, textMatrix, usrSudokuArr, zoomOn, drag,
@@ -328,13 +322,10 @@ public class GameActivity extends AppCompatActivity
 		
 		// call function to set all listeners - needs drawR
 		
-		// TODO: add here the finishedGame variable to stop listeners from being re activated
-		// TODO: to prevent bug where when user finishes game then resumes game, the user can still play
-		
 		listeners = new ButtonListener(currentRectColoured, usrSudokuArr,
 					drawR, touchX, touchY, lastRectColoured, usrLangPref, btnClicked,
 					Hint, wordArray, usrModePref, numArray, WORD_COUNT, COL_PER_BLOCK, ROW_PER_BLOCK,
-					this, tableLayout, orientation);
+					this, tableLayout, orientation, state, orderArr, rotation);
 		
 
 
@@ -346,9 +337,47 @@ public class GameActivity extends AppCompatActivity
 
 
 		//draw matrix so far
-		drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
+		if( rotation[0] == 0 ) {
+			drawR.setDrawParameters(touchX, touchY, lastRectColoured, currentRectColoured);
+		}
 		drawR.reDraw( currentRectColoured, usrLangPref, 0 );
 
+			/*UNDO BUTTON*/
+
+		ImageButton btnUndo = findViewById(R.id.button_undo);
+		btnUndo.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick( View v)
+			{
+				if (!usrSudokuArr.historyisEmpty()) {
+					usrSudokuArr.printHistory();
+					Entry lastEntry = usrSudokuArr.removeHistory();
+					usrSudokuArr.setPuzzleVal(lastEntry.getValue(), lastEntry.getCoordinate().getRow(), lastEntry.getCoordinate().getColumn());
+					drawR.reDraw( currentRectColoured, usrLangPref, 0 );
+					//textMatrix.scaleTextZoom( ZOOM_SCALE[0] );
+					//textMatrix.reDrawTextZoom( touchXZ, touchYZ, dX, dY ); // call this because .scaleTextZoom() only scales Layouts, so call this to place them in correct (drag) position
+					//TODO: add code to redraw Text in Puzzle
+				}
+				else {
+					Toast.makeText(v.getContext(), "There is nothing to undo!", Toast.LENGTH_LONG).show( );
+				}
+			}
+		});
+
+			/*RESET BUTTON*/
+
+		ImageButton btnReset = findViewById(R.id.button_reset);
+		btnReset.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick( View v)
+			{
+				usrSudokuArr.resetPuzzle();
+				usrSudokuArr.printCurrent();
+				//TODO: add code to redraw Text in Puzzle
+			}
+		});
 
 			/* ZOOM IN BUTTON */
 
@@ -389,19 +418,19 @@ public class GameActivity extends AppCompatActivity
 						*/
 						
 						// CHECK INPUT FOR DUPLICATES
-						int currentSelectedIsCorrect = 0;
-						/*if( currentRectColoured.getRow() != -1 ) {
-							
+						if( currentRectColoured.getRow() != -1 ) {
 							// 0 == nothing selected; 1 == selected and correct; 2 == selected but incorrect
-							
-							
-							// TODO: here add the check for testing for conflict on select and highlighting
-							currentSelectedIsCorrect = 2; // TODO: here call check funciton
+							if (usrSudokuArr.checkDuplicate(currentRectColoured.getRow(), currentRectColoured.getColumn())) {
+								currentSelectedIsCorrect = 2;
+							}
+							else {
+								currentSelectedIsCorrect = 1;
+							}
 						}
 						else
 						{
 							currentSelectedIsCorrect = 0;
-						}*/
+						}
 						
 						// on zoom in, calculate coordinate to zoom on selected square
 						//findSqrCoordToZoomInOn.findSqrCoordToZoomInOn( );
@@ -448,21 +477,21 @@ public class GameActivity extends AppCompatActivity
 								touchXZ[0] = 0;
 								touchYZ[0] = 0;
 								*/
-								
+
 								// CHECK INPUT FOR DUPLICATES
-								int currentSelectedIsCorrect = 0;
-								/*if( currentRectColoured.getRow() != -1 ) {
-									
+								if( currentRectColoured.getRow() != -1 ) {
 									// 0 == nothing selected; 1 == selected and correct; 2 == selected but incorrect
-									
-									
-									// TODO: here add the check for testing for conflict on select and highlighting
-									currentSelectedIsCorrect = 2; // TODO: here call check funciton
+									if (usrSudokuArr.checkDuplicate(currentRectColoured.getRow(), currentRectColoured.getColumn())) {
+										currentSelectedIsCorrect = 2;
+									}
+									else {
+										currentSelectedIsCorrect = 1;
+									}
 								}
 								else
 								{
 									currentSelectedIsCorrect = 0;
-								}*/
+								}
 								
 								// on zoom, calculate coordinate to zoom on selected square
 								//findSqrCoordToZoomInOn.findSqrCoordToZoomInOn( );
@@ -488,9 +517,23 @@ public class GameActivity extends AppCompatActivity
 			// 			 so touchXZ = 0 will be start top left corner, == 1000 means == 1000 top left corner will start and top right corner
 			// 			 would be 1000 + screen_width
 			// touchXZclick : initial (stored) regular pixel coordinate of where user first clicked
+		//TODO: REMOVE ONCE SS DONE FOR CURRENT RECTANGLE COLOURED
+		/*
+		if (touchX[0] != 0 || touchY[0] != 0) {
 
+			long downTime = SystemClock.uptimeMillis();
+			long eventTime = SystemClock.uptimeMillis()+100;
+			float x = (float) touchX[0];
+			float y = (float) touchY[0];
+			int metaState = 0;
+			MotionEvent motionEvent = MotionEvent.obtain(downTime,eventTime,MotionEvent.ACTION_UP,x,y,metaState);
+			View view = R.layout.activity_game;
+			view.dispatchTouchEvent(motionEvent);
 
-
+			actionDown();
+			actionUp();
+		}
+		*/
 			/** ON-TOUCH **/
 
 		handleTouch = new View.OnTouchListener( )
@@ -549,15 +592,7 @@ public class GameActivity extends AppCompatActivity
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
-		savedInstanceState.putParcelable("wordArrayGA", wordArray);
-		savedInstanceState.putInt( "usrLangPrefGA", usrLangPref );
-		savedInstanceState.putSerializable("SudokuArrGA", usrSudokuArr);
-		savedInstanceState.putInt("state", state);
-		savedInstanceState.putInt("usrModeGA", usrModePref);
-		savedInstanceState.putString("languageGA", language);
-		if (usrModePref == 1) {
-			savedInstanceState.putStringArray("numArrayGA", numArray);
-		}
+		savetheInstanceState (1, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect, touchX, touchY);
 	}
 
 	@Override
@@ -566,15 +601,21 @@ public class GameActivity extends AppCompatActivity
 		onStopAlreadyCalled[0] = 1; //stop onStop() from being called again
 		Log.i("selectW", "back pressed");
 		Intent resumeSrc = new Intent( GameActivity.this, MainActivity.class );
-		state = 1;
-		resumeSrc.putExtra( "wordArrayGA", wordArray );
-		resumeSrc.putExtra( "usrLangPrefGA", usrLangPref );
-		resumeSrc.putExtra("SudokuArrGA", usrSudokuArr);
+		resumeSrc.putExtra( "wordArray", wordArray );
+		resumeSrc.putExtra( "usrLangPref", usrLangPref );
+		resumeSrc.putExtra("SudokuArr", usrSudokuArr);
+		if (usrSudokuArr.isCorrect) {
+			state = 2;
+		}
+		else {
+			state = 1;
+		}
 		resumeSrc.putExtra("state", state);
-		resumeSrc.putExtra("usrModeGA", usrModePref);
-		resumeSrc.putExtra("languageGA", language);
+		resumeSrc.putExtra("usrMode", usrModePref);
+		resumeSrc.putExtra("language", language);
 		if (usrModePref == 1) {
-			resumeSrc.putExtra("numArrayGA", numArray);
+			resumeSrc.putExtra("numArray", numArray);
+			resumeSrc.putExtra("orderArr", orderArr);
 		}
 		//resumeSrc.putExtra("countryGA", country);
 		Log.i("TAG", "Result about to be stored");
@@ -942,7 +983,7 @@ public class GameActivity extends AppCompatActivity
 //			drawR.setConflictAtIndex( 1, a );
 //		}
 		////////////////////////////////
-		
+
 		//disable safety because by clicking, user updates to new valid coordinates
 		zoomClickSafe[0] = 0;
 		zoomButtonDisableUpdate[0] = 0; //once user clicks, the coordinates are updated and become valid, so let button update sqr clicked
@@ -965,29 +1006,24 @@ public class GameActivity extends AppCompatActivity
 		}
 		
 		drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
-		
-		/////////////////
-		//
-		// TODO: here add the check for testing for conflict on select and highlighting
-		// TODO: make sure check function called only when currentRectColoured != -1
-		//
-		/////////////////
-		
-		// TODO: also add this code in Button listener and Zoom buttons
-		
-		int currentSelectedIsCorrect = 0;
-		/*if( currentRectColoured.getRow() != -1 ) {
-			
+
+		if( currentRectColoured.getRow() != -1 ) {
+			Log.d("TAG", "duplicate is about to be checked");
 			// 0 == nothing selected; 1 == selected and correct; 2 == selected but incorrect
-			currentSelectedIsCorrect = 2; // TODO: here call check function
+			if (usrSudokuArr.checkDuplicate(currentRectColoured.getRow(), currentRectColoured.getColumn())) {
+				Log.d("TAG", "duplicate should have been found");
+				currentSelectedIsCorrect = 2;
+			} else {
+				Log.d("TAG", "duplicate is not found");
+				currentSelectedIsCorrect = 1;
+			}
 		}
 		else
 		{
 			currentSelectedIsCorrect = 0;
-		}*/
-		
+		}
 		drawR.reDraw( currentRectColoured, usrLangPref, currentSelectedIsCorrect );
-		
+
 		// TEXT TO SPEECH
 		if (usrModePref == 1) {
 			row = currentRectColoured.getRow();
@@ -1174,6 +1210,74 @@ public class GameActivity extends AppCompatActivity
 		
 		touchXZ[0] = topX;
 		touchYZ[0] = topY;
+	}
+	private void randomizeOrder(int[] arr)
+	{
+		//bit map to see what order has been used
+		int size = arr.length;
+		int[] numUsed = new int[size];
+		for (int i=0; i<size; i++) {
+			numUsed[i] = 0;
+		}
+		int randPos;
+		Random rand = new Random();
+		int i = 0;
+		while (i < size) {
+			randPos = rand.nextInt(100);
+			randPos = randPos%size;
+			if (numUsed[randPos] == 0) { // if not used before
+				arr[i] = randPos; // put rand num back in arr
+				numUsed[randPos] = 1; // mark as used
+				i++; // by putting i++ here this only moves on until it find valid num
+			}
+		}
+	}
+	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP, Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect, int[] touchx, int[] touchy) {
+		if (RorS == 0) {
+			//we are receiving
+			//a state had been saved, load it
+			state = (int) savedInstanceState.getSerializable("state");
+			wordArray = (WordArray) savedInstanceState.getParcelable("wordArray");
+			usrLangPref = savedInstanceState.getInt("usrLangPref");
+			usrSudokuArr = (SudokuGenerator) savedInstanceState.get("SudokuArr");
+			usrModePref = (int) savedInstanceState.getSerializable("usrMode");
+			language = (String) savedInstanceState.getSerializable("language");
+			HINT_CLICK_TO_MAX_PROB = savedInstanceState.getInt( "HINT_CLICK_TO_MAX_PROB" );
+			//TODO REMOVE
+			touchX = (int[]) savedInstanceState.getIntArray("touchX");
+			touchY = (int[]) savedInstanceState.getIntArray("touchY");
+			currentRectColoured = (Pair) savedInstanceState.getSerializable("currentRectColoured");
+			currentSelectedIsCorrect = (int) savedInstanceState.getSerializable("currentSelectedIsCorrect");
+			//rectArr = (Block[][]) savedInstanceState.getSerializable("rectArr");
+			if (usrModePref == 1) {
+				numArray = (String[]) savedInstanceState.getSerializable("numArray");
+				orderArr = (int[]) savedInstanceState.getIntArray("orderArr");
+			}
+		}
+		else {
+			//we are sending
+			savedInstanceState.putInt("state", sis_state);
+			savedInstanceState.putParcelable("wordArray", sis_wordArray);
+			savedInstanceState.putInt( "usrLangPref", sis_usrLangPref );
+			savedInstanceState.putSerializable("SudokuArr", sis_usrSudokuArr);
+			if (sis_usrSudokuArr.isCorrect) {
+				sis_state = 2;
+			}
+			savedInstanceState.putInt("state", sis_state);
+			savedInstanceState.putInt("usrMode", sis_usrModePref);
+			savedInstanceState.putString("language", sis_language);
+			savedInstanceState.putInt("HINT_CLICK_TO_MAX_PROB", sis_HCTMP);
+			//TODO REMOVE
+			savedInstanceState.putIntArray("touchX", touchx);
+			savedInstanceState.putIntArray("touchY", touchy);
+			savedInstanceState.putSerializable("currentRectColoured", sis_currentRectColoured);
+			savedInstanceState.putSerializable("currentSelectedIsCorrect", sis_currentSelectedIsCorrect);
+			//savedInstanceState.putSerializable("rectArr", sis_rectArr);
+			if (sis_usrModePref == 1) {
+				savedInstanceState.putStringArray("numArray", sis_numArray);
+				savedInstanceState.putIntArray("orderArr", sis_orderArr);
+			}
+		}
 	}
 }
 
