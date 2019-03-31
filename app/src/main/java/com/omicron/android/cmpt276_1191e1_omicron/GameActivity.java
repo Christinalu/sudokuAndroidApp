@@ -57,6 +57,7 @@ public class GameActivity extends AppCompatActivity
 	private int usrLangPref;
 	private int usrDiffPref = 0;
 	private int state; //0=new start, 1=resume, 2=completed
+	boolean isRotated = false; //true after
 	private int usrModePref; //0=standard, 1=speech
 	private int usrPuzzSize; //stores puzzle size
 	private int usrPuzzleTypePref; //stores puzzle size 4x4 ... 1 = 4x4, 2 = 6x6, 3 = 9x9, 4 = 12x12
@@ -333,6 +334,7 @@ public class GameActivity extends AppCompatActivity
 
 
 		//draw matrix so far
+
 		if (state == 0 ) {
 			drawR.setDrawParameters(touchX, touchY, lastRectColoured, currentRectColoured);
 		}
@@ -350,17 +352,17 @@ public class GameActivity extends AppCompatActivity
 					usrSudokuArr.printHistory();
 					Entry lastEntry = usrSudokuArr.removeHistory();
 					usrSudokuArr.setPuzzleVal(lastEntry.getValue(), lastEntry.getCoordinate().getRow(), lastEntry.getCoordinate().getColumn());
-					int currentSelectedisCorrect = 0;
+					int cSiC = 0;
 					if (usrSudokuArr.checkDuplicate(lastEntry.getCoordinate().getRow(), lastEntry.getCoordinate().getColumn())) {
 						Log.d("TESTI", "Duplicate in given coordinate detected");
-						currentSelectedisCorrect = 2;
+						cSiC = 2;
 					}
 					else {
 						Log.d("TESTI", "No duplicate detected");
-						currentSelectedisCorrect = 1;
+						cSiC = 1;
 					}
 					//TODO: add code to redraw Text in Puzzle
-					drawR.reDraw( currentRectColoured, usrLangPref, currentSelectedIsCorrect );
+					drawR.reDraw( currentRectColoured, usrLangPref, cSiC );
 				}
 				else {
 					Toast.makeText(v.getContext(), "There is nothing to undo!", Toast.LENGTH_LONG).show( );
@@ -1260,14 +1262,14 @@ public class GameActivity extends AppCompatActivity
 		}
 		else {
 			//we are sending
+			if (sis_usrSudokuArr.isCorrect) {
+				sis_state = 2;
+			}
+			else {sis_state =1;}
 			savedInstanceState.putInt("state", sis_state);
 			savedInstanceState.putParcelable("wordArray", sis_wordArray);
 			savedInstanceState.putInt( "usrLangPref", sis_usrLangPref );
 			savedInstanceState.putSerializable("SudokuArr", sis_usrSudokuArr);
-			if (sis_usrSudokuArr.isCorrect) {
-				sis_state = 2;
-			}
-			savedInstanceState.putInt("state", sis_state);
 			savedInstanceState.putInt("usrMode", sis_usrModePref);
 			savedInstanceState.putString("language", sis_language);
 			savedInstanceState.putInt("HINT_CLICK_TO_MAX_PROB", sis_HCTMP);
