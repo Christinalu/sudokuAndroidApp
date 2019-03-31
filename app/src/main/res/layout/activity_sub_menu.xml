@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/transparent"
     android:orientation="vertical">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -16,14 +15,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/background"
-        android:padding="20sp">
+
+        android:padding="10sp">
 
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/linearLayoutdifficultyLevel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -34,12 +33,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
+                android:fontFamily="casual"
+                android:textStyle="bold"
                 android:text="@string/difficulty_level"/>
             <RadioGroup
                 android:id="@+id/button_level"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:orientation="horizontal">
 
                 <RadioButton
@@ -48,6 +49,7 @@
                     android:layout_height="wrap_content"
                     android:checked="true"
                     android:text="@string/easy_level"
+                    android:fontFamily="casual"
                     android:textSize="15sp"
                     android:buttonTint="@color/navy"/>
 
@@ -56,6 +58,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/medium_level"
+                    android:fontFamily="casual"
                     android:textSize="15sp"
                     android:buttonTint="@color/navy"/>
 
@@ -64,6 +67,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/hard_level"
+                    android:fontFamily="casual"
                     android:textSize="15sp"
                     android:buttonTint="@color/navy"/>
 
@@ -83,13 +87,15 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="casual"
+                android:textStyle="bold"
                 android:textSize="20sp"
                 android:text="@string/language_selection"/>
             <RadioGroup
                 android:id="@+id/button_language"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:orientation="horizontal"
                 android:textSize="15sp">
 
@@ -101,6 +107,7 @@
                     android:layout_height="wrap_content"
                     android:checked="true"
                     android:text="@string/native_trans"
+                    android:fontFamily="casual"
                     android:textSize="15sp"
                     android:buttonTint="@color/navy"/>
 
@@ -109,6 +116,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/trans_native"
+                    android:fontFamily="casual"
                     android:textSize="15sp"
                     android:buttonTint="@color/navy"/>
 
@@ -131,12 +139,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
+                android:fontFamily="casual"
+                android:textStyle="bold"
                 android:text="@string/mode_selection"/>
             <RadioGroup
                 android:id="@+id/button_mode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:orientation="horizontal"
                 android:textSize="15sp">
 
@@ -147,6 +157,7 @@
                     android:layout_height="wrap_content"
                     android:checked="true"
                     android:text="@string/mStandard"
+                    android:fontFamily="casual"
                     android:textSize="15sp"
                     android:buttonTint="@color/navy"/>
 
@@ -155,6 +166,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/mSpeech"
+                    android:fontFamily="casual"
                     android:textSize="15sp"
                     android:buttonTint="@color/navy"/>
 
@@ -178,13 +190,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:textSize="20sp"
+                android:fontFamily="casual"
+                android:textStyle="bold"
                 android:text="Puzzle Type" />
 
             <RadioGroup
                 android:id="@+id/btn_type"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:buttonTint="@color/navy"
                 android:orientation="horizontal"
                 android:textSize="15sp">
@@ -198,6 +212,7 @@
                     android:buttonTint="@color/navy"
                     android:checked="false"
                     android:text="4x4"
+                    android:fontFamily="casual"
                     android:textSize="15sp" />
 
                 <RadioButton
@@ -207,6 +222,7 @@
                     android:buttonTint="@color/navy"
                     android:checked="false"
                     android:text="6x6"
+                    android:fontFamily="casual"
                     android:textSize="15sp" />
 
                 <RadioButton
@@ -216,6 +232,7 @@
                     android:buttonTint="@color/navy"
                     android:checked="true"
                     android:text="9x9"
+                    android:fontFamily="casual"
                     android:textSize="15sp" />
 
                 <RadioButton
@@ -225,6 +242,7 @@
                     android:buttonTint="@color/navy"
                     android:checked="false"
                     android:text="12x12"
+                    android:fontFamily="casual"
                     android:textSize="15sp" />
 
             </RadioGroup>

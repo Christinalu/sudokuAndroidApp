@@ -3,6 +3,8 @@ package com.omicron.android.cmpt276_1191e1_omicron;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.LightingColorFilter;
 import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AlertDialog;
@@ -133,6 +135,8 @@ public class MainActivity extends AppCompatActivity
 
 
 		// SET LISTENERS TO WHICH PKG IS SELECTED //
+
+
 
 		pkgRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
 			@Override
@@ -369,6 +373,8 @@ public class MainActivity extends AppCompatActivity
 	{
 		super.onStart( );
 
+
+
 			/** WHEN USER RETURNING FROM UPLOAD ACTIVITY, UPDATE WORD PKG LIST **/
 
 		FileCSV fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
@@ -499,12 +505,20 @@ public class MainActivity extends AppCompatActivity
 			/* UPDATE THE WORD PKG SCROLL */
 
 		RadioButton radBtn;
+		ColorStateList colorStateList = new ColorStateList(
+				new int[][]{
+						new int[]{android.R.attr.state_enabled}, //enabled
+						new int[]{android.R.attr.state_enabled} //disabled
 
+				},
+				new int[]{R.color.navy, R.color.white}
+		);
 		for( int i=0; i<CURRENT_WORD_PKG_COUNT; i++ )
 		{
 			radBtn = new RadioButton( this );
 
 			radBtn.setText( wordPackageFileIndexArr.getPackageFileAtIndex( i ).getWordPackageName( ) );
+			radBtn.setButtonTintList(colorStateList);
 
 			pkgRadioGroup.addView(radBtn);
 		}
@@ -660,6 +674,8 @@ public class MainActivity extends AppCompatActivity
 
 
 		alertDialog.setNegativeButton(android.R.string.cancel, null);
+
+
 		alertDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -730,7 +746,16 @@ public class MainActivity extends AppCompatActivity
 
 		AlertDialog dialog = alertDialog.create();
 		dialog.show();
-		dialog.getWindow().setLayout(1000,1200);
+		Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+		//positiveButton.setBackground(getResources().getDrawable(R.drawable.buttons));
+		positiveButton.setTextColor(getResources().getColor(R.color.glacierblue));
+		Button negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+		negativeButton.setTextColor(getResources().getColor(R.color.colorAccent));
+		//negativeButton.setBackground(getResources().getDrawable(R.drawable.buttons));
+		dialog.getWindow().getDecorView().setBackground(getResources().getDrawable(R.drawable.buttons));
+		//dialog.getWindow().setBackgroundDrawable(R.drawable.background);
+
+		//dialog.getWindow().setLayout(1000,1200);
 
 
 	}

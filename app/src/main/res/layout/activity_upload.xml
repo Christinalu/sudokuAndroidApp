@@ -28,6 +28,8 @@
 		android:layout_height="wrap_content"
 		android:background="@drawable/hint"
 		android:padding="10dp"
+		android:fontFamily="casual"
+		android:textStyle="bold"
 		android:layout_marginTop="10dp"
 		android:layout_gravity="center"
 		android:text="@string/upload_csv"/>
@@ -36,6 +38,7 @@
 		android:id="@+id/selected_file"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
+
 		android:paddingLeft="25dp"
 />
 

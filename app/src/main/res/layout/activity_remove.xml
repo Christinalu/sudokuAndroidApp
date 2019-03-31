@@ -5,7 +5,8 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:background="@drawable/background"
-	tools:context=".RemoveActivity">
+	tools:context=".RemoveActivity"
+	android:padding="10sp">
 
 	<LinearLayout
 		android:layout_width="match_parent"
@@ -19,6 +20,8 @@
             android:textSize="25sp"
 			android:paddingTop="50dp"
             android:textAlignment="center"
+			android:fontFamily="casual"
+			android:textStyle="bold"
             android:text="Are you sure you want to delete selected Word Package?"/>
 
 		<TextView
@@ -34,7 +37,9 @@
             android:layout_height="wrap_content"
             android:textSize="20sp"
             android:textColor="@color/colorAccent"
-            android:padding="15dp"
+            android:padding="10sp"
+			android:fontFamily="casual"
+
             android:textAlignment="center"
             android:text="Deleted Packages cannot be recovered unless reinstalled."/>
 
@@ -46,6 +51,8 @@
 			android:paddingStart="10dp"
 			android:paddingEnd="10dp"
 			android:layout_gravity="center"
+			android:fontFamily="casual"
+			android:textStyle="bold"
             android:text="YES, DELETE PACKAGE"/>
 
 	</LinearLayout>

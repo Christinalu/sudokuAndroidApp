@@ -33,6 +33,7 @@ public class UploadActivity extends AppCompatActivity
 	private int MAX_CSV_ROW;
 	private int MIN_CSV_ROW;
 	private int READ_REQUEST_CODE = 0;
+	private int addREAD_REQUEST_CODE = 0;
 	private int CURRENT_WORD_PKG_COUNT = 0; //stores current number of packages the user has uploaded
 	private  FileCSV fileCSV; //object for using CSV functions
 	private int STATISTIC_MULTIPLE = 2; //double user Hint clicks to make it more likely for word to be shown
