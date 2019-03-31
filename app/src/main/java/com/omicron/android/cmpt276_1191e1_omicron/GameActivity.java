@@ -186,7 +186,7 @@ public class GameActivity extends AppCompatActivity
 		if (savedInstanceState != null) {
 			//a state had been saved, load it
             //TODO: add currentSelectedisCorrect
-			savetheInstanceState (0, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect, touchX, touchY);
+			savetheInstanceState (0, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect);
 			rotation[0] = 1;
 		}
 		else {
@@ -340,6 +340,10 @@ public class GameActivity extends AppCompatActivity
 		if( rotation[0] == 0 ) {
 			drawR.setDrawParameters(touchX, touchY, lastRectColoured, currentRectColoured);
 		}
+		//TODO: TESTING HIGHLIGHT BUG
+		if (currentRectColoured.getRow()!=-1) {
+			rectArr[currentRectColoured.getRow()][currentRectColoured.getColumn()].select();
+		}
 		drawR.reDraw( currentRectColoured, usrLangPref, 0 );
 
 			/*UNDO BUTTON*/
@@ -367,7 +371,10 @@ public class GameActivity extends AppCompatActivity
                             cSiC = 1;
                         }
                         //TODO: add code to redraw Text in Puzzle
-                        drawR.reDraw(currentRectColoured, usrLangPref, cSiC);
+						if (currentRectColoured.getRow()!=-1) {
+							rectArr[currentRectColoured.getRow()][currentRectColoured.getColumn()].select();
+						}
+						drawR.reDraw(currentRectColoured, usrLangPref, cSiC);
                     } else {
                         Toast.makeText(v.getContext(), "There is nothing to undo!", Toast.LENGTH_LONG).show();
                     }
@@ -605,7 +612,7 @@ public class GameActivity extends AppCompatActivity
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
-		savetheInstanceState (1, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect, touchX, touchY);
+		savetheInstanceState (1, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect);
 	}
 
 	@Override
@@ -1245,7 +1252,7 @@ public class GameActivity extends AppCompatActivity
 			}
 		}
 	}
-	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP, Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect, int[] touchx, int[] touchy) {
+	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP, Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect) {
 		if (RorS == 0) {
 			//we are receiving
 			//a state had been saved, load it
@@ -1256,8 +1263,8 @@ public class GameActivity extends AppCompatActivity
 			usrModePref = (int) savedInstanceState.getSerializable("usrMode");
 			language = (String) savedInstanceState.getSerializable("language");
 			HINT_CLICK_TO_MAX_PROB = savedInstanceState.getInt( "HINT_CLICK_TO_MAX_PROB" );
-			touchX = (int[]) savedInstanceState.getIntArray("touchX");
-			touchY = (int[]) savedInstanceState.getIntArray("touchY");
+			//touchX = (int[]) savedInstanceState.getIntArray("touchX");
+			//touchY = (int[]) savedInstanceState.getIntArray("touchY");
 			currentRectColoured = (Pair) savedInstanceState.getSerializable("currentRectColoured");
 			currentSelectedIsCorrect = (int) savedInstanceState.getSerializable("currentSelectedIsCorrect");
 			//rectArr = (Block[][]) savedInstanceState.getSerializable("rectArr");
@@ -1279,8 +1286,8 @@ public class GameActivity extends AppCompatActivity
 			savedInstanceState.putInt("usrMode", sis_usrModePref);
 			savedInstanceState.putString("language", sis_language);
 			savedInstanceState.putInt("HINT_CLICK_TO_MAX_PROB", sis_HCTMP);
-			savedInstanceState.putIntArray("touchX", touchx);
-			savedInstanceState.putIntArray("touchY", touchy);
+			//savedInstanceState.putIntArray("touchX", touchx);
+			//savedInstanceState.putIntArray("touchY", touchy);
 			savedInstanceState.putSerializable("currentRectColoured", sis_currentRectColoured);
 			savedInstanceState.putSerializable("currentSelectedIsCorrect", sis_currentSelectedIsCorrect);
 			//savedInstanceState.putSerializable("rectArr", sis_rectArr);

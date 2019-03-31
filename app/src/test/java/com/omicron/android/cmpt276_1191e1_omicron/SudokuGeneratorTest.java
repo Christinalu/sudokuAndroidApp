@@ -121,7 +121,7 @@ public class SudokuGeneratorTest {
     }
     @Test
     public void SetPuzzleVal() {
-        //sets a value at (x,y) on Puzzle
+        //sets a value at (x,y) on Puzzle... make sure your (x,y) exists in the puzzle for the test... otherwise you will get out of bounds exception
         int val = 99;
         int x = 3;
         int y = 3;
