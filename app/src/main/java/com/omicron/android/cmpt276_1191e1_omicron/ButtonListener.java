@@ -37,7 +37,7 @@ public class ButtonListener extends AppCompatActivity
 						  final int[] touchX, final int[] touchY, final Pair lastRectColoured,
 						  final int usrLangPref, final int[] btnClicked, final TextView Hint, final WordArray wordArray,
 						  final int usrModePref, final String[] numArray, int WORD_COUNT, int COL_PER_BLOCK,
-						  int ROW_PER_BLOCK, Context context, TableLayout tableLayout, int orientation, int state, int[] orderArr) {
+						  int ROW_PER_BLOCK, Context context, TableLayout tableLayout, int orientation, int state, int[] orderArr, final int[] rotation) {
 		// pulled out of button listeners
 		final Handler handler = new Handler();
 		int rowCount;
@@ -232,7 +232,10 @@ public class ButtonListener extends AppCompatActivity
 
 														 // redraw square matrix and text overlay
 														 btnClicked[0] = 1; //this flag allows (for efficiency) class drw to update TextView as well in zoom mode
-														 drawR.setDrawParameters(touchX, touchY, lastRectColoured, currentRectColoured);
+
+														 if( rotation[0] == 0 ) {
+															 drawR.setDrawParameters(touchX, touchY, lastRectColoured, currentRectColoured);
+														 }
 
 														 // check if there is a duplicate in row/col/section. MAKE SURE TO HAVE AFTER PUZZLE INPUT IS SET
 														 int currentSelectedisCorrect = 0;
@@ -267,13 +270,13 @@ public class ButtonListener extends AppCompatActivity
 														 // SO FAR keep the idea that "if inserted correct word once without using HintClick, it implies the user is getting better with that word"
 
 														 //have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
-														 if (usrSudokuArr.enableCheck) {
+														 if (usrSudokuArr.canCheck()) {
 															 usrSudokuArr.checkPuzzle(v, btnArr);
 														 }
 													 }
 
 													 //debug
-													 //usrSudokuArr.printCurrent( );
+													 usrSudokuArr.printCurrent( );
 												 }
 											 }
 
