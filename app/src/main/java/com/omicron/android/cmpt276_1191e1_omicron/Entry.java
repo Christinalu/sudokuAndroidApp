@@ -34,13 +34,6 @@ public class Entry implements Serializable
 		Log.d("TESTI", "Entry is: val("+val+") coor("+coor.getRow()+", "+coor.getColumn()+")");
 	}
 
-	public boolean isEqual(Entry e) {
-		if (e.getValue() == val && e.getCoordinate().isEqual(coor)) {
-			return true;
-		}
-		return false;
-	}
-
 	public int getValue( )
 	{
 		return val;

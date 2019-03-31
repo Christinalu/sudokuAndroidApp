@@ -452,26 +452,6 @@ public class drw
 		
 		canvas.drawRect(rectArr[i][j].getRect(), paint);
 	}
-
-	/*
-	public int[][] getConflictArr( ){ return  conflictArr; }
-
-	public void setConflictArr( int[][] arr ){ conflictArr = arr; }
-
-	public int setConflictAtIndex( int i, int j ){
-		//returns 1 on incorrect index
-		if( i < 0 || j < 0 || i >= WORD_COUNT || j >= WORD_COUNT ){ return 1; }
-		conflictArr[i][j] = 1;
-		return 0;
-	}
-
-	public int removeConflictAtIndex( int i, int j ){
-		//returns 1 on incorrect index
-		if( i < 0 || j < 0 || i >= WORD_COUNT || j >= WORD_COUNT ){ return 1; }
-		conflictArr[i][j] = 0;
-		return 0;
-	}
-	*/
 }
 
 
