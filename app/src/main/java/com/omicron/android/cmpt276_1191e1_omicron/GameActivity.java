@@ -333,7 +333,9 @@ public class GameActivity extends AppCompatActivity
 
 
 		//draw matrix so far
-		drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
+		if (state == 0 ) {
+			drawR.setDrawParameters(touchX, touchY, lastRectColoured, currentRectColoured);
+		}
 		drawR.reDraw( currentRectColoured, usrLangPref, 0 );
 
 			/*UNDO BUTTON*/
@@ -348,7 +350,17 @@ public class GameActivity extends AppCompatActivity
 					usrSudokuArr.printHistory();
 					Entry lastEntry = usrSudokuArr.removeHistory();
 					usrSudokuArr.setPuzzleVal(lastEntry.getValue(), lastEntry.getCoordinate().getRow(), lastEntry.getCoordinate().getColumn());
+					int currentSelectedisCorrect = 0;
+					if (usrSudokuArr.checkDuplicate(lastEntry.getCoordinate().getRow(), lastEntry.getCoordinate().getColumn())) {
+						Log.d("TESTI", "Duplicate in given coordinate detected");
+						currentSelectedisCorrect = 2;
+					}
+					else {
+						Log.d("TESTI", "No duplicate detected");
+						currentSelectedisCorrect = 1;
+					}
 					//TODO: add code to redraw Text in Puzzle
+					drawR.reDraw( currentRectColoured, usrLangPref, currentSelectedIsCorrect );
 				}
 				else {
 					Toast.makeText(v.getContext(), "There is nothing to undo!", Toast.LENGTH_LONG).show( );
@@ -367,6 +379,7 @@ public class GameActivity extends AppCompatActivity
 				usrSudokuArr.resetPuzzle();
 				usrSudokuArr.printCurrent();
 				//TODO: add code to redraw Text in Puzzle
+				drawR.reDraw( currentRectColoured, usrLangPref, 1 );
 			}
 		});
 

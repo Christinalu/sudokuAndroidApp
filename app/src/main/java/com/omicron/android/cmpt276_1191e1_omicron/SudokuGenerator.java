@@ -450,6 +450,7 @@ public class SudokuGenerator implements Serializable {
     public Entry removeHistory() {
         //caller's responsibility to check if empty
         Entry e = new Entry(History.get(hsize - 1));
+        removeDuplicates(e.getCoordinate().getRow(),e.getCoordinate().getColumn());
         History.remove(hsize - 1);
         hsize--;
         return e;
