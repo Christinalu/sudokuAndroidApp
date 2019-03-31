@@ -1,5 +1,6 @@
 ![Logo](/uploads/c6817788d720a76e544671f777b30551/Logo.png)
 
+
 # Introduction
 >This is an educational game app for users who are learning a new language and enjoy Sudoku puzzles.
 
@@ -19,7 +20,7 @@ Sudoku Vocabulary App is optimized for:
 # Implemented Features
 * [First iteration] (https://csil-git1.cs.surrey.sfu.ca/eazizika/CMPT276-1191E1-Omicron/wikis/First-Iteration)
 * [Second iteration] (https://csil-git1.cs.surrey.sfu.ca/eazizika/CMPT276-1191E1-Omicron/wikis/Second-Iteration)
-* [Third and final iteration] (https://csil-git1.cs.surrey.sfu.ca/eazizika/CMPT276-1191E1-Omicron/wikis/Third-and-Last-Iteration)
+* [Third and final iteration] (https://csil-git1.cs.surrey.sfu.ca/eazizika/CMPT276-1191E1-Omicron/wikis/Third-Iteration)
 
 
 # Tests
