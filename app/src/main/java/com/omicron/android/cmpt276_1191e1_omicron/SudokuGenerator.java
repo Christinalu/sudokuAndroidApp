@@ -35,12 +35,14 @@ public class SudokuGenerator implements Serializable {
     public int[][] PuzzleOriginal;
     public int[][] Puzzle; //stores user input changes
     public int[][] PuzzleSol; //stores puzzle solution
+    private int[][] conflictArr;
 
     public boolean isCorrect;
     public boolean enableCheck;
     private int sqrFilled;
 
-    private List<Entry> duplicateList;
+    private List<Entry> History;
+    private int hsize;
 
 	//
     //TODO: Remove the first 3D array (the test array) before submitting for iteration 3
@@ -209,18 +211,21 @@ public class SudokuGenerator implements Serializable {
 		Puzzle = new int[size][size];
 		PuzzleSol = new int[size][size];
 		PuzzleOriginal = new int[size][size];
+		conflictArr = new int[size][size];
 
 		isCorrect = false;
 		enableCheck = false;
 		sqrFilled = 0;
 
-        duplicateList = new ArrayList<Entry>();
+        History = new ArrayList<Entry>();
+        hsize = 0;
 
         copyarr(puzz_seeds[pindex], Puzzle);
         copyarr(puzz_seedSols[pindex], PuzzleSol);
         //printCurrent();
         scramble(Puzzle, PuzzleSol);
         copyarr(Puzzle, PuzzleOriginal );
+        zero(conflictArr);
         printCurrent();
 
         for (int i=0; i<size; i++) {
@@ -269,7 +274,7 @@ public class SudokuGenerator implements Serializable {
         //Log.d(tag,"Arr " + tag + " is:" + Arrays.deepToString(arr));
     }
 
-    private void printCurrent( ) {
+    public void printCurrent( ) {
         printArr("puzzle", Puzzle);
         printArr("puzzleSol", PuzzleSol);
     }
@@ -278,6 +283,17 @@ public class SudokuGenerator implements Serializable {
     private void zero(int[] arr)
     {
         for (int i=0; i<arr.length; i++) arr[i] = 0;
+    }
+
+    //zero a 2D array
+    private void zero(int[][] arr)
+    {
+        int arrSize = arr.length;
+        for (int i=0; i<arrSize; i++) {
+            for (int j=0; j<arrSize; j++) {
+                arr[i][j] = 0;
+            }
+        }
     }
 
     //copy a 2D array into another
@@ -396,13 +412,66 @@ public class SudokuGenerator implements Serializable {
             }
         }
     }
-	
+
 	public int[][] getSolution( )
 	{ return PuzzleSol; }
 
 	public int[][] getPuzzle() { return Puzzle;}
 
-	public List<Entry> getduplicateList () { return duplicateList; }
+	public void setPuzzleVal(int val, int x, int y) {
+        Puzzle[x][y] = val;
+    }
+
+	public int[][] getconflictArr() {return conflictArr;}
+
+	public void resetPuzzle() {
+        copyarr(PuzzleOriginal,Puzzle);
+        sqrFilled = 0;
+        for (int i=0; i<size; i++) {
+            for (int j=0; j<size; j++) {
+                if (PuzzleOriginal[i][j] != 0) {
+                    sqrFilled++;
+                }
+            }
+        }
+        zero(conflictArr);
+        clearHistory();
+    }
+
+    //add entry to history
+    public void addHistroy(int x, int y) {
+        Pair p = new Pair(x,y);
+        Entry e = new Entry(Puzzle[x][y], p);
+        History.add(e);
+        hsize++;
+    }
+
+    //remove entry from history
+    public Entry removeHistory() {
+        //caller's responsibility to check if empty
+        Entry e = new Entry(History.get(hsize - 1));
+        History.remove(hsize - 1);
+        hsize--;
+        return e;
+    }
+
+    private void clearHistory() {
+        History.clear();
+        hsize = 0;
+    }
+
+    public boolean historyisEmpty() {return History.isEmpty();}
+
+    public void printHistory() {
+        if (!History.isEmpty()) {
+            for (int i = 0; i < hsize; i++) {
+                History.get(i).print();
+            }
+        }
+        else {
+            Log.e ("TESTI", "Histroy list is empty");
+        }
+    }
 
     public void track(Pair currentRectColoured) {
         if( Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] == 0 ) //if sqr selected was not selected so far
@@ -448,13 +517,9 @@ public class SudokuGenerator implements Serializable {
 
     //check row, col, section for duplicate entries. return true if duplicate detected, false if no duplicates
     public boolean checkDuplicate (int x, int y) {
-        //check row for duplicates
         int input = Puzzle[x][y];
         if (input > 0 && PuzzleOriginal[x][y] == 0) {
             int duplicateFound = 0;
-            int duplicate_val;
-            Pair duplicate_coor;
-            Entry duplicate;
             //find (x,y) of the section currently selected
             int sec_x = x / sec_numRows;
             sec_x = sec_x * sec_numRows;
@@ -464,38 +529,24 @@ public class SudokuGenerator implements Serializable {
             //temporarily set Puzzle[x][y] to 0 so we can check with loops
             Puzzle[x][y] = 0;
 
-            int count = 0;
-            int loopCount = (sec_x + sec_numRows)%size;
-            while (loopCount != sec_x) {
+            int loopCount = (sec_y + sec_numCols)%size;
+            while (loopCount != sec_y) {
                 //check row for duplicates
                 if (input == Puzzle[x][loopCount]) {
-                    duplicate_val = Puzzle[x][loopCount];
-                    duplicate_coor = new Pair(x, loopCount);
-                    duplicate = new Entry(duplicate_val, duplicate_coor);
-                    //check if entry is already in the list
-                    if (notinList(duplicate)) {
-                        duplicateList.add(duplicate);
-                    }
+                    Log.d("TAG", "Duplicate found at: ("+x+","+loopCount+")");
                     duplicateFound = 1;
+                    conflictArr[x][loopCount] = 1;
                 }
-                count++;
                 loopCount = (loopCount + 1)%size;
             }
-            count = 0;
-            loopCount = (sec_y + sec_numCols)%size;
-            while (loopCount != sec_y) {
+            loopCount = (sec_x + sec_numRows)%size;
+            while (loopCount != sec_x) {
                 //check col for duplicates
                 if (input == Puzzle[loopCount][y]) {
-                    duplicate_val = Puzzle[loopCount][y];
-                    duplicate_coor = new Pair(loopCount, y);
-                    duplicate = new Entry(duplicate_val, duplicate_coor);
-                    //check if entry is already in the list
-                    if (notinList(duplicate)) {
-                        duplicateList.add(duplicate);
-                    }
+                    Log.d("TAG", "Duplicate found at: ("+loopCount+","+y+")");
                     duplicateFound = 1;
+                    conflictArr[loopCount][y] = 1;
                 }
-                count++;
                 loopCount = (loopCount + 1)%size;
             }
             //Log.d("TESTI", "y coordinate of section is: "+sec_y);
@@ -503,45 +554,63 @@ public class SudokuGenerator implements Serializable {
                 for (int j = sec_y; j < sec_numCols + sec_y; j++) {
                     //check section for duplicates
                     if (input == Puzzle[i][j]) {
-                        //Log.d("TESTI", "duplicate found in: ("+i+", "+j+")");
-                        duplicate_val = Puzzle[i][j];
-                        duplicate_coor = new Pair(i, j);
-                        duplicate = new Entry(duplicate_val, duplicate_coor);
-                        //check if entry is already in the list
-                        if (notinList(duplicate)) {
-                            duplicateList.add(duplicate);
-                        }
+                        Log.d("TAG", "Duplicate found at: ("+i+","+j+")");
                         duplicateFound = 1;
+                        conflictArr[i][j] = 1;
                     }
-                    count++;
                 }
             }
-            Log.d("TESTI", "section count is: "+count);
             Puzzle[x][y] = input;
             if (duplicateFound == 1) {
-                duplicate_val = input;
-                duplicate_coor = new Pair(x,y);
-                duplicate = new Entry(duplicate_val, duplicate_coor);
-                //Log.d("TESTI", "duplicate found in: ("+x+", "+y+")");
-                if (notinList(duplicate)) {
-                    duplicateList.add(duplicate);
-                }
-                //FOR DEBUGGING
-                int size = duplicateList.size();
-                for (int i = 0; i < size; i++) {
-                    duplicateList.get(i).print();
-                }
+                conflictArr[x][y] = 1;
                 return true;
             }
         }
         return false;
     }
-    public boolean notinList(Entry e) {
-        for (int i=0; i<duplicateList.size(); i++) {
-            if (e.getCoordinate().isEqual(duplicateList.get(i).getCoordinate())) {
-                return false;
+
+    public void removeDuplicates(int x, int y) {
+        //function removes conflicts from conflictArr in preparation for a new input at (x,y)
+        int current = Puzzle[x][y];
+        if (current > 0 && PuzzleOriginal[x][y] == 0) {
+            //find (x,y) of the section currently selected
+            int sec_x = x / sec_numRows;
+            sec_x = sec_x * sec_numRows;
+            //Log.d("TESTI", "x coordinate of section is: "+sec_x);
+            int sec_y = y / sec_numCols;
+            sec_y = sec_y * sec_numCols;
+            //temporarily set Puzzle[x][y] to 0 so we can check with loops
+            Puzzle[x][y] = 0;
+            int loopCount = (sec_y + sec_numCols)%size;
+            while (loopCount != sec_y) {
+                //check row for duplicates
+                if (current == Puzzle[x][loopCount]) {
+                    conflictArr[x][loopCount] = 0;
+                    checkDuplicate(x,loopCount);
+                }
+                loopCount = (loopCount + 1)%size;
             }
+            loopCount = (sec_x + sec_numRows)%size;
+            while (loopCount != sec_x) {
+                //check col for duplicates
+                if (current == Puzzle[loopCount][y]) {
+                    conflictArr[loopCount][y] = 0;
+                    checkDuplicate(loopCount,y);
+                }
+                loopCount = (loopCount + 1)%size;
+            }
+            //Log.d("TESTI", "y coordinate of section is: "+sec_y);
+            for (int i = sec_x; i < sec_numRows + sec_x; i++) {
+                for (int j = sec_y; j < sec_numCols + sec_y; j++) {
+                    //check section for duplicates
+                    if (current == Puzzle[i][j]) {
+                        conflictArr[i][j] = 0;
+                        checkDuplicate(i,j);
+                    }
+                }
+            }
+            Puzzle[x][y] = current;
+            conflictArr[x][y] = 0;
         }
-        return true;
     }
 }

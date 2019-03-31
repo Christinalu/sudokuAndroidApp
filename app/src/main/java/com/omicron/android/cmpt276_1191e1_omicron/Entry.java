@@ -19,6 +19,11 @@ public class Entry implements Serializable
 		coor = coordinate;
 	}
 
+	public Entry(Entry e){
+		val = e.getValue();
+		coor = e.getCoordinate();
+	}
+
 	public void update( int value, Pair coordinate ) // update with new values
 	{
 		val = value;

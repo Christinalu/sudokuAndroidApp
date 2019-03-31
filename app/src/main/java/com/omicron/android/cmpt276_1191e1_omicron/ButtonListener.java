@@ -31,7 +31,6 @@ public class ButtonListener extends AppCompatActivity
 
 	private int i;
 	private Button [] btnArr;
-	private boolean notZero;
 	
 	
 	public ButtonListener(final Pair currentRectColoured, final SudokuGenerator usrSudokuArr, final drw drawR,
@@ -50,32 +49,24 @@ public class ButtonListener extends AppCompatActivity
 
 		btnArr = new Button[WORD_COUNT]; // set buttons as an array
 
-		Log.d("listener", "WORD_COUNT: " + WORD_COUNT);
-		if (btnArr == null) {
-			Log.d("listener", "ERROR: null Button[]");
-		}
+		Log.d( "listener", "WORD_COUNT: " + WORD_COUNT );
+		if( btnArr == null){ Log.d( "listener", "ERROR: null Button[]" ); }
 
-		/* CREATE TABLE LAYOUT */
-		if (COL_PER_BLOCK > ROW_PER_BLOCK) //set row count as biggest of ROW/COL_PER_BLOCK, so that less buttons per row
-		{
-			rowCount = COL_PER_BLOCK;
-			btnCount = ROW_PER_BLOCK;
-		}        // but more rows allows to fit bigger words
-		else {
-			rowCount = ROW_PER_BLOCK;
-			btnCount = COL_PER_BLOCK;
-		}
+			/* CREATE TABLE LAYOUT */
+		if( COL_PER_BLOCK > ROW_PER_BLOCK ) //set row count as biggest of ROW/COL_PER_BLOCK, so that less buttons per row
+		{ rowCount = COL_PER_BLOCK; btnCount = ROW_PER_BLOCK; }		// but more rows allows to fit bigger words
+		else{ rowCount = ROW_PER_BLOCK; btnCount = COL_PER_BLOCK; }
 
 
 		TableRow tableRow;
 		Button button;
 
-		Log.d("listener", "rowCount: " + rowCount);
-		Log.d("listener", "btnCount: " + btnCount);
+		Log.d( "listener", "rowCount: " + rowCount );
+		Log.d( "listener", "btnCount: " + btnCount );
 
 		// if it's in PORTRAIT mode
-		if (orientation == 1) {
-			for (int j = 0; j < rowCount; j++) //add button rows to table
+		if(orientation == 1) {
+			for( int j=0; j<rowCount; j++ ) //add button rows to table
 			{
 				tableRow = new TableRow(context);
 				for (int k = 0; k < btnCount; k++) {
@@ -106,6 +97,7 @@ public class ButtonListener extends AppCompatActivity
 							button.setText(wordArray.getWordTranslationAtIndex(orderArr[indexArr]));
 						}
 					}
+
 					btnArr[indexArr] = button;
 					tableRow.addView(button);
 					indexArr++;
@@ -114,8 +106,8 @@ public class ButtonListener extends AppCompatActivity
 			}
 		}
 		// if it's in LANDSCAPE mode
-		else if (orientation == 2) {
-			TableLayout.LayoutParams params = new TableLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+		else if (orientation == 2){
+			TableLayout.LayoutParams params = new TableLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT,1.0f);
 			for (int k = 0; k < WORD_COUNT; k++) {
 				button = new Button(context);
 				tableLayout.setOrientation(TableLayout.VERTICAL);
@@ -146,7 +138,7 @@ public class ButtonListener extends AppCompatActivity
 				button.setBackgroundResource(R.drawable.buttons);
 				button.setLayoutParams(params);
 				button.setGravity(Gravity.CENTER);
-				button.setPadding(20, 0, 20, 0);
+				button.setPadding(20,0,20,0);
 				button.setSingleLine();
 
 				Log.d("listener", "sample word from array: " + wordArray.getWordNativeAtIndex(indexArr));
@@ -158,7 +150,8 @@ public class ButtonListener extends AppCompatActivity
 
 		}
 
-		/** SET BUTTON LISTENERS **/
+			/** SET BUTTON LISTENERS **/
+
 		// loop to set up all keypad buttons
 		if (state != 2) {
 			for (i = 0; i < WORD_COUNT; i++) {
@@ -218,27 +211,32 @@ public class ButtonListener extends AppCompatActivity
 												 @Override
 												 public void onClick(View v) {
 													 //if current button selected is valid and is not restricted
-													 if (currentRectColoured.getRow() != -1 && usrSudokuArr.PuzzleOriginal[currentRectColoured.getRow()][currentRectColoured.getColumn()] == 0) {
+													 int row = currentRectColoured.getRow();
+													 int col = currentRectColoured.getColumn();
+													 if (row != -1 && usrSudokuArr.PuzzleOriginal[row][col] == 0) {
 														 // increase the count of inserted numbers if needed
 														 usrSudokuArr.track(currentRectColoured); //important, 'track' must occur before 'usrSudokuArr.Puzzle[][] = x'
 
-														 //TODO: implement duplicateList
-														 if (usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] != 0) {
-														 	notZero = true;
+														 //remove duplicates from (x,y) in preparation of new input and new duplication check
+														 usrSudokuArr.removeDuplicates(row,col);
+
+														 //if new value is not equal to the old one add last value and its coordinate to history before changing it
+														 if (usrSudokuArr.getPuzzle()[row][col] != var) {
+															 usrSudokuArr.addHistroy(row, col);
+															 usrSudokuArr.printHistory();
 														 }
 
 														 // set the cell in the Puzzle to corresponding number based on button user input
 														 //if( zoomButtonDisableUpdate[0] == 0 ) // do not update entry when switching modes - causes errors
-														 usrSudokuArr.Puzzle[currentRectColoured.getRow()][currentRectColoured.getColumn()] = var;
+														 usrSudokuArr.Puzzle[row][col] = var;
 
 														 // redraw square matrix and text overlay
 														 btnClicked[0] = 1; //this flag allows (for efficiency) class drw to update TextView as well in zoom mode
 														 drawR.setDrawParameters(touchX, touchY, lastRectColoured, currentRectColoured);
 
-														 //TODO: add code here to handle detected duplicate entries
 														 // check if there is a duplicate in row/col/section. MAKE SURE TO HAVE AFTER PUZZLE INPUT IS SET
-														 int currentSelectedisCorrect;
-														 if (usrSudokuArr.checkDuplicate(currentRectColoured.getRow(), currentRectColoured.getColumn())) {
+														 int currentSelectedisCorrect = 0;
+														 if (usrSudokuArr.checkDuplicate(row, col)) {
 															 Log.d("TESTI", "Duplicate in given coordinate detected");
 															 currentSelectedisCorrect = 2;
 														 }
@@ -248,19 +246,13 @@ public class ButtonListener extends AppCompatActivity
 														 }
 														 drawR.reDraw(currentRectColoured, usrLangPref, currentSelectedisCorrect);
 
-														 //TODO: implement duplicateList
-														 //if entry replaced a value, check and remove any duplicates from the row/col/section
-														 if (notZero) {
-
-														 }
-
 														 btnClicked[0] = 0;
 														 //textOverlay.reDrawText( usrLangPref );
 
 														 Log.d("selectW", "btn clicked: " + var);
 
 														 //check if word inserted is correct (used to decrease probability of word being selected in WordArray.selectWord() )
-														 if (var == usrSudokuArr.getSolution()[currentRectColoured.getRow()][currentRectColoured.getColumn()]) //if input matches solution
+														 if (var == usrSudokuArr.getSolution()[row][col]) //if input matches solution
 														 {
 															 Log.d("selectW", "btn listener: user sqr input correct");
 															 if (wordArray.getWordAlreadyUsedInGameAtIndex(var - 1) == false) //if correctly using this word for the first time in game
@@ -289,19 +281,4 @@ public class ButtonListener extends AppCompatActivity
 			}
 		}
 	}
-	/*
-	//DEBUG REMOVE AFTER
-	int size = duplicateList.size();
-		for (int i = 0; i < size; i++) {
-	duplicateList.get(i).print();
-}
-	private boolean checkinList(SudokuGenerator s, int value, int x, int y) {
-		List<Entry> duplicateList = s.getduplicateList();
-		for (int i=0; i<duplicateList.size(); i++) {
-			if (duplicateList.get(i).getValue() == value) {
-
-			}
-		}
-	}
-	*/
 }

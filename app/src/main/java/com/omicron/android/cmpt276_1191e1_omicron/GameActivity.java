@@ -9,6 +9,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -83,6 +84,8 @@ public class GameActivity extends AppCompatActivity
 	private drw drawR; // class that draws the squares either highlighted or not, based on touch
 	private Pair lastRectColoured = new Pair( -1, -1 ); // stores the last coloured square coordinates
 	private Pair currentRectColoured = new Pair( -1, -1 ); // stores the current coloured square
+	private int currentSelectedIsCorrect = 0;
+	//TODO TESTING
 	
 	private Paint paintblack = new Paint();
 	private TextMatrix textMatrix; //stores the TextView for drawing the text
@@ -171,12 +174,18 @@ public class GameActivity extends AppCompatActivity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_game);
 		
+
+		// TODO: test if highlighting is preserved when zooming
+
+
+
 		ZOOM_FIRST_TIME[0] = true;
 
 		//set intent to receive word array from Main Activity
 		if (savedInstanceState != null) {
 			//a state had been saved, load it
-			savetheInstanceState (0, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr, HINT_CLICK_TO_MAX_PROB, currentRectColoured);
+            //TODO: add currentSelectedisCorrect
+			savetheInstanceState (0, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect);
 		}
 		else {
 			Intent gameSrc = getIntent();
@@ -198,7 +207,7 @@ public class GameActivity extends AppCompatActivity
 				}
 				else {
 					//we are starting a new game
-					state = 1; //set game available to resume
+					//state = 1; //set game available to resume
 					wordArray = (WordArray) gameSrc.getParcelableExtra("wordArray");
 					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPref");
 					usrModePref = (int) gameSrc.getSerializableExtra("usrMode");
@@ -236,6 +245,7 @@ public class GameActivity extends AppCompatActivity
 				}
 			}
 		}
+
 		if (usrModePref == 1) {
 			mTTS = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
 				@Override
@@ -254,6 +264,7 @@ public class GameActivity extends AppCompatActivity
 				}
 			});
 		}
+
 
 		TextView Hint=(TextView) findViewById(R.id.hint_content);
 
@@ -293,7 +304,7 @@ public class GameActivity extends AppCompatActivity
 		// PREDEFINE VARIABLES FOR MATRIX OVERLAY
 		paintblack.setColor(Color.parseColor("#0000ff"));
 		paintblack.setTextSize(30);
-		
+
 		rectArr = new Block[WORD_COUNT][WORD_COUNT]; // stores all squares in a 2D array
 		
 		drawR.drwInitialize( rectArr, paint, rectTextLayout, textMatrix, usrSudokuArr, zoomOn, drag,
@@ -325,6 +336,39 @@ public class GameActivity extends AppCompatActivity
 		drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
 		drawR.reDraw( currentRectColoured, usrLangPref, 0 );
 
+			/*UNDO BUTTON*/
+
+		ImageButton btnUndo = findViewById(R.id.button_undo);
+		btnUndo.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick( View v)
+			{
+				if (!usrSudokuArr.historyisEmpty()) {
+					usrSudokuArr.printHistory();
+					Entry lastEntry = usrSudokuArr.removeHistory();
+					usrSudokuArr.setPuzzleVal(lastEntry.getValue(), lastEntry.getCoordinate().getRow(), lastEntry.getCoordinate().getColumn());
+					//TODO: add code to redraw Text in Puzzle
+				}
+				else {
+					Toast.makeText(v.getContext(), "There is nothing to undo!", Toast.LENGTH_LONG).show( );
+				}
+			}
+		});
+
+			/*RESET BUTTON*/
+
+		ImageButton btnReset = findViewById(R.id.button_reset);
+		btnReset.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick( View v)
+			{
+				usrSudokuArr.resetPuzzle();
+				usrSudokuArr.printCurrent();
+				//TODO: add code to redraw Text in Puzzle
+			}
+		});
 
 			/* ZOOM IN BUTTON */
 
@@ -365,7 +409,6 @@ public class GameActivity extends AppCompatActivity
 						*/
 						
 						// CHECK INPUT FOR DUPLICATES
-						int currentSelectedIsCorrect;
 						if( currentRectColoured.getRow() != -1 ) {
 							// 0 == nothing selected; 1 == selected and correct; 2 == selected but incorrect
 							if (usrSudokuArr.checkDuplicate(currentRectColoured.getRow(), currentRectColoured.getColumn())) {
@@ -426,9 +469,7 @@ public class GameActivity extends AppCompatActivity
 								touchYZ[0] = 0;
 								*/
 
-								//TODO Duplicate check, work in progress
 								// CHECK INPUT FOR DUPLICATES
-								int currentSelectedIsCorrect;
 								if( currentRectColoured.getRow() != -1 ) {
 									// 0 == nothing selected; 1 == selected and correct; 2 == selected but incorrect
 									if (usrSudokuArr.checkDuplicate(currentRectColoured.getRow(), currentRectColoured.getColumn())) {
@@ -542,7 +583,7 @@ public class GameActivity extends AppCompatActivity
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
-		savetheInstanceState (1, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr, HINT_CLICK_TO_MAX_PROB, currentRectColoured);
+		savetheInstanceState (1, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect);
 	}
 
 	@Override
@@ -556,6 +597,9 @@ public class GameActivity extends AppCompatActivity
 		resumeSrc.putExtra("SudokuArr", usrSudokuArr);
 		if (usrSudokuArr.isCorrect) {
 			state = 2;
+		}
+		else {
+			state = 1;
 		}
 		resumeSrc.putExtra("state", state);
 		resumeSrc.putExtra("usrMode", usrModePref);
@@ -923,6 +967,14 @@ public class GameActivity extends AppCompatActivity
 		 * when user has clicked the screen
 		 */
 		
+		/////////////// TEST ///////////
+//		for( int a=0; a<WORD_COUNT; a++ ) //highlight top 2 rows for conflict
+//		{
+//			drawR.setConflictAtIndex( 0, a );
+//			drawR.setConflictAtIndex( 1, a );
+//		}
+		////////////////////////////////
+
 		//disable safety because by clicking, user updates to new valid coordinates
 		zoomClickSafe[0] = 0;
 		zoomButtonDisableUpdate[0] = 0; //once user clicks, the coordinates are updated and become valid, so let button update sqr clicked
@@ -945,22 +997,15 @@ public class GameActivity extends AppCompatActivity
 		}
 		
 		drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
-		
-		/////////////////
-		//
-		// TODO: here add the check for testing for conflict on select and highlighting
-		// TODO: make sure check function called only when currentRectColoured != -1
-		//
-		/////////////////
-		
-		// TODO: also add this code in Button listener and Zoom buttons
 
-		int currentSelectedIsCorrect;
 		if( currentRectColoured.getRow() != -1 ) {
+			Log.d("TAG", "duplicate is about to be checked");
 			// 0 == nothing selected; 1 == selected and correct; 2 == selected but incorrect
 			if (usrSudokuArr.checkDuplicate(currentRectColoured.getRow(), currentRectColoured.getColumn())) {
+				Log.d("TAG", "duplicate should have been found");
 				currentSelectedIsCorrect = 2;
 			} else {
+				Log.d("TAG", "duplicate is not found");
 				currentSelectedIsCorrect = 1;
 			}
 		}
@@ -1178,7 +1223,7 @@ public class GameActivity extends AppCompatActivity
 			}
 		}
 	}
-	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP, Pair sis_currentRectColoured) {
+	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP, Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect) {
 		if (RorS == 0) {
 			//we are receiving
 			//a state had been saved, load it
@@ -1195,6 +1240,8 @@ public class GameActivity extends AppCompatActivity
 			touchY = (int[]) savedInstanceState.getIntArray("touchY");
 			*/
 			currentRectColoured = (Pair) savedInstanceState.getSerializable("currentRectColoured");
+			currentSelectedIsCorrect = (int) savedInstanceState.getSerializable("currentSelectedIsCorrect");
+			//rectArr = (Block[][]) savedInstanceState.getSerializable("rectArr");
 			if (usrModePref == 1) {
 				numArray = (String[]) savedInstanceState.getSerializable("numArray");
 				orderArr = (int[]) savedInstanceState.getIntArray("orderArr");
@@ -1219,6 +1266,8 @@ public class GameActivity extends AppCompatActivity
 			savedInstanceState.putIntArray("touchY", touchy);
 			*/
 			savedInstanceState.putSerializable("currentRectColoured", sis_currentRectColoured);
+			savedInstanceState.putSerializable("currentSelectedIsCorrect", sis_currentSelectedIsCorrect);
+			//savedInstanceState.putSerializable("rectArr", sis_rectArr);
 			if (sis_usrModePref == 1) {
 				savedInstanceState.putStringArray("numArray", sis_numArray);
 				savedInstanceState.putIntArray("orderArr", sis_orderArr);
