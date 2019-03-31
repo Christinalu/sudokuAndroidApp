@@ -11,8 +11,8 @@
 
 	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 		android:id="@+id/linearLayout"
-		android:layout_width="0sp"
-		android:layout_height="0sp"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
 		android:gravity="center"
 		android:orientation="vertical"
 		app:layout_constraintBottom_toBottomOf="parent"
@@ -25,9 +25,9 @@
 
 
 		<ImageView
-			android:layout_width="260sp"
-			android:layout_height="260sp"
-			android:layout_marginBottom="10dp"
+			android:padding="20sp"
+			android:layout_width="match_parent"
+			android:layout_height="280sp"
 			android:src="@drawable/newlogo"/>
 
         <TextView
@@ -150,6 +150,7 @@
 			android:id="@+id/radio_scroll_view"
 			android:layout_width="match_parent"
 			android:layout_height="80dp"
+			android:layout_margin="20dp"
 
 			android:paddingHorizontal="10dp">
 

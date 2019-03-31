@@ -23,37 +23,35 @@
 
 		<LinearLayout
 			android:layout_width="wrap_content"
-			android:layout_height="match_parent"
-			android:orientation="vertical">
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			android:layout_gravity="center"
+			android:layout_margin="20sp">
 
 		<ImageView
-			android:layout_width="300sp"
-			android:layout_height="300sp"
-			android:paddingLeft="20dp"
-			android:paddingRight="20dp"
-			android:src="@drawable/newlogo"/>
+			android:layout_gravity="center"
+			android:layout_width="280sp"
+			android:layout_height="280sp"
+			android:src="@drawable/newlogo" />
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="15sp"
-			android:layout_marginBottom="10sp"
+			android:layout_margin="10sp"
+			android:layout_gravity="center"
 			android:text="@string/sudoku"
 			android:textColor="@color/navy"
 			android:fontFamily="casual"
 			android:gravity="center"
-			android:textSize="30sp"
-			android:textStyle="bold"
-			android:layout_marginLeft="20sp"
-			android:layout_marginRight="20sp"
- />
+			android:textSize="25sp"
+			android:textStyle="bold" />
 		</LinearLayout>
 
 		<LinearLayout
-			android:layout_width="match_parent"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:gravity="center"
 			android:orientation="vertical"
-			android:padding="20sp">
+			android:layout_margin="20sp">
 			<Button
 				android:id="@+id/button-start"
 				android:layout_width="wrap_content"
