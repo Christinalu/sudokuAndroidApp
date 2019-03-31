@@ -9,8 +9,16 @@
         android:radius="20dp"></corners>
 
     <solid android:color="@color/overcast" />
-    <stroke android:width="2dp"
-        android:color="@color/navy"/>
+    <stroke
+        android:color="@color/navy"
+        android:width="2sp"/>
+    <gradient
+        android:startColor="@color/overcast"
+        android:endColor="@color/ice"
+        android:type="radial"
+        android:gradientRadius="500sp"/>
+
+
 
 
 </shape>

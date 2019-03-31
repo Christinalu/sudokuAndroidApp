@@ -29,6 +29,7 @@ public class ButtonListener extends AppCompatActivity
 
 	private int i;
 	private Button [] btnArr;
+
 	
 	
 	public ButtonListener(final Pair currentRectColoured, final SudokuGenerator usrSudokuArr, final drw drawR,
@@ -76,8 +77,8 @@ public class ButtonListener extends AppCompatActivity
 					if (button == null) {
 						Log.d("listener", "ERROR: null button");
 					}
-					//button.setTextColor(Color.parseColor("#00293C"));
-					button.setBackgroundResource(R.drawable.buttons);
+					button.setTextColor(Color.parseColor("#00293C"));
+					button.setBackgroundResource(R.drawable.keypad_button);
 					button.setSingleLine();
 
 					Log.d("listener", "sample word from array: " + wordArray.getWordNativeAtIndex(indexArr));
@@ -113,8 +114,8 @@ public class ButtonListener extends AppCompatActivity
 					button.setText(wordArray.getWordTranslationAtIndex(indexArr));
 				}
 
-				button.setTextColor(Color.WHITE);
-				button.setBackgroundResource(R.drawable.buttons);
+				button.setTextColor(Color.parseColor("#00293C"));
+				button.setBackgroundResource(R.drawable.keypad_button);
 				button.setLayoutParams(params);
 				button.setGravity(Gravity.CENTER);
 				button.setPadding(20,0,20,0);
@@ -132,20 +133,24 @@ public class ButtonListener extends AppCompatActivity
 			/** SET BUTTON LISTENERS **/
 		
 		// loop to set up all keypad buttons
+
 		for( i=0; i<WORD_COUNT; i++ )
 		{
 			final int var;
 			var = i + 1;
 			final int index;
 			index=i;
+
 			btnArr[i].setOnLongClickListener(new View.OnLongClickListener() {
 												 @SuppressLint("SetTextI18n")
 												 @Override
 												 public boolean onLongClick(View v) {
 												 	 Log.d( "selectW", "long button press" );
-												     Hint.setBackgroundColor(R.drawable.buttons);
-                                                     final Drawable buttonBackground = btnArr[index].getBackground();
-                                                     btnArr[index].setBackgroundColor(R.drawable.buttons);
+												 	 Hint.setBackgroundColor(R.drawable.buttons);
+													 //Hint.setTextColor(getResources().getColor(R.color.ice));
+
+													 //final Drawable buttonBackground = btnArr[index].getBackground();
+
 													 if(usrLangPref==0){
 													     if(usrModePref==1){
                                                              Hint.setText(wordArray.getWordNativeAtIndex( index ) + " : " + numArray[index]);
@@ -172,9 +177,10 @@ public class ButtonListener extends AppCompatActivity
 															 // Do something after 5s = 5000ms
                                                              Hint.setBackgroundColor(Color.TRANSPARENT);
 															 Hint.setText("");
-                                                             btnArr[index].setBackground(buttonBackground);
+
                                                      }
 													 }, 4000);
+
 
 
 													 return true;

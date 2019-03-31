@@ -752,7 +752,7 @@ public class MainActivity extends AppCompatActivity
 		Button negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
 		negativeButton.setTextColor(getResources().getColor(R.color.colorAccent));
 		//negativeButton.setBackground(getResources().getDrawable(R.drawable.buttons));
-		dialog.getWindow().getDecorView().setBackground(getResources().getDrawable(R.drawable.buttons));
+		dialog.getWindow().getDecorView().setBackground(getResources().getDrawable(R.drawable.background));
 		//dialog.getWindow().setBackgroundDrawable(R.drawable.background);
 
 		//dialog.getWindow().setLayout(1000,1200);
