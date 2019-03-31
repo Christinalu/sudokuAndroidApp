@@ -1,8 +1,8 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AlertDialog;
@@ -45,15 +45,17 @@ public class MainActivity extends AppCompatActivity
 	RadioGroup Difficulty;
 	RadioGroup Language;
 	RadioGroup Mode;
+	RadioGroup Size;
 	private int usrModePref = 0; // 0=standard, 1=speech
 	private int usrLangPref = 0; // 0=eng_fr, 1=fr_eng; 0 == native(squares that cannot be modified); 1 == translation(the words that the user inserts)
 	private int usrDiffPref; //0=easy,1=medium,2=difficult
 	private int state = 0; //0=new start, 1=resume
 	private String language;
 	private boolean canStart = true;
-	private int[] usrPuzzleTypePref = { -1 }; //determines if it is a 4x4, 6x6, 9x9 or 12x12 sudoku puzzle
+	private int usrPuzzleTypePref = 2; //determines if it is a 4x4, 6x6, 9x9 or 12x12 sudoku puzzle
 	private RadioGroup pkgRadioGroup;
-	
+	private Boolean pressOK = false;
+
 	WordArray wordArrayResume;
 	String[] numArrayResume;
 	private int usrLangPrefResume;
@@ -78,7 +80,7 @@ public class MainActivity extends AppCompatActivity
 	private FileCSV fileCSV; //object containing CSV functions
 	private int[] indexOfRadBtnToRemove = { -1 }; //which radio btn to remove
 	private boolean[] removeBtnEnable = { true }; //when false, do not allow "REMOVE PKG" button (required because GameActivity may be using that file to save "Hint Click")
-	
+
 	private WordArray wordArray;
 	/*private Word[] wordArray =new Word[]
 			{
@@ -95,10 +97,10 @@ public class MainActivity extends AppCompatActivity
 					new Word( "pkg_n.csv", "", -1, -1 ) //pkg name
 			};*/
 
-	
+
 	// TODO: separate all of Intent activity.putExtra( ) outside of MainActivity in different functions
-	
-	
+
+
 	@Override
 	protected void onCreate( Bundle savedInstanceState )
 	{
@@ -119,19 +121,19 @@ public class MainActivity extends AppCompatActivity
 				}
 			}
 		}
-		
+
 		fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
-		
+
 		pkgRadioGroup = findViewById( R.id.pkg_radio_group ); //stores all the radio buttons with file names
-		
+
 		int res = checkIfJustInstalledAndSetUpPackagesAlreadyInstalled( );
-		
+
 		if( res != 0 ) //some exception occurred
 		{ return; }
-		
-		
+
+
 		// SET LISTENERS TO WHICH PKG IS SELECTED //
-		
+
 		pkgRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -142,8 +144,8 @@ public class MainActivity extends AppCompatActivity
 				}
 			}
 		});
-		
-		
+
+
 		//create button which will start new UploadActivity to upload and process .csv file
 		Button btn_upload = findViewById( R.id.btn_upload );
 		btn_upload.setOnClickListener(new View.OnClickListener( )
@@ -151,18 +153,18 @@ public class MainActivity extends AppCompatActivity
 									@Override
 									public void onClick( View v )
 									{
-										
+
 										Intent uploadActivityIntent = new Intent( MainActivity.this, UploadActivity.class );
 										uploadActivityIntent.putExtra( "MAX_WORD_PKG", MAX_WORD_PKG );
 										uploadActivityIntent.putExtra( "MAX_CSV_ROW", MAX_CSV_ROW );
 										uploadActivityIntent.putExtra( "MIN_CSV_ROW", MIN_CSV_ROW );
-										
+
 										startActivity( uploadActivityIntent );
 									}
 								}
 		);
-		
-		
+
+
 		//create button which will remove file
 		final Button btn_remove = findViewById( R.id.btn_remove );
 		btn_remove.setOnClickListener(new View.OnClickListener( )
@@ -173,22 +175,22 @@ public class MainActivity extends AppCompatActivity
 											  //FIND WHICH BUTTON IS SELECTED
 											  int indexOfRadBtnToRemove2 = pkgRadioGroup.indexOfChild( findViewById( (pkgRadioGroup.getCheckedRadioButtonId()) ) );
 											  indexOfRadBtnToRemove[0] = indexOfRadBtnToRemove2; //save a local copy needed for onStop() to remove radio btn
-											  
+
 											  String pkgInternalFileName = wordPackageFileIndexArr.getPackageFileAtIndex( indexOfRadBtnToRemove2 ).getInternalFileName( ); //find internal file name of pkg to remove
 											  String pkgName = wordPackageFileIndexArr.getPackageFileAtIndex( indexOfRadBtnToRemove2 ).getWordPackageName( ); //user defined pkg name
-											  
+
 											  Intent removeActivityIntent = new Intent( MainActivity.this, RemoveActivity.class );
 											  removeActivityIntent.putExtra( "indexOfRadBtnToRemove", indexOfRadBtnToRemove2 );
 											  removeActivityIntent.putExtra( "pkgInternalFileName", pkgInternalFileName );
 											  removeActivityIntent.putExtra( "pkgName", pkgName );
-											
+
 											  startActivity( removeActivityIntent );
 										  }
 									  }
 		);
-		
-		
-		
+
+
+
 //			// CHOOSE THE LEVEL OF DIFFICULTY
 //		Difficulty = findViewById(R.id.button_level);
 //		Difficulty.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -287,7 +289,7 @@ public class MainActivity extends AppCompatActivity
 
 
 			/** START GAME BUTTON **/
-		
+
 		// used to switch to gameActivity
 		Button btnStart = findViewById( R.id.button_start );
 		btnStart.setOnClickListener( new View.OnClickListener(  )
@@ -295,81 +297,17 @@ public class MainActivity extends AppCompatActivity
 				@Override
 				public void onClick( View v )
 				{
-					startDialog();
+					// Select Package from main activity
 					RadioButton radBtnSelected = findViewById( pkgRadioGroup.getCheckedRadioButtonId() );
-					String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex( pkgRadioGroup.indexOfChild( radBtnSelected ) ).getInternalFileName( ); //get pkg internal file name to find csv
+					String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex( pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
 
-					//initialize a word array to store puzzle words and preferences
-					RadioGroup radGroup = findViewById( R.id.btn_type );
-					usrPuzzleTypePref[0] = findUserPuzzleTypePreference( radGroup ); //stores user puzzle preference inside wordArray
-					wordArray = new WordArray( usrPuzzleTypePref[0], MAX_CSV_ROW, HINT_CLICK_TO_MAX_PROB );
+					startDialog(fileNameSelected);
 
-					try {
-						//based on pkg, initialize the wordArray (select 'n' words)
-						int res = wordArray.initializeWordArray( MainActivity.this, fileNameSelected );
-						if( res == 1 ){
-							Log.d( "upload", "ERROR: initializeWordArray( ) returned an error" );
-							Toast.makeText(MainActivity.this, "Something went wrong. Could not start Game", Toast.LENGTH_SHORT).show();
-							return; //error: could not initialize wordArray
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-
-					Intent gameActivity = new Intent( MainActivity.this, GameActivity.class );
-					state = 0;
-					//check to see for language format is correct and available
-					if (usrModePref == 1) {
-						if (usrLangPref == 0) {
-							language = wordArray.getTranslationLang();
-							Log.e("lTTSs", "language is: "+language);
-						}
-						else {
-							language = wordArray.getNativeLang();
-							Log.e("lTTSs", "language is: "+language);
-						}
-						canStart = false;
-						for (int i=0; i<lTTSlangTags.size(); i++) {
-							//Log.e("lTTS", "language is: "+language+" langTag is: "+langTags.get(i));
-							if (Objects.equals(language,lTTSlanguage.get(i))) {
-								language = lTTSlangTags.get(i);
-								canStart = true;
-								if (canStart) {
-									break;
-								}
-							}
-						}
-						if (canStart) {
-							//save wordArray for Game Activity
-							gameActivity.putExtra( "wordArray", wordArray );
-							gameActivity.putExtra( "usrLangPref", usrLangPref );
-							gameActivity.putExtra("usrDiffPref",usrDiffPref);
-							gameActivity.putExtra("state", state);
-							gameActivity.putExtra("usrModeMA", usrModePref);
-							gameActivity.putExtra("languageMA", language);
-							gameActivity.putExtra( "HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB );
-							startActivityForResult(gameActivity,0);
-						}
-						else {
-							Toast.makeText(v.getContext(),R.string.no_language, Toast.LENGTH_LONG).show();
-						}
-					}
-					else {
-						//standard start
-						gameActivity.putExtra( "wordArray", wordArray );
-						gameActivity.putExtra( "usrLangPref", usrLangPref );
-						gameActivity.putExtra("usrDiffPref",usrDiffPref);
-						gameActivity.putExtra("state", state);
-						gameActivity.putExtra("usrModeMA", usrModePref);
-						gameActivity.putExtra("languageMA", language);
-						gameActivity.putExtra( "HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB );
-						startActivityForResult(gameActivity,0);
-					}
 				}
 			}
 		);
-		
-		
+
+
 		//implement STOP btn
 		Button btnStop = (Button) findViewById( R.id.button_stop );
 		btnStop.setOnClickListener( new View.OnClickListener(  )
@@ -385,8 +323,8 @@ public class MainActivity extends AppCompatActivity
 				}
 			}
 		);
-		
-		
+
+
 		Button btnResume = (Button) findViewById(R.id.button_resume);
 		if (state == 0) {
 			btnResume.setEnabled(false); //block Resume button unless a previous game is saved
@@ -396,8 +334,8 @@ public class MainActivity extends AppCompatActivity
 		else {
 			removeBtnEnable[0] = false;
 		}
-		
-		
+
+
 		//if resume button is unblocked and pressed, it will load previous game preferences
 		btnResume.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -424,15 +362,15 @@ public class MainActivity extends AppCompatActivity
 			}
 		});
 	}
-	
-	
+
+
 	@Override
 	public void onStart( )
 	{
 		super.onStart( );
-		
+
 			/** WHEN USER RETURNING FROM UPLOAD ACTIVITY, UPDATE WORD PKG LIST **/
-			
+
 		FileCSV fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
 		int CURRENT_WORD_PKG_COUNT_RETURN;
 		try {
@@ -441,7 +379,7 @@ public class MainActivity extends AppCompatActivity
 			CURRENT_WORD_PKG_COUNT_RETURN = CURRENT_WORD_PKG_COUNT;
 			e.printStackTrace();
 		}
-		
+
 		// ENABLE OR DISABLE REMOVE BTN
 		if( removeBtnEnable[0] == true ) //enable btn
 		{
@@ -451,24 +389,24 @@ public class MainActivity extends AppCompatActivity
 			Button btn = findViewById( R.id.btn_remove );
 			btn.setEnabled( false );
 		}
-		
-		
+
+
 		// read all packages the user has uploaded so far, and get an array with name and file
 		try {
 			wordPackageFileIndexArr = new WordPackageFileIndex( this, MAX_WORD_PKG, CURRENT_WORD_PKG_COUNT_RETURN ); //allow a maximum of X packages
 		} catch( IOException e ){
 			e.printStackTrace( );
 		}
-		
+
 		pkgRadioGroup = findViewById(R.id.pkg_radio_group);
-		
+
 		//update scroll pkg view
 		updatePkgViewAfterUploadOrRemoval( CURRENT_WORD_PKG_COUNT_RETURN );
-		
+
 		Log.d( "upload", "onStart() called from MainActivity" );
 	}
-	
-	
+
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent resumeSrc) {
 		if (resumeSrc != null) {
@@ -510,27 +448,27 @@ public class MainActivity extends AppCompatActivity
 		}
 	}
 
-	private int findUserPuzzleTypePreference( RadioGroup radGroup )
-	{
-		//find which puzzle type the user selected
-		int usrPuzzleTypePref = -1;
-		int btnID = radGroup.getCheckedRadioButtonId( );
-		View radioBtn = radGroup.findViewById( btnID );
-		usrPuzzleTypePref = radGroup.indexOfChild( radioBtn );
-		return usrPuzzleTypePref - 1; //-1 because first index is TextView
-	}
+//	private int findUserPuzzleTypePreference( RadioGroup radGroup )
+//	{
+//		//find which puzzle type the user selected
+//		int usrPuzzleTypePref = -1;
+//		int btnID = radGroup.getCheckedRadioButtonId( );
+//		View radioBtn = radGroup.findViewById( btnID );
+//		usrPuzzleTypePref = radGroup.indexOfChild(radGroup);
+//		return usrPuzzleTypePref - 1; //-1 because first index is TextView
+//	}
 
 
 
 	private int checkIfJustInstalledAndSetUpPackagesAlreadyInstalled( )
 	{
 		//return 0 on success
-		
+
 			/* TEST IF USER JUST INSTALLED APP - IF USER HAS, LOAD DEFAULT FILES */
 			/* ELSE, SET UP wordPackageFileIndexArr to store all packages so far, and create Package Scroll */
-		
+
 		int usrNewInstall = fileCSV.checkIfCurrentWordPkgCountFileExists( this ); //0==files already exist
-		
+
 		if( usrNewInstall == 0 ) //if app was already installed and has correct files - get current_word_pkg_count
 			try {
 				CURRENT_WORD_PKG_COUNT = fileCSV.findCurrentPackageCount( this ); //get current Packages count so far
@@ -549,7 +487,7 @@ public class MainActivity extends AppCompatActivity
 				return 1;
 			}
 		}
-		
+
 		// read all packages the user has uploaded so far, and get an array with name and file
 		try {
 			wordPackageFileIndexArr = new WordPackageFileIndex( this, MAX_WORD_PKG, CURRENT_WORD_PKG_COUNT ); //allow a maximum of X packages
@@ -557,42 +495,27 @@ public class MainActivity extends AppCompatActivity
 			e.printStackTrace( );
 			return 1;
 		}
-		
+
 			/* UPDATE THE WORD PKG SCROLL */
-		
+
 		RadioButton radBtn;
-		ColorStateList colorStateList = new ColorStateList(
-				new int[][]{
-
-						new int[]{-android.R.attr.state_enabled}, //disabled
-						new int[]{android.R.attr.state_enabled} //enabled
-				},
-				new int[] {
-
-						R.color.white //disabled
-						,R.color.navy //enabled
-
-				}
-		);
-
 
 		for( int i=0; i<CURRENT_WORD_PKG_COUNT; i++ )
 		{
 			radBtn = new RadioButton( this );
-			
+
 			radBtn.setText( wordPackageFileIndexArr.getPackageFileAtIndex( i ).getWordPackageName( ) );
-			radBtn.setButtonTintList(colorStateList);
-			
+
 			pkgRadioGroup.addView(radBtn);
 		}
-		
+
 		//automatically select first button
 		( (RadioButton) (pkgRadioGroup.getChildAt(0)) ).setChecked( true );
-		
+
 		return 0;
 	}
-	
-	
+
+
 	private void updatePkgViewAfterUploadOrRemoval( int CURRENT_WORD_PKG_COUNT_RETURN )
 	{
 		/*
@@ -600,42 +523,42 @@ public class MainActivity extends AppCompatActivity
 		 * This function updates the user Scroll View with what packages are available after removal/upload
 		 */
 		RadioButton radBtn;
-		
+
 		if( CURRENT_WORD_PKG_COUNT_RETURN > CURRENT_WORD_PKG_COUNT ) //usr uploaded a pkg
 		{
 			/* USER UPLOADED A PKG */
-			
+
 			CURRENT_WORD_PKG_COUNT = CURRENT_WORD_PKG_COUNT_RETURN; //update pkg count because it increased
 			Log.d("upload", "USER UPLOADED A PKG");
 			//find how many pkg are available and if user user
 			for( int i=pkgRadioGroup.getChildCount(); i<CURRENT_WORD_PKG_COUNT; i++ )
 			{
 				radBtn = new RadioButton(this);
-				
+
 				//radBtn.setText( allPkgName[i] );
 				radBtn.setText(wordPackageFileIndexArr.getPackageFileAtIndex(i).getWordPackageName());
-				
+
 				pkgRadioGroup.addView(radBtn);
-				
+
 			}
 		}
 		else if( CURRENT_WORD_PKG_COUNT_RETURN < CURRENT_WORD_PKG_COUNT )
 		{
 			/* USER DELETED A PKG */
-			
+
 			Log.d("upload", "USER DELETED A PKG");
 			CURRENT_WORD_PKG_COUNT = CURRENT_WORD_PKG_COUNT_RETURN; //update pkg count because it decreased
-			
-			
+
+
 			// IMPORTANT: the following procedure limits to deleting only 1 file at a time
 			//			  to delete multiple files at one, have to delete and re-create all radio buttons in RadioGroup
-			
+
 			pkgRadioGroup.removeViewAt( indexOfRadBtnToRemove[0] );
-			
+
 			//reselect top radio btn
 			( (RadioButton) pkgRadioGroup.getChildAt(0)).setChecked( true );
-			
-			
+
+
 		}
 		else
 		{
@@ -643,17 +566,16 @@ public class MainActivity extends AppCompatActivity
 		}
 	}
 
-    private  void startDialog(){
-        View view = getLayoutInflater().inflate(R.layout.activity_sub_menu, null);
+    private  void startDialog(final String fileNameSelected){
+
+        final View view = getLayoutInflater().inflate(R.layout.activity_sub_menu, null);
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this,R.style.Theme_AppCompat_DayNight_Dialog_Alert);
         alertDialog.setView(view);
-        AlertDialog dialog = alertDialog.create();
-		dialog.show();
 
-		//dialog.getWindow().setLayout(1000,1000);
+
 
 		// CHOOSE THE DIFFICULTY
-		Difficulty = findViewById(R.id.button_level);
+		Difficulty = view.findViewById(R.id.button_level);
 		Difficulty.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -677,7 +599,7 @@ public class MainActivity extends AppCompatActivity
 
 
 		// CHOOSE THE LANGUAGE
-		Language=findViewById(R.id.button_language);
+		Language = view.findViewById(R.id.button_language);
 		Language.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -696,7 +618,7 @@ public class MainActivity extends AppCompatActivity
 		});
 
 		// CHOOSE THE MODE
-		Mode=findViewById(R.id.button_mode);
+		Mode = view.findViewById(R.id.button_mode);
 		Mode.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -714,7 +636,104 @@ public class MainActivity extends AppCompatActivity
 			}
 		});
 
-    }
+		// CHOOSE THE SIZE OF PUZZLE
+		Size = view.findViewById(R.id.btn_type);
+		Size.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				switch (checkedId){
+					case R.id.btn_4x4:
+						usrPuzzleTypePref = 0;
+						break;
+					case R.id.btn_6x6:
+						usrPuzzleTypePref = 1;
+						break;
+					case R.id.btn_9x9:
+						usrPuzzleTypePref = 2;
+						break;
+					case R.id.btn_12x12:
+						usrPuzzleTypePref = 3;
+						break;
+				}
+			}
+		});
+
+
+		alertDialog.setNegativeButton(android.R.string.cancel, null);
+		alertDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+
+				System.out.println("Size: "+ usrPuzzleTypePref);
+				wordArray = new WordArray( usrPuzzleTypePref, MAX_CSV_ROW, HINT_CLICK_TO_MAX_PROB );
+
+				try {
+					//based on pkg, initialize the wordArray (select 'n' words)
+					int res = wordArray.initializeWordArray( MainActivity.this, fileNameSelected );
+					if( res == 1 ){
+						Log.d( "upload", "ERROR: initializeWordArray( ) returned an error" );
+						Toast.makeText(MainActivity.this, "Something went wrong. Could not start Game", Toast.LENGTH_SHORT).show();
+						return; //error: could not initialize wordArray
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				Intent gameActivity = new Intent(MainActivity.this, GameActivity.class);
+				state = 0;
+				//check to see for language format is correct and available
+				if (usrModePref == 1) {
+					if (usrLangPref == 0) {
+						language = wordArray.getTranslationLang();
+						Log.e("lTTSs", "language is: " + language);
+					} else {
+						language = wordArray.getNativeLang();
+						Log.e("lTTSs", "language is: " + language);
+					}
+					canStart = false;
+					for (int i = 0; i < lTTSlangTags.size(); i++) {
+						//Log.e("lTTS", "language is: "+language+" langTag is: "+langTags.get(i));
+						if (Objects.equals(language, lTTSlanguage.get(i))) {
+							language = lTTSlangTags.get(i);
+							canStart = true;
+							if (canStart) {
+								break;
+							}
+						}
+					}
+					if (canStart) {
+						//save wordArray for Game Activity
+						gameActivity.putExtra("wordArray", wordArray);
+						gameActivity.putExtra("usrLangPref", usrLangPref);
+						gameActivity.putExtra("usrDiffPref", usrDiffPref);
+						gameActivity.putExtra("state", state);
+						gameActivity.putExtra("usrModeMA", usrModePref);
+						gameActivity.putExtra("languageMA", language);
+						gameActivity.putExtra("HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB);
+						startActivityForResult(gameActivity, 0);
+					} else {
+						Toast.makeText(view.getContext(), R.string.no_language, Toast.LENGTH_LONG).show();
+					}
+				} else {
+					//standard start
+					gameActivity.putExtra("wordArray", wordArray);
+					gameActivity.putExtra("usrLangPref", usrLangPref);
+					gameActivity.putExtra("usrDiffPref", usrDiffPref);
+					gameActivity.putExtra("state", state);
+					gameActivity.putExtra("usrModeMA", usrModePref);
+					gameActivity.putExtra("languageMA", language);
+					gameActivity.putExtra("HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB);
+					startActivityForResult(gameActivity, 0);
+				}
+			}
+		});
+
+		AlertDialog dialog = alertDialog.create();
+		dialog.show();
+		dialog.getWindow().setLayout(1000,1200);
+
+
+	}
 }
 
 
