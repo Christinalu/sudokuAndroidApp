@@ -36,6 +36,7 @@ public class ButtonListener extends AppCompatActivity
 						  final int usrLangPref, final int[] btnClicked, final TextView Hint, final WordArray wordArray,
 						  final int usrModePref, final String[] numArray, int WORD_COUNT, int COL_PER_BLOCK,
 						  int ROW_PER_BLOCK, Context context, TableLayout tableLayout, int orientation)
+
 	{
 		// pulled out of button listeners
 		final PuzzleCheck check = new PuzzleCheck(usrSudokuArr.Puzzle);
@@ -75,7 +76,7 @@ public class ButtonListener extends AppCompatActivity
 					if (button == null) {
 						Log.d("listener", "ERROR: null button");
 					}
-					button.setTextColor(Color.parseColor("#00293C"));
+					//button.setTextColor(Color.parseColor("#00293C"));
 					button.setBackgroundResource(R.drawable.buttons);
 					button.setSingleLine();
 

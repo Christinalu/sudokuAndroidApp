@@ -2,6 +2,7 @@ package com.omicron.android.cmpt276_1191e1_omicron;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AlertDialog;
@@ -560,12 +561,27 @@ public class MainActivity extends AppCompatActivity
 			/* UPDATE THE WORD PKG SCROLL */
 		
 		RadioButton radBtn;
-		
+		ColorStateList colorStateList = new ColorStateList(
+				new int[][]{
+
+						new int[]{-android.R.attr.state_enabled}, //disabled
+						new int[]{android.R.attr.state_enabled} //enabled
+				},
+				new int[] {
+
+						R.color.white //disabled
+						,R.color.navy //enabled
+
+				}
+		);
+
+
 		for( int i=0; i<CURRENT_WORD_PKG_COUNT; i++ )
 		{
 			radBtn = new RadioButton( this );
 			
 			radBtn.setText( wordPackageFileIndexArr.getPackageFileAtIndex( i ).getWordPackageName( ) );
+			radBtn.setButtonTintList(colorStateList);
 			
 			pkgRadioGroup.addView(radBtn);
 		}
@@ -633,7 +649,8 @@ public class MainActivity extends AppCompatActivity
         alertDialog.setView(view);
         AlertDialog dialog = alertDialog.create();
 		dialog.show();
-		dialog.getWindow().setLayout(1000,1000);
+
+		//dialog.getWindow().setLayout(1000,1000);
 
 		// CHOOSE THE DIFFICULTY
 		Difficulty = findViewById(R.id.button_level);
