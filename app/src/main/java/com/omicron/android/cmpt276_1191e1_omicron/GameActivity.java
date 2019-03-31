@@ -287,16 +287,6 @@ public class GameActivity extends AppCompatActivity
 		
 		paint.setColor(Color.parseColor("#c2c2c2"));
 
-		
-		
-		
-		
-		
-		
-		
-		
-		
-
 		textMatrix = new TextMatrix( this, sqrSizeWidth, sqrSizeHeight, ZOOM_SCALE, WORD_COUNT );
 
 

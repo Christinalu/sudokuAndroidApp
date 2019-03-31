@@ -5,7 +5,7 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:gravity="center"
-	android:background="@color/mediumaquamarine"
+	android:background="@drawable/background"
 	tools:context=".UploadActivity"
 	android:orientation="vertical">
 
@@ -26,6 +26,7 @@
 		android:id="@+id/selected_file"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
+		android:fontFamily="casual"
 		android:paddingLeft="25sp"/>
 
 	<Button
@@ -35,7 +36,9 @@
 		android:layout_gravity="center"
 		android:background="@drawable/hint"
 		android:padding="10dp"
-		android:text="@string/upload_csv" />
+		android:text="@string/upload_csv"
+		android:fontFamily="casual"
+		android:textStyle="bold"/>
 
 	<ScrollView
 		android:layout_width="wrap_content"
