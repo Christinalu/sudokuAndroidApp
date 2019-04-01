@@ -1,4 +1,5 @@
 ![Logo](/uploads/c6817788d720a76e544671f777b30551/Logo.png)
+![new_logo](/uploads/4865e9849dfacb383f905d5325e9c84a/new_logo.png)
 
 
 # Introduction
