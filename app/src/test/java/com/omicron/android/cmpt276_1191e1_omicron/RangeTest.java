@@ -5,49 +5,31 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class RangeTest {
-    private long left = 455; // left range index
-    private long right = 7888; // right range index
-    private String strNative = "kitchen";
-    private String strTranslation = "cuisine";
-    private int hintClick = 3;
 
-    private Range mRange = new Range(left, right, strNative, strTranslation,hintClick);
+    private Range mRange = new Range(455, 7888, "kitchen", "cuisine",3);
 
     @Test
     public void getNumLeft() {
-        assertEquals(left, mRange.getNumLeft());
+        assertEquals(455, mRange.getNumLeft());
     }
 
     @Test
     public void getNumRight() {
-        assertEquals(right, mRange.getNumRight());
+        assertEquals(7888, mRange.getNumRight());
     }
 
     @Test
     public void getStrNative() {
-        assertEquals(strNative, mRange.getStrNative());
+        assertEquals("kitchen", mRange.getStrNative());
     }
 
     @Test
     public void getStrTranslation() {
-        assertEquals(strTranslation, mRange.getStrTranslation());
+        assertEquals("cuisine", mRange.getStrTranslation());
     }
 
     @Test
     public void getHintClick() {
-        assertEquals(hintClick, mRange.getHintClick());
-    }
-
-    @Test
-    public void setNumLeftANDsetNumRight() {
-        int check = 0;
-        int LEFT = 10;
-        int RIGHT = 20;
-        mRange.setNumLeft(LEFT);
-        mRange.setNumRight(RIGHT);
-        if (mRange.getNumLeft()!=LEFT || mRange.getNumRight()!=RIGHT) {
-            check++;
-        }
-        assertEquals(0,check);
+        assertEquals(3, mRange.getHintClick());
     }
 }

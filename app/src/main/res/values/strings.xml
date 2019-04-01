@@ -23,8 +23,6 @@
     <string name="dict">Words</string>
     <string name="zoom_in">Zoom in</string>
     <string name="zoom_out">Zoom out</string>
-    <string name="button_reset">Reset puzzle</string>
-    <string name="button_undo">Undo last move</string>
     <string name="keypads">KEYPADS</string>
     <string name="upload_csv">UPLOAD CSV FILE</string>
     <string name="package_name">Name of Word Package</string>

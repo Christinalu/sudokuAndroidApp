@@ -1,8 +1,6 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
-import java.io.Serializable;
-
-public class Pair implements Serializable
+public class Pair
 {
 	/*
 	 *	This class holds coordiante x,y of an object in 2D array
@@ -21,13 +19,6 @@ public class Pair implements Serializable
 	{
 		x = row;
 		y = col;
-	}
-
-	public boolean isEqual(Pair p) {
-		if (p.getRow() == x && p.getColumn() == y) {
-			return true;
-		}
-		return false;
 	}
 
 	public int getColumn( )

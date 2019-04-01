@@ -60,13 +60,10 @@ public class MainActivity extends AppCompatActivity
 
 	WordArray wordArrayResume;
 	String[] numArrayResume;
-	int[] orderArrResume;
 	private int usrLangPrefResume;
 	private SudokuGenerator usrSudokuArrResume;
 	int usrModePrefResume;
 	String languageResume;
-	private Pair currentRectColoured = new Pair( -1, -1 ); // stores the current coloured square
-	private int currentSelectedIsCorrect=0;
 
 	//used only for user entering language check//convert to appropriate tag
 	private TextToSpeech lTTS;
@@ -111,8 +108,20 @@ public class MainActivity extends AppCompatActivity
 	{
 		super.onCreate( savedInstanceState );
 		setContentView( R.layout.activity_main );
+
 		if (savedInstanceState != null) {
-			savetheInstanceState(0, savedInstanceState, state, wordArrayResume, usrLangPrefResume, usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume, 0, currentRectColoured, currentSelectedIsCorrect);
+			//a state had been saved, load it. if state == 0, there is nothing to load.
+			state = (int) savedInstanceState.getSerializable("state");
+			if (state == 1) {
+				wordArrayResume = (WordArray) savedInstanceState.getParcelable("wordArrayMA");
+				usrLangPrefResume = savedInstanceState.getInt("usrLangPrefMA");
+				usrSudokuArrResume = (SudokuGenerator) savedInstanceState.get("SudokuArrMA");
+				usrModePrefResume = (int) savedInstanceState.getSerializable("usrModeMA");
+				languageResume = (String) savedInstanceState.getSerializable("languageMA");
+				if (usrModePrefResume == 1) {
+					numArrayResume = (String[]) savedInstanceState.getSerializable("numArrayMA");
+				}
+			}
 		}
 
 		fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
@@ -194,7 +203,7 @@ public class MainActivity extends AppCompatActivity
 					//For optional implementations
 					String TTSlanguage;
 					String TTScountry;
-					//int counter = 0;
+					int counter = 0;
 					for (Locale LO : thelocale) {
 						int res = lTTS.isLanguageAvailable(LO);
 						if (res == TextToSpeech.LANG_COUNTRY_AVAILABLE) {
@@ -210,7 +219,7 @@ public class MainActivity extends AppCompatActivity
 							TTScountry = LO.getDisplayCountry();
 							lTTScountry.add(TTScountry);
 							//Log.e("lTTS", "Language and Country is: "+lTTSlanguage.get(counter)+" - "+lTTScountry.get(counter));
-							//counter++;
+							counter++;
 						}
 					}
 				}
@@ -237,45 +246,8 @@ public class MainActivity extends AppCompatActivity
 											 state = 0;
 											 startDialog(fileNameSelected, state);
 
-					Intent gameActivity = new Intent( MainActivity.this, GameActivity.class );
-					state = 0;
-					//check to see for language format is correct and available
-					if (usrModePref == 1) {
-						if (usrLangPref == 0) {
-							language = wordArray.getTranslationLang();
-							Log.e("lTTSs", "language is: "+language);
-						}
-						else {
-							language = wordArray.getNativeLang();
-							Log.e("lTTSs", "language is: "+language);
-						}
-						canStart = false;
-						for (int i=0; i<lTTSlangTags.size(); i++) {
-							//Log.e("lTTS", "language is: "+language+" langTag is: "+langTags.get(i));
-							if (Objects.equals(language,lTTSlanguage.get(i))) {
-								language = lTTSlangTags.get(i);
-								canStart = true;
-								if (canStart) {
-									break;
-								}
-							}
-						}
-						if (canStart) {
-							//save wordArray for Game Activity
-							gameSetup(gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB);
-							startActivityForResult(gameActivity,0);
-						}
-						else {
-							Toast.makeText(v.getContext(),R.string.no_language, Toast.LENGTH_LONG).show();
-						}
-					}
-					else {
-						//standard start
-						gameSetup(gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB);
-						startActivityForResult(gameActivity,0);
-					}
-				}
-			}
+										 }
+									 }
 		);
 
 
@@ -311,23 +283,20 @@ public class MainActivity extends AppCompatActivity
 		btnResume.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (state > 0) {
+				if (state==1) {
 					//load previous game preferences to prepare for export to new Game Activity
 					Intent resumeActivity = new Intent(MainActivity.this, GameActivity.class);
 					//save preferences for Game Activity to read
-					resumeActivity.putExtra("wordArray", wordArrayResume);
-					resumeActivity.putExtra("usrLangPref", usrLangPrefResume);
-					resumeActivity.putExtra("SudokuArr", usrSudokuArrResume);
+					resumeActivity.putExtra("wordArrayMA", wordArrayResume);
+					resumeActivity.putExtra("usrLangPrefMA", usrLangPrefResume);
+					resumeActivity.putExtra("SudokuArrMA", usrSudokuArrResume);
 					resumeActivity.putExtra("state", state);
-					resumeActivity.putExtra("usrMode", usrModePrefResume);
+					resumeActivity.putExtra("usrModeMA", usrModePrefResume);
 					if (usrModePrefResume == 1) {
-						resumeActivity.putExtra("numArray", numArrayResume);
-						resumeActivity.putExtra("orderArr", orderArrResume);
+						resumeActivity.putExtra("numArrayMA", numArrayResume);
 					}
-					resumeActivity.putExtra("language", languageResume);
+					resumeActivity.putExtra("languageMA", languageResume);
 					resumeActivity.putExtra( "HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB );
-					resumeActivity.putExtra("currentRectColoured", currentRectColoured);
-					resumeActivity.putExtra("currentSelectedIsCorrect", currentSelectedIsCorrect);
 					startActivityForResult(resumeActivity, 0);
 				}
 				else {
@@ -380,33 +349,22 @@ public class MainActivity extends AppCompatActivity
 		Log.d( "upload", "onStart() called from MainActivity" );
 	}
 
-	@Override
-	public void onDestroy() {
-		if (lTTS != null) {
-			lTTS.stop();
-			lTTS.shutdown();
-		}
-		super.onDestroy();
-	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent resumeSrc) {
 		if (resumeSrc != null) {
 			//if all necessary game preferences are written in memory, then unblock resume button
-			if (resumeSrc.hasExtra("wordArray") && resumeSrc.hasExtra("usrLangPref") && resumeSrc.hasExtra("SudokuArr") && resumeSrc.hasExtra("usrMode") && resumeSrc.hasExtra("language")) {
+			if (resumeSrc.hasExtra("wordArrayGA") && resumeSrc.hasExtra("usrLangPrefGA") && resumeSrc.hasExtra("SudokuArrGA") && resumeSrc.hasExtra("usrModeGA") && resumeSrc.hasExtra("languageGA")) {
 				Log.i("TAG", "resumeSrc has all elements");
-				state = (int) resumeSrc.getSerializableExtra("state");
-				wordArrayResume = (WordArray) resumeSrc.getParcelableExtra("wordArray");
-				usrLangPrefResume = (int) resumeSrc.getSerializableExtra("usrLangPref");
-				usrSudokuArrResume = (SudokuGenerator) resumeSrc.getSerializableExtra("SudokuArr");
-				usrModePrefResume = (int) resumeSrc.getSerializableExtra("usrMode");
+				wordArrayResume = (WordArray) resumeSrc.getParcelableExtra("wordArrayGA");
+				usrLangPrefResume = (int) resumeSrc.getSerializableExtra("usrLangPrefGA");
+				usrSudokuArrResume = (SudokuGenerator) resumeSrc.getSerializableExtra("SudokuArrGA");
+				usrModePrefResume = (int) resumeSrc.getSerializableExtra("usrModeGA");
 				if (usrModePrefResume == 1) {
-					numArrayResume = (String[]) resumeSrc.getStringArrayExtra("numArray");
-					orderArrResume = (int[]) resumeSrc.getIntArrayExtra("orderArr");
+					numArrayResume = (String[]) resumeSrc.getStringArrayExtra("numArrayGA");
 				}
-				languageResume = (String) resumeSrc.getSerializableExtra("language");
-				currentRectColoured = (Pair) resumeSrc.getSerializableExtra("currentRectColoured");
-				currentSelectedIsCorrect = (int) resumeSrc.getSerializableExtra("currentSelectedIsCorrect");
+				languageResume = (String) resumeSrc.getSerializableExtra("languageGA");
+				state = 1;
 				Button btnResume = (Button) findViewById(R.id.button_resume);
 				btnResume.setEnabled(true);
 				Button btnRemove = (Button) findViewById(R.id.btn_remove); //block user from deleting pkg while playing game
@@ -419,7 +377,18 @@ public class MainActivity extends AppCompatActivity
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
-		savetheInstanceState(1, savedInstanceState, state, wordArrayResume, usrLangPrefResume, usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect);
+		savedInstanceState.putInt("state", state);
+		if (state == 1) {
+			savedInstanceState.putParcelable("wordArrayMA", wordArrayResume);
+			savedInstanceState.putInt("usrLangPrefMA", usrLangPrefResume);
+			savedInstanceState.putSerializable("SudokuArrMA", usrSudokuArrResume);
+			savedInstanceState.putInt("usrModeMA", usrModePrefResume);
+			savedInstanceState.putString("languageMA", languageResume);
+			savedInstanceState.putInt( "HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB );
+			if (usrModePrefResume == 1) {
+				savedInstanceState.putStringArray("numArrayMA", numArrayResume);
+			}
+		}
 	}
 
 //	private int findUserPuzzleTypePreference( RadioGroup radGroup )
@@ -544,55 +513,176 @@ public class MainActivity extends AppCompatActivity
 			Log.d("upload", "USER DID NOT MODIFY A PKG");
 		}
 	}
-	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP, Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect) {
-		if (RorS == 0) {
-			//we are receiving
-			state = (int) savedInstanceState.getSerializable("state");
-			if (state > 0) {
-				wordArrayResume = (WordArray) savedInstanceState.getParcelable("wordArray");
-				usrLangPrefResume = savedInstanceState.getInt("usrLangPref");
-				usrSudokuArrResume = (SudokuGenerator) savedInstanceState.get("SudokuArr");
-				usrModePrefResume = (int) savedInstanceState.getSerializable("usrMode");
-				languageResume = (String) savedInstanceState.getSerializable("language");
-				HINT_CLICK_TO_MAX_PROB = (int) savedInstanceState.getSerializable("HINT_CLICK_TO_MAX_PROB");
-				currentRectColoured = (Pair) savedInstanceState.getSerializable("currentRectColoured");
-				currentSelectedIsCorrect = (int) savedInstanceState.getSerializable("currentSelectedIsCorrect");
-				if (usrModePrefResume == 1) {
-					numArrayResume = (String[]) savedInstanceState.getSerializable("numArray");
-					orderArrResume = (int[]) savedInstanceState.getSerializable("orderArr");
-				}
-			}
-		}
-		else {
-			//we are sending
-			savedInstanceState.putInt("state", sis_state);
-			if (sis_state > 0) {
-				//if there was a previous game, load it's contents
-				savedInstanceState.putParcelable("wordArray", sis_wordArray);
-				savedInstanceState.putInt("usrLangPref", sis_usrLangPref);
-				savedInstanceState.putSerializable("SudokuArr", sis_usrSudokuArr);
-				savedInstanceState.putInt("usrMode", sis_usrModePref);
-				savedInstanceState.putString("language", sis_language);
-				savedInstanceState.putInt( "HINT_CLICK_TO_MAX_PROB", sis_HCTMP );
-				savedInstanceState.putSerializable("currentRectColoured", sis_currentRectColoured);
-				savedInstanceState.putSerializable("currentSelectedIsCorrect", sis_currentSelectedIsCorrect);
 
-				if (sis_usrModePref == 1) {
-					savedInstanceState.putStringArray("numArray", sis_numArray);
-					savedInstanceState.putIntArray("orderArr", sis_orderArr);
+	private  void startDialog(final String fileNameSelected, final int state){
+
+		final View view = getLayoutInflater().inflate(R.layout.activity_sub_menu, null);
+		AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this,R.style.Theme_AppCompat_DayNight_Dialog_Alert);
+		alertDialog.setView(view);
+
+		// CHOOSE THE DIFFICULTY
+		Difficulty = view.findViewById(R.id.button_level);
+		Difficulty.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				int difficultyId = group.getCheckedRadioButtonId();
+				switch(difficultyId)
+				{
+					case R.id.button_easy:
+						usrDiffPref = 0;
+						break;
+
+					case R.id.button_medium:
+						usrDiffPref = 1;
+						break;
+
+					case R.id.button_hard:
+						usrDiffPref = 2;
+						break;
 				}
 			}
-		}
-	}
-	public void gameSetup(Intent gA, int gs_state, WordArray gs_wordArray, int gs_usrLangPref, int gs_usrDiffPref, int gs_usrModePref, String gs_language, int gs_usrPuzzleTypePref, int HCTMP) {
-		gA.putExtra("state", gs_state);
-		gA.putExtra( "wordArray", gs_wordArray );
-		gA.putExtra( "usrLangPref", gs_usrLangPref );
-		gA.putExtra("usrDiffPref",gs_usrDiffPref);
-		gA.putExtra("usrMode", gs_usrModePref);
-		gA.putExtra("language", gs_language);
-		gA.putExtra("usrPuzzSize", gs_usrPuzzleTypePref);
-		gA.putExtra( "HINT_CLICK_TO_MAX_PROB", HCTMP );
+		});
+
+
+		// CHOOSE THE LANGUAGE
+		Language = view.findViewById(R.id.button_language);
+		Language.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				int LanguageId = group.getCheckedRadioButtonId();
+				switch (LanguageId)
+				{
+					case R.id.button_eng_fr:
+						usrLangPref = 0;
+						break;
+
+					case R.id.button_fr_eng:
+						usrLangPref = 1;
+						break;
+				}
+			}
+		});
+
+		// CHOOSE THE MODE
+		Mode = view.findViewById(R.id.button_mode);
+		Mode.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				int ModeId = group.getCheckedRadioButtonId();
+				switch (ModeId)
+				{
+					case R.id.button_mStandard:
+						usrModePref = 0;
+						break;
+
+					case R.id.button_mSpeech:
+						usrModePref = 1;
+						break;
+				}
+			}
+		});
+
+		// CHOOSE THE SIZE OF PUZZLE
+		Size = view.findViewById(R.id.btn_type);
+		Size.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				switch (checkedId){
+					case R.id.btn_4x4:
+						usrPuzzleTypePref = 0;
+						break;
+					case R.id.btn_6x6:
+						usrPuzzleTypePref = 1;
+						break;
+					case R.id.btn_9x9:
+						usrPuzzleTypePref = 2;
+						break;
+					case R.id.btn_12x12:
+						usrPuzzleTypePref = 3;
+						break;
+				}
+			}
+		});
+
+		alertDialog.setNegativeButton(android.R.string.cancel, null);
+
+		alertDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+
+				wordArray = new WordArray( usrPuzzleTypePref, MAX_CSV_ROW, HINT_CLICK_TO_MAX_PROB );
+
+				try {
+					//based on pkg, initialize the wordArray (select 'n' words)
+					int res = wordArray.initializeWordArray( MainActivity.this, fileNameSelected );
+					if( res == 1 ) {
+						Log.d( "upload", "ERROR: initializeWordArray( ) returned an error" );
+						Toast.makeText(MainActivity.this, "Please select one of the Puzzle Type to start", Toast.LENGTH_SHORT).show();
+						return; //error: could not initialize wordArray
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				Intent gameActivity = new Intent(MainActivity.this, GameActivity.class);
+				//check to see for language format is correct and available
+				if (usrModePref == 1) {
+					if (usrLangPref == 0) {
+						language = wordArray.getTranslationLang();
+						Log.e("lTTSs", "language is: " + language);
+					} else {
+						language = wordArray.getNativeLang();
+						Log.e("lTTSs", "language is: " + language);
+					}
+					canStart = false;
+					for (int i = 0; i < lTTSlangTags.size(); i++) {
+						//Log.e("lTTS", "language is: "+language+" langTag is: "+langTags.get(i));
+						if (Objects.equals(language, lTTSlanguage.get(i))) {
+							language = lTTSlangTags.get(i);
+							canStart = true;
+							if (canStart) {
+								break;
+							}
+						}
+					}
+					if (canStart) {
+						//save wordArray for Game Activity
+						gameActivity.putExtra("wordArray", wordArray);
+						gameActivity.putExtra("usrLangPref", usrLangPref);
+						gameActivity.putExtra("usrDiffPref", usrDiffPref);
+						gameActivity.putExtra("state", state);
+						gameActivity.putExtra("usrModeMA", usrModePref);
+						gameActivity.putExtra("languageMA", language);
+						gameActivity.putExtra("HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB);
+						startActivityForResult(gameActivity, 0);
+					} else {
+						Toast.makeText(view.getContext(), R.string.no_language, Toast.LENGTH_LONG).show();
+					}
+				} else {
+					//standard start
+					gameActivity.putExtra("wordArray", wordArray);
+					gameActivity.putExtra("usrLangPref", usrLangPref);
+					gameActivity.putExtra("usrDiffPref", usrDiffPref);
+					gameActivity.putExtra("state", state);
+					gameActivity.putExtra("usrModeMA", usrModePref);
+					gameActivity.putExtra("languageMA", language);
+					gameActivity.putExtra("HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB);
+					startActivityForResult(gameActivity, 0);
+				}
+			}
+		});
+
+		AlertDialog dialog = alertDialog.create();
+		dialog.show();
+		Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+		//positiveButton.setBackground(getResources().getDrawable(R.drawable.buttons));
+		positiveButton.setTextColor(getResources().getColor(R.color.glacierblue));
+		Button negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+		negativeButton.setTextColor(getResources().getColor(R.color.colorAccent));
+		//negativeButton.setBackground(getResources().getDrawable(R.drawable.buttons));
+		dialog.getWindow().getDecorView().setBackground(getResources().getDrawable(R.drawable.background));
+		//dialog.getWindow().setBackgroundDrawable(R.drawable.background);
+
 	}
 }
 
