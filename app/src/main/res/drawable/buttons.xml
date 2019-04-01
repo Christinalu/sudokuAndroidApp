@@ -5,7 +5,7 @@
         android:radius="5sp"/>
 
     <stroke android:width="4sp"
-    android:color="@color/translucent"/>
+    android:color="@android:color/transparent"/>
 
     <gradient
         android:startColor="@color/ice"
