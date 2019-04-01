@@ -414,10 +414,12 @@ public class drw
 			//note: animation will reset each time a button is clicked because
 			textMatrix.chooseLangAndDraw( currentRectColoured.getRow(), currentRectColoured.getColumn(),
 					  					  wordArray, usrSudokuArr, usrLangPref );
+			Log.d( "text-1", "re-drawing text in drw..." );
 		}
 		
 		if( zoomOn[0] == 1 )
 		{
+			Log.d( "text-1", "re-drawing text in drw..." );
 			textMatrix.reDrawTextZoom(touchXZ, touchYZ, dX, dY);
 			canvas.restore( ); //return canvas back to original before zoom
 		}
@@ -451,6 +453,28 @@ public class drw
 		}
 		
 		canvas.drawRect(rectArr[i][j].getRect(), paint);
+	}
+	
+	public void resetRectArrConflict( )
+	{
+		for( int i=0; i<WORD_COUNT; i++ )
+		{
+			for( int j=0; j<WORD_COUNT; j++ )
+			{
+				rectArr[i][j].setConflict( false );
+			}
+		}
+	}
+	
+	public Block[][] getRectArr( )
+	{
+		return rectArr;
+	}
+	
+	public void setRectArrSelectedAtIndex( int i, int j )
+	{
+		//in rectArr, mark new rect as selected (usually called across rotation to preserve selected colouring)
+		rectArr[i][j].select( );
 	}
 
 	/*

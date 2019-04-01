@@ -232,11 +232,11 @@ public class ButtonListener extends AppCompatActivity
 
 														 // redraw square matrix and text overlay
 														 btnClicked[0] = 1; //this flag allows (for efficiency) class drw to update TextView as well in zoom mode
-														 
+
 														 if( rotation[0] == 0 ) {
 															 drawR.setDrawParameters(touchX, touchY, lastRectColoured, currentRectColoured);
 														 }
-														 
+
 														 // check if there is a duplicate in row/col/section. MAKE SURE TO HAVE AFTER PUZZLE INPUT IS SET
 														 int currentSelectedisCorrect = 0;
 														 if (usrSudokuArr.checkDuplicate(row, col)) {
@@ -270,9 +270,12 @@ public class ButtonListener extends AppCompatActivity
 														 // SO FAR keep the idea that "if inserted correct word once without using HintClick, it implies the user is getting better with that word"
 
 														 //have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
-														 if (usrSudokuArr.enableCheck) {
+														 if (usrSudokuArr.canCheck()) {
 															 usrSudokuArr.checkPuzzle(v, btnArr);
 														 }
+														
+														 Log.d( "highlight", "marked rectArr (in ButtonListener) as selected at: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );
+														
 													 }
 
 													 //debug

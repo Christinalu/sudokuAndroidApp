@@ -168,7 +168,7 @@ public class GameActivity extends AppCompatActivity
 	private int HORIZONTAL_BLOCK;
 	
 	private int[] rotation = { 0 };
-	
+
 	@Override
 	protected void onCreate( Bundle savedInstanceState )
 	{
@@ -247,7 +247,7 @@ public class GameActivity extends AppCompatActivity
 				}
 			}
 		}
-		
+
 		Log.d( "debug-1", "currentRectColoured: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );
 
 		if (usrModePref == 1) {
@@ -336,11 +336,34 @@ public class GameActivity extends AppCompatActivity
 		createRectMatrix( );
 
 
-		//draw matrix so far
-		if( rotation[0] == 0 ) {
+		//set matrix parameters so far, if the game is not resuming or rotating
+		if( rotation[0] == 0 ) { //if not rotating
+			Log.d( "highlight", "setting drw parameters..." );
 			drawR.setDrawParameters(touchX, touchY, lastRectColoured, currentRectColoured);
 		}
-		drawR.reDraw( currentRectColoured, usrLangPref, 0 );
+		
+		//TODO: see if you still need this 'if statement' code
+		//PRESERVE SELECTED RECTANGLE IN rectArr, FROM drw CLASS, WHEN ROTATING OR RESUMING
+		if( (rotation[0] == 1 ) && currentRectColoured.getRow() != -1 ) {
+			Log.d( "highlight", "marked rectArr as selected at: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );
+			
+			Log.d("TAG", "duplicate is about to be checked");
+			// 0 == nothing selected; 1 == selected and correct; 2 == selected but incorrect
+			currentSelectedIsCorrect = 0;
+			if (usrSudokuArr.checkDuplicate(currentRectColoured.getRow(), currentRectColoured.getColumn())) {
+				Log.d("TAG", "duplicate should have been found");
+				currentSelectedIsCorrect = 2;
+			} else {
+				Log.d("TAG", "duplicate is not found");
+				currentSelectedIsCorrect = 1;
+			}
+			
+			drawR.setRectArrSelectedAtIndex( currentRectColoured.getRow(), currentRectColoured.getColumn() );
+		}
+		
+		drawR.reDraw( currentRectColoured, usrLangPref, currentSelectedIsCorrect );
+		
+		
 
 			/*UNDO BUTTON*/
 
@@ -350,18 +373,38 @@ public class GameActivity extends AppCompatActivity
 			@Override
 			public void onClick( View v)
 			{
-				if (!usrSudokuArr.historyisEmpty()) {
-					usrSudokuArr.printHistory();
-					Entry lastEntry = usrSudokuArr.removeHistory();
-					usrSudokuArr.setPuzzleVal(lastEntry.getValue(), lastEntry.getCoordinate().getRow(), lastEntry.getCoordinate().getColumn());
-					drawR.reDraw( currentRectColoured, usrLangPref, 0 );
-					//textMatrix.scaleTextZoom( ZOOM_SCALE[0] );
-					//textMatrix.reDrawTextZoom( touchXZ, touchYZ, dX, dY ); // call this because .scaleTextZoom() only scales Layouts, so call this to place them in correct (drag) position
-					//TODO: add code to redraw Text in Puzzle
-				}
-				else {
-					Toast.makeText(v.getContext(), "There is nothing to undo!", Toast.LENGTH_LONG).show( );
-				}
+			    if (!usrSudokuArr.isCorrect) {
+                    if (!usrSudokuArr.historyisEmpty()) {
+                        usrSudokuArr.printHistory();
+                        Entry lastEntry = usrSudokuArr.removeHistory();
+                        int tempRow = lastEntry.getCoordinate().getRow();
+                        int tempCol = lastEntry.getCoordinate().getColumn();
+                        int cSiC;
+						drawR.getRectArr()[currentRectColoured.getRow()][currentRectColoured.getColumn()].deselect(); //deselect current from drw class
+						currentRectColoured.update(tempRow, tempCol);
+						Log.d( "highlight", "currentRectColoured after undo: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );
+						usrSudokuArr.setPuzzleVal(lastEntry.getValue(), tempRow, tempCol);
+                        if (usrSudokuArr.checkDuplicate(tempRow, tempCol)) {
+                            Log.d("TESTI", "Duplicate in given coordinate detected");
+                            cSiC = 2;
+                        } else {
+                            Log.d("TESTI", "No duplicate detected");
+                            cSiC = 1;
+                        }
+                        //TODO: add code to redraw Text in Puzzle
+	
+						//deselect current and reselect last in rectArr in drw class
+						//deselecting part executed at start of function
+						drawR.getRectArr()[tempRow][tempCol].select();
+                        drawR.reDraw(currentRectColoured, usrLangPref, cSiC);
+						textMatrix.chooseLangAndDraw( currentRectColoured.getRow(), currentRectColoured.getColumn(),
+								wordArray, usrSudokuArr, usrLangPref );
+						
+						
+                    } else {
+                        //Toast.makeText(v.getContext(), "There is nothing to undo!", Toast.LENGTH_LONG).show();
+                    }
+                }
 			}
 		});
 
@@ -373,9 +416,14 @@ public class GameActivity extends AppCompatActivity
 			@Override
 			public void onClick( View v)
 			{
-				usrSudokuArr.resetPuzzle();
-				usrSudokuArr.printCurrent();
-				//TODO: add code to redraw Text in Puzzle
+			    if (!usrSudokuArr.isCorrect) {
+                    usrSudokuArr.resetPuzzle();
+                    usrSudokuArr.printCurrent();
+                    //TODO: add code to redraw Text in Puzzle
+                    drawR.reDraw(currentRectColoured, usrLangPref, 0);
+					textMatrix.resetAllText( usrSudokuArr );
+					drawR.resetRectArrConflict( );
+                }
 			}
 		});
 
@@ -1243,7 +1291,6 @@ public class GameActivity extends AppCompatActivity
 			usrModePref = (int) savedInstanceState.getSerializable("usrMode");
 			language = (String) savedInstanceState.getSerializable("language");
 			HINT_CLICK_TO_MAX_PROB = savedInstanceState.getInt( "HINT_CLICK_TO_MAX_PROB" );
-			//TODO REMOVE
 			touchX = (int[]) savedInstanceState.getIntArray("touchX");
 			touchY = (int[]) savedInstanceState.getIntArray("touchY");
 			currentRectColoured = (Pair) savedInstanceState.getSerializable("currentRectColoured");
@@ -1256,18 +1303,17 @@ public class GameActivity extends AppCompatActivity
 		}
 		else {
 			//we are sending
+			if (sis_usrSudokuArr.isCorrect) {
+				sis_state = 2;
+			}
+			else {sis_state = 1;}
 			savedInstanceState.putInt("state", sis_state);
 			savedInstanceState.putParcelable("wordArray", sis_wordArray);
 			savedInstanceState.putInt( "usrLangPref", sis_usrLangPref );
 			savedInstanceState.putSerializable("SudokuArr", sis_usrSudokuArr);
-			if (sis_usrSudokuArr.isCorrect) {
-				sis_state = 2;
-			}
-			savedInstanceState.putInt("state", sis_state);
 			savedInstanceState.putInt("usrMode", sis_usrModePref);
 			savedInstanceState.putString("language", sis_language);
 			savedInstanceState.putInt("HINT_CLICK_TO_MAX_PROB", sis_HCTMP);
-			//TODO REMOVE
 			savedInstanceState.putIntArray("touchX", touchx);
 			savedInstanceState.putIntArray("touchY", touchy);
 			savedInstanceState.putSerializable("currentRectColoured", sis_currentRectColoured);

@@ -450,8 +450,16 @@ public class SudokuGenerator implements Serializable {
     public Entry removeHistory() {
         //caller's responsibility to check if empty
         Entry e = new Entry(History.get(hsize - 1));
+        int x = e.getCoordinate().getRow();
+        int y = e.getCoordinate().getColumn();
+        int newVal = e.getValue();
+        removeDuplicates(x,y);
         History.remove(hsize - 1);
         hsize--;
+        //if previous entry was a 0, we need to remove a sqrFilled
+        if (newVal == 0) {
+            sqrFilled--;
+        }
         return e;
     }
 
@@ -494,6 +502,10 @@ public class SudokuGenerator implements Serializable {
             }
         }
         return true;
+    }
+
+    public boolean canCheck() {
+        return enableCheck;
     }
 
     // check if puzzle is correct, if it is then disable buttons
@@ -612,5 +624,25 @@ public class SudokuGenerator implements Serializable {
             Puzzle[x][y] = current;
             conflictArr[x][y] = 0;
         }
+    }
+    public int getSqrFilled () {
+        //only used for SudokuGeneratorTest
+        return sqrFilled;
+    }
+    public void setSqrFilled () {
+        //only used for SudokuGeneratorTest
+        sqrFilled = (size*size)-1;
+    }
+    public void setPuzzle (int [][] arr) {
+        //only used for SudokuGeneratorTest
+        Puzzle = arr;
+    }
+    public void setPuzzleOriginal (int [][] arr) {
+        //only used for SudokuGeneratorTest
+        PuzzleOriginal = arr;
+    }
+    public void setPuzzleSol (int[][] arr) {
+        //only used for SudokuGeneratorTest
+        PuzzleSol = arr;
     }
 }

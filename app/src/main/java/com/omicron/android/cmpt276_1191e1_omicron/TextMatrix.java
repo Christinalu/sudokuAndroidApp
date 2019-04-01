@@ -232,4 +232,22 @@ public class TextMatrix
 	{
 		return textViewArr;
 	}
+	
+	public void resetAllText( SudokuGenerator usrSudokuArr )
+	{
+		/*
+		 * Reset all cells the user has modified to no text
+		 */
+		
+		for( int i=0; i<puzzleTypeSize; i++ )
+		{
+			for( int j=0; j<puzzleTypeSize; j++ )
+			{
+				if( usrSudokuArr.PuzzleOriginal[i][j] == 0 ) //if a cell that the user can modify
+				{
+					( (TextView) (textViewArr[i][j].getRelativeLayout().getChildAt(0)) ).setText( "" );
+				}
+			}
+		}
+	}
 }
