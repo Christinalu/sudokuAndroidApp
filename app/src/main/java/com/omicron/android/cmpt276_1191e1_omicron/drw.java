@@ -51,7 +51,8 @@ public class drw
 	private int HORIZONTAL_BLOCK;
 	private Context context; //context of GameActivity
 	private String lastColour;
-	
+	private int[] undoBtnPressed;
+
 	
 	public drw( Context context2, RelativeLayout rectLayout2 )
 	{
@@ -69,7 +70,7 @@ public class drw
 				int[] touchXZ2, int[] touchYZ2, int[] zoomButtonSafe2, int[] zoomClickSafe2,
 				int[] zoomButtonDisableUpdate2, int bitmapSizeWidth2, int bitmapSizeHeight2, WordArray wordArray2, int[] btnClicked2,
 				float[] ZOOM_SCALE2, int COL_PER_BLOCK2, int ROW_PER_BLOCK2, int VERTICAL_BLOCK2, int HORIZONTAL_BLOCK2,
-				int WORD_COUNT2, int barH2 )
+				int WORD_COUNT2, int barH2, int[] undoBtnPressed2 )
 	{
 		paint = paint2;
 		rectArr = rectArr2;
@@ -98,7 +99,7 @@ public class drw
 		HORIZONTAL_BLOCK = HORIZONTAL_BLOCK2;
 		WORD_COUNT = WORD_COUNT2;
 		barH = barH2;
-		
+		undoBtnPressed = undoBtnPressed2;
 	}
 
 	
@@ -280,8 +281,13 @@ public class drw
 		{
 			for( int j=0; j<WORD_COUNT; j++ )
 			{
+				//for each word, mark if there is conflict
+				if( usrSudokuArr.getconflictArr()[i][j] == 1 )
+				{ rectArr[i][j].setConflict( true ); }
+				else{ rectArr[i][j].setConflict( false ); } //no conflict
+
 				//set colours; must occur after figuring out is rect contained
-				if (rectArr[i][j].isSelected()) //if a selected rect
+				if( rectArr[i][j].isSelected( ) ) //if a selected rect
 				{
 					Log.d( "highlight", "selected" );
 					if( usrSudokuArr.PuzzleOriginal[i][j] != 0 ) //if an element that cannot be modified
@@ -303,21 +309,34 @@ public class drw
 					{
 						paint.setColor(Color.parseColor( selectCorrect ));
 						rectArr[i][j].setConflict( false );
+						usrSudokuArr.getconflictArr()[i][j] = 0; //mark as no conflict
 						rectArr[i][j].setLastColour( selectCorrect );
 					}
 					else if( currentSelectedIsCorrect == 2 ) //selected is incorrect
 					{
 						paint.setColor(Color.parseColor( selectIncorrect ));
 						rectArr[i][j].setConflict( true );
+						usrSudokuArr.getconflictArr()[i][j] = 1; //mark conflict
 						rectArr[i][j].setLastColour( selectIncorrect );
 					}
 					else
 					{
 						//paint.setColor(Color.parseColor("#000000"));
-						paint.setColor( Color.parseColor( rectArr[i][j].getLastColour( ) ) ); //on drag, use previous colour of selected rect
+						//paint.setColor( Color.parseColor( rectArr[i][j].getLastColour( ) ) ); //on drag, use previous colour of selected rect
+
+
+						//if no button clicked, then currentSelectedIsCorrect == 0, so draw colour that was so far
+						if( rectArr[i][j].getConflict() == true ) //if a word has conflict, preserve incorrect colour
+						{
+							paint.setColor(Color.parseColor( selectIncorrect )); // set already filled with incorrect colour
+						}
+						else
+						{
+							paint.setColor(Color.parseColor( selectFixedSquareLight )); // set lighter colour for fixed numbers
+						}
 					}
 
-				} else if (usrSudokuArr.PuzzleOriginal[i][j] != 0) // if a element that cannot be modified
+				} else if( usrSudokuArr.PuzzleOriginal[i][j] != 0 ) // if a element that cannot be modified
 				{
 					paint.setColor(Color.parseColor( selectFixedSquareDark )); // set darker colour for fixed numbers
 				} else {
@@ -396,10 +415,12 @@ public class drw
 			//note: animation will reset each time a button is clicked because
 			textMatrix.chooseLangAndDraw( currentRectColoured.getRow(), currentRectColoured.getColumn(),
 					  					  wordArray, usrSudokuArr, usrLangPref );
+			Log.d( "text-1", "re-drawing text in drw..." );
 		}
 		
 		if( zoomOn[0] == 1 )
 		{
+			Log.d( "text-1", "re-drawing text in drw..." );
 			textMatrix.reDrawTextZoom(touchXZ, touchYZ, dX, dY);
 			canvas.restore( ); //return canvas back to original before zoom
 		}
@@ -434,6 +455,48 @@ public class drw
 		
 		canvas.drawRect(rectArr[i][j].getRect(), paint);
 	}
+
+	public void resetRectArrConflict( )
+	{
+		for( int i=0; i<WORD_COUNT; i++ )
+		{
+			for( int j=0; j<WORD_COUNT; j++ )
+			{
+				rectArr[i][j].setConflict( false );
+			}
+		}
+	}
+
+	public Block[][] getRectArr( )
+	{
+		return rectArr;
+	}
+
+	public void setRectArrSelectedAtIndex( int i, int j )
+	{
+		//in rectArr, mark new rect as selected (usually called across rotation to preserve selected colouring)
+		rectArr[i][j].select( );
+	}
+
+	/*
+	public int[][] getConflictArr( ){ return  conflictArr; }
+
+	public void setConflictArr( int[][] arr ){ conflictArr = arr; }
+
+	public int setConflictAtIndex( int i, int j ){
+		//returns 1 on incorrect index
+		if( i < 0 || j < 0 || i >= WORD_COUNT || j >= WORD_COUNT ){ return 1; }
+		conflictArr[i][j] = 1;
+		return 0;
+	}
+
+	public int removeConflictAtIndex( int i, int j ){
+		//returns 1 on incorrect index
+		if( i < 0 || j < 0 || i >= WORD_COUNT || j >= WORD_COUNT ){ return 1; }
+		conflictArr[i][j] = 0;
+		return 0;
+	}
+	*/
 }
 
 
