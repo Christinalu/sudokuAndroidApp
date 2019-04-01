@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.support.annotation.ColorInt;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
@@ -31,6 +32,7 @@ public class ButtonListener extends AppCompatActivity
 
 	private int i;
 	private Button [] btnArr;
+
 	
 	
 	public ButtonListener(final Pair currentRectColoured, final SudokuGenerator usrSudokuArr, final drw drawR,
@@ -75,8 +77,8 @@ public class ButtonListener extends AppCompatActivity
 					if (button == null) {
 						Log.d("listener", "ERROR: null button");
 					}
-					button.setTextColor(Color.WHITE);
-					button.setBackgroundResource(R.drawable.buttons);
+					button.setTextColor(Color.parseColor("#00293C"));
+					button.setBackgroundResource(R.drawable.keypad_button);
 					button.setSingleLine();
 
 					Log.d("listener", "sample word from array: " + wordArray.getWordNativeAtIndex(indexArr));
@@ -135,8 +137,8 @@ public class ButtonListener extends AppCompatActivity
 					}
 				}
 
-				button.setTextColor(Color.WHITE);
-				button.setBackgroundResource(R.drawable.buttons);
+				button.setTextColor(Color.parseColor("#00293C"));
+				button.setBackgroundResource(R.drawable.keypad_button);
 				button.setLayoutParams(params);
 				button.setGravity(Gravity.CENTER);
 				button.setPadding(20,0,20,0);

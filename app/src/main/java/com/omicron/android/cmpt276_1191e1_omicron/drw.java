@@ -264,13 +264,13 @@ public class drw
 			canvas.scale( ZOOM_SCALE[0], ZOOM_SCALE[0] );
 		}
 		
-		canvas.drawColor( Color.parseColor( "#5cddb1" ) ); //reset all canvas to colour
+		canvas.drawColor( Color.parseColor( "#F1F1F2" ) ); //reset all canvas to colour
 		
 		boolean highlight = true;
 		String selectPredefionedWord = "#626262";
-		String selectEmptySquare = "#79b064";
+		String selectEmptySquare = "#689ec1";
 		String selectCorrect = "#228b22";
-		String selectIncorrect = "#ff7f50";
+		String selectIncorrect = "#C60000";
 		String selectFixedSquareDark = "#a2a2a2";
 		String selectFixedSquareLight = "#c2c2c2";
 		
@@ -358,7 +358,7 @@ public class drw
 		
 		String highlightPredefinedDarker = "#828282";
 		String highlightConflictDarker = "#dd5d2e";
-		String highlightRegularDarker = "#8ac075";
+		String highlightRegularDarker = "#037fc1";
 		
 		
 			/** HIGHLIGHT ROW AND COL **/

@@ -17,7 +17,7 @@ public class Block implements Serializable
 	private Rect sqr; //rectangle
 	private boolean selected; //indicates if rect is the one user selected
 	private TextView textView;
-	private String lastColour = "#000000";
+	private String lastColour = "#000000"; //black
 	private boolean conflict = false; //if word has row/col/block conflict; no conflict does not guarantee correct solution
 
 	public Block( int sqrL, int sqrT, int sqrR, int sqrB )

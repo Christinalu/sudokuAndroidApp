@@ -50,6 +50,7 @@ public class TextMatrix
 			{
 				textViewArr[i][j] = new RelativeAndPos( context );
 				textViewArr[i][j].getRelativeLayout().addView( new TextView( context ) );
+
 			}
 		}
 
@@ -102,6 +103,7 @@ public class TextMatrix
 				textViewArr[i][j].getRelativeLayout().setY( textViewArr[i][j].getRelativeLayout().getY( ) * ZOOM_SCALE );
 
 				textViewArr[i][j].getRelativeLayout().setLayoutParams( parameter );
+
 
 				//upscale text size
 				( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setTextSize( TXT_SIZE_ZOOM );
