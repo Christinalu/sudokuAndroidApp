@@ -87,6 +87,17 @@ public class SudokuGeneratorTest {
                 }
             }
         }
+        //lets make sure scramble scrambled Puzzle and PuzzleSol equally
+        for (int i=0; i<len; i++) {
+            for (int j = 0; j < len; j++) {
+                //make sure all entries in Puzzle[i][j] and PuzzleSol[i][j] are equal (with the exception of Puzzle[i][j] == 0, since these are the empty entries for the user to complete
+                if (puzz[i][j] != puzzsol[i][j]) {
+                    if (puzz[i][j] != 0) {
+                        duplicates++;
+                    }
+                }
+            }
+        }
         assertEquals(0, duplicates);
     }
     @Test
