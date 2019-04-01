@@ -85,7 +85,6 @@ public class GameActivity extends AppCompatActivity
 	private Pair lastRectColoured = new Pair( -1, -1 ); // stores the last coloured square coordinates
 	private Pair currentRectColoured = new Pair( -1, -1 ); // stores the current coloured square
 	private int currentSelectedIsCorrect = 0;
-	//TODO TESTING
 	
 	private Paint paintblack = new Paint();
 	private TextMatrix textMatrix; //stores the TextView for drawing the text
@@ -174,18 +173,12 @@ public class GameActivity extends AppCompatActivity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_game);
-		
-
-		// TODO: test if highlighting is preserved when zooming
-
-
 
 		ZOOM_FIRST_TIME[0] = true;
 
 		//set intent to receive word array from Main Activity
 		if (savedInstanceState != null) {
 			//a state had been saved, load it
-            //TODO: add currentSelectedisCorrect
 			savetheInstanceState (0, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect);
 			rotation[0] = 1;
 		}
@@ -201,7 +194,10 @@ public class GameActivity extends AppCompatActivity
 					usrModePref = (int) gameSrc.getSerializableExtra("usrMode");
 					language = (String) gameSrc.getSerializableExtra("language");
 					HINT_CLICK_TO_MAX_PROB = (int) gameSrc.getSerializableExtra( "HINT_CLICK_TO_MAX_PROB" );
+					currentRectColoured = (Pair) gameSrc.getSerializableExtra("currentRectColoured");
+					currentSelectedIsCorrect = (int) gameSrc.getSerializableExtra("currentSelectedIsCorrect");
 					usrSudokuArr = (SudokuGenerator) gameSrc.getSerializableExtra("SudokuArr");
+					rotation[0] = 1;
 					if (usrModePref == 1) {
 						numArray = (String[]) gameSrc.getStringArrayExtra("numArray");
 						orderArr = (int[]) gameSrc.getIntArrayExtra("orderArr");
@@ -342,7 +338,6 @@ public class GameActivity extends AppCompatActivity
 			drawR.setDrawParameters(touchX, touchY, lastRectColoured, currentRectColoured);
 		}
 
-		//TODO: see if you still need this 'if statement' code
 		//PRESERVE SELECTED RECTANGLE IN rectArr, FROM drw CLASS, WHEN ROTATING OR RESUMING
 		if( (rotation[0] == 1 ) && currentRectColoured.getRow() != -1 ) {
 			Log.d( "highlight", "marked rectArr as selected at: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );
@@ -380,6 +375,7 @@ public class GameActivity extends AppCompatActivity
                         int tempRow = lastEntry.getCoordinate().getRow();
                         int tempCol = lastEntry.getCoordinate().getColumn();
                         int cSiC;
+						Log.d( "debug-1", "currentRectColoured: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );
 						drawR.getRectArr()[currentRectColoured.getRow()][currentRectColoured.getColumn()].deselect(); //deselect current from drw class
 						currentRectColoured.update(tempRow, tempCol);
 						Log.d( "highlight", "currentRectColoured after undo: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );
@@ -391,8 +387,6 @@ public class GameActivity extends AppCompatActivity
                             Log.d("TESTI", "No duplicate detected");
                             cSiC = 1;
                         }
-                        //TODO: add code to redraw Text in Puzzle
-
 						//deselect current and reselect last in rectArr in drw class
 						//deselecting part executed at start of function
 						drawR.getRectArr()[tempRow][tempCol].select();
@@ -419,7 +413,6 @@ public class GameActivity extends AppCompatActivity
 			    if (!usrSudokuArr.isCorrect) {
                     usrSudokuArr.resetPuzzle();
                     usrSudokuArr.printCurrent();
-                    //TODO: add code to redraw Text in Puzzle
                     drawR.reDraw(currentRectColoured, usrLangPref, 0);
 					textMatrix.resetAllText( usrSudokuArr );
 					drawR.resetRectArrConflict( );
@@ -565,23 +558,7 @@ public class GameActivity extends AppCompatActivity
 			// 			 so touchXZ = 0 will be start top left corner, == 1000 means == 1000 top left corner will start and top right corner
 			// 			 would be 1000 + screen_width
 			// touchXZclick : initial (stored) regular pixel coordinate of where user first clicked
-		//TODO: REMOVE ONCE SS DONE FOR CURRENT RECTANGLE COLOURED
-		/*
-		if (touchX[0] != 0 || touchY[0] != 0) {
 
-			long downTime = SystemClock.uptimeMillis();
-			long eventTime = SystemClock.uptimeMillis()+100;
-			float x = (float) touchX[0];
-			float y = (float) touchY[0];
-			int metaState = 0;
-			MotionEvent motionEvent = MotionEvent.obtain(downTime,eventTime,MotionEvent.ACTION_UP,x,y,metaState);
-			View view = R.layout.activity_game;
-			view.dispatchTouchEvent(motionEvent);
-
-			actionDown();
-			actionUp();
-		}
-		*/
 			/** ON-TOUCH **/
 
 		handleTouch = new View.OnTouchListener( )
@@ -661,6 +638,8 @@ public class GameActivity extends AppCompatActivity
 		resumeSrc.putExtra("state", state);
 		resumeSrc.putExtra("usrMode", usrModePref);
 		resumeSrc.putExtra("language", language);
+		resumeSrc.putExtra("currentRectColoured", currentRectColoured);
+		resumeSrc.putExtra("currentSelectedIsCorrect", currentSelectedIsCorrect);
 		if (usrModePref == 1) {
 			resumeSrc.putExtra("numArray", numArray);
 			resumeSrc.putExtra("orderArr", orderArr);

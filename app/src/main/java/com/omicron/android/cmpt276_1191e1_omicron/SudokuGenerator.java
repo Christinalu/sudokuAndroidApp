@@ -459,6 +459,7 @@ public class SudokuGenerator implements Serializable {
         //if previous entry was a 0, we need to remove a sqrFilled
         if (newVal == 0) {
             sqrFilled--;
+            Log.d("TESTI", "sqrFilled is: "+sqrFilled);
         }
         return e;
     }
@@ -490,6 +491,9 @@ public class SudokuGenerator implements Serializable {
         if( sqrFilled == size*size )
         {
             enableCheck = true; //allow for puzzle to be checked
+        }
+        else {
+            enableCheck = false;
         }
     }
 

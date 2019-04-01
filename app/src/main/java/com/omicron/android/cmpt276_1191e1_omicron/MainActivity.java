@@ -54,6 +54,8 @@ public class MainActivity extends AppCompatActivity
 	private SudokuGenerator usrSudokuArrResume;
 	int usrModePrefResume;
 	String languageResume;
+	private Pair currentRectColoured = new Pair( -1, -1 ); // stores the current coloured square
+	private int currentSelectedIsCorrect=0;
 
 	//used only for user entering language check//convert to appropriate tag
 	private TextToSpeech lTTS;
@@ -102,7 +104,7 @@ public class MainActivity extends AppCompatActivity
 		super.onCreate( savedInstanceState );
 		setContentView( R.layout.activity_main );
 		if (savedInstanceState != null) {
-			savetheInstanceState(0, savedInstanceState, state, wordArrayResume, usrLangPrefResume, usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume, 0);
+			savetheInstanceState(0, savedInstanceState, state, wordArrayResume, usrLangPrefResume, usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume, 0, currentRectColoured, currentSelectedIsCorrect);
 		}
 		
 		fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
@@ -389,6 +391,8 @@ public class MainActivity extends AppCompatActivity
 					}
 					resumeActivity.putExtra("language", languageResume);
 					resumeActivity.putExtra( "HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB );
+					resumeActivity.putExtra("currentRectColoured", currentRectColoured);
+					resumeActivity.putExtra("currentSelectedIsCorrect", currentSelectedIsCorrect);
 					startActivityForResult(resumeActivity, 0);
 				}
 				else {
@@ -466,6 +470,8 @@ public class MainActivity extends AppCompatActivity
 					orderArrResume = (int[]) resumeSrc.getIntArrayExtra("orderArr");
 				}
 				languageResume = (String) resumeSrc.getSerializableExtra("language");
+				currentRectColoured = (Pair) resumeSrc.getSerializableExtra("currentRectColoured");
+				currentSelectedIsCorrect = (int) resumeSrc.getSerializableExtra("currentSelectedIsCorrect");
 				Button btnResume = (Button) findViewById(R.id.button_resume);
 				btnResume.setEnabled(true);
 				Button btnRemove = (Button) findViewById(R.id.btn_remove); //block user from deleting pkg while playing game
@@ -478,7 +484,7 @@ public class MainActivity extends AppCompatActivity
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
-		savetheInstanceState(1, savedInstanceState, state, wordArrayResume, usrLangPrefResume, usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume, HINT_CLICK_TO_MAX_PROB);
+		savetheInstanceState(1, savedInstanceState, state, wordArrayResume, usrLangPrefResume, usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect);
 	}
 	
 	private int findUserPuzzleTypePreference( RadioGroup radGroup )
@@ -597,7 +603,7 @@ public class MainActivity extends AppCompatActivity
 			Log.d("upload", "USER DID NOT MODIFY A PKG");
 		}
 	}
-	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP) {
+	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP, Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect) {
 		if (RorS == 0) {
 			//we are receiving
 			state = (int) savedInstanceState.getSerializable("state");
@@ -608,6 +614,8 @@ public class MainActivity extends AppCompatActivity
 				usrModePrefResume = (int) savedInstanceState.getSerializable("usrMode");
 				languageResume = (String) savedInstanceState.getSerializable("language");
 				HINT_CLICK_TO_MAX_PROB = (int) savedInstanceState.getSerializable("HINT_CLICK_TO_MAX_PROB");
+				currentRectColoured = (Pair) savedInstanceState.getSerializable("currentRectColoured");
+				currentSelectedIsCorrect = (int) savedInstanceState.getSerializable("currentSelectedIsCorrect");
 				if (usrModePrefResume == 1) {
 					numArrayResume = (String[]) savedInstanceState.getSerializable("numArray");
 					orderArrResume = (int[]) savedInstanceState.getSerializable("orderArr");
@@ -625,6 +633,8 @@ public class MainActivity extends AppCompatActivity
 				savedInstanceState.putInt("usrMode", sis_usrModePref);
 				savedInstanceState.putString("language", sis_language);
 				savedInstanceState.putInt( "HINT_CLICK_TO_MAX_PROB", sis_HCTMP );
+				savedInstanceState.putSerializable("currentRectColoured", sis_currentRectColoured);
+				savedInstanceState.putSerializable("currentSelectedIsCorrect", sis_currentSelectedIsCorrect);
 
 				if (sis_usrModePref == 1) {
 					savedInstanceState.putStringArray("numArray", sis_numArray);
