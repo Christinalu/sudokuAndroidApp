@@ -273,6 +273,9 @@ public class ButtonListener extends AppCompatActivity
 														 if (usrSudokuArr.canCheck()) {
 															 usrSudokuArr.checkPuzzle(v, btnArr);
 														 }
+
+														 Log.d( "highlight", "marked rectArr (in ButtonListener) as selected at: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );
+
 													 }
 
 													 //debug

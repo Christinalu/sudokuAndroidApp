@@ -597,7 +597,7 @@ public class MainActivity extends AppCompatActivity
 			Log.d("upload", "USER DID NOT MODIFY A PKG");
 		}
 	}
-	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int [] sis_orderArr, int HCTMP) {
+	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP) {
 		if (RorS == 0) {
 			//we are receiving
 			state = (int) savedInstanceState.getSerializable("state");
@@ -607,6 +607,7 @@ public class MainActivity extends AppCompatActivity
 				usrSudokuArrResume = (SudokuGenerator) savedInstanceState.get("SudokuArr");
 				usrModePrefResume = (int) savedInstanceState.getSerializable("usrMode");
 				languageResume = (String) savedInstanceState.getSerializable("language");
+				HINT_CLICK_TO_MAX_PROB = (int) savedInstanceState.getSerializable("HINT_CLICK_TO_MAX_PROB");
 				if (usrModePrefResume == 1) {
 					numArrayResume = (String[]) savedInstanceState.getSerializable("numArray");
 					orderArrResume = (int[]) savedInstanceState.getSerializable("orderArr");
@@ -623,7 +624,8 @@ public class MainActivity extends AppCompatActivity
 				savedInstanceState.putSerializable("SudokuArr", sis_usrSudokuArr);
 				savedInstanceState.putInt("usrMode", sis_usrModePref);
 				savedInstanceState.putString("language", sis_language);
-				savedInstanceState.putInt( "HINT_CLICK_TO_MAX_PROB", HCTMP );
+				savedInstanceState.putInt( "HINT_CLICK_TO_MAX_PROB", sis_HCTMP );
+
 				if (sis_usrModePref == 1) {
 					savedInstanceState.putStringArray("numArray", sis_numArray);
 					savedInstanceState.putIntArray("orderArr", sis_orderArr);

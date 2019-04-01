@@ -336,15 +336,34 @@ public class GameActivity extends AppCompatActivity
 		createRectMatrix( );
 
 
-		//draw matrix so far
-		if( rotation[0] == 0 ) {
+		//set matrix parameters so far, if the game is not resuming or rotating
+		if( rotation[0] == 0 ) { //if not rotating
+			Log.d( "highlight", "setting drw parameters..." );
 			drawR.setDrawParameters(touchX, touchY, lastRectColoured, currentRectColoured);
 		}
-		//TODO: TESTING HIGHLIGHT BUG
-		if (currentRectColoured.getRow()!=-1) {
-			rectArr[currentRectColoured.getRow()][currentRectColoured.getColumn()].select();
+
+		//TODO: see if you still need this 'if statement' code
+		//PRESERVE SELECTED RECTANGLE IN rectArr, FROM drw CLASS, WHEN ROTATING OR RESUMING
+		if( (rotation[0] == 1 ) && currentRectColoured.getRow() != -1 ) {
+			Log.d( "highlight", "marked rectArr as selected at: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );
+
+			Log.d("TAG", "duplicate is about to be checked");
+			// 0 == nothing selected; 1 == selected and correct; 2 == selected but incorrect
+			currentSelectedIsCorrect = 0;
+			if (usrSudokuArr.checkDuplicate(currentRectColoured.getRow(), currentRectColoured.getColumn())) {
+				Log.d("TAG", "duplicate should have been found");
+				currentSelectedIsCorrect = 2;
+			} else {
+				Log.d("TAG", "duplicate is not found");
+				currentSelectedIsCorrect = 1;
+			}
+
+			drawR.setRectArrSelectedAtIndex( currentRectColoured.getRow(), currentRectColoured.getColumn() );
 		}
-		drawR.reDraw( currentRectColoured, usrLangPref, 0 );
+
+		drawR.reDraw( currentRectColoured, usrLangPref, currentSelectedIsCorrect );
+
+
 
 			/*UNDO BUTTON*/
 
@@ -361,8 +380,10 @@ public class GameActivity extends AppCompatActivity
                         int tempRow = lastEntry.getCoordinate().getRow();
                         int tempCol = lastEntry.getCoordinate().getColumn();
                         int cSiC;
-                        currentRectColoured.update(tempRow, tempCol);
-                        usrSudokuArr.setPuzzleVal(lastEntry.getValue(), tempRow, tempCol);
+						drawR.getRectArr()[currentRectColoured.getRow()][currentRectColoured.getColumn()].deselect(); //deselect current from drw class
+						currentRectColoured.update(tempRow, tempCol);
+						Log.d( "highlight", "currentRectColoured after undo: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );
+						usrSudokuArr.setPuzzleVal(lastEntry.getValue(), tempRow, tempCol);
                         if (usrSudokuArr.checkDuplicate(tempRow, tempCol)) {
                             Log.d("TESTI", "Duplicate in given coordinate detected");
                             cSiC = 2;
@@ -371,12 +392,17 @@ public class GameActivity extends AppCompatActivity
                             cSiC = 1;
                         }
                         //TODO: add code to redraw Text in Puzzle
-						if (currentRectColoured.getRow()!=-1) {
-							rectArr[currentRectColoured.getRow()][currentRectColoured.getColumn()].select();
-						}
-						drawR.reDraw(currentRectColoured, usrLangPref, cSiC);
+
+						//deselect current and reselect last in rectArr in drw class
+						//deselecting part executed at start of function
+						drawR.getRectArr()[tempRow][tempCol].select();
+                        drawR.reDraw(currentRectColoured, usrLangPref, cSiC);
+						textMatrix.chooseLangAndDraw( currentRectColoured.getRow(), currentRectColoured.getColumn(),
+								wordArray, usrSudokuArr, usrLangPref );
+
+
                     } else {
-                        Toast.makeText(v.getContext(), "There is nothing to undo!", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(v.getContext(), "There is nothing to undo!", Toast.LENGTH_LONG).show();
                     }
                 }
 			}
@@ -394,7 +420,9 @@ public class GameActivity extends AppCompatActivity
                     usrSudokuArr.resetPuzzle();
                     usrSudokuArr.printCurrent();
                     //TODO: add code to redraw Text in Puzzle
-                    drawR.reDraw(currentRectColoured, usrLangPref, 1);
+                    drawR.reDraw(currentRectColoured, usrLangPref, 0);
+					textMatrix.resetAllText( usrSudokuArr );
+					drawR.resetRectArrConflict( );
                 }
 			}
 		});
