@@ -2,6 +2,8 @@
 
 <img src="/uploads/4865e9849dfacb383f905d5325e9c84a/new_logo.png" width="250">
 
+>created from (https://wordart.com)
+
 
 ## Introduction
 >This is an educational game app for users who are learning a new language and enjoy Sudoku puzzles.
@@ -33,4 +35,6 @@ All the tests are under AndroidTest and Test folders.
 
 
 ## FAQ
+
+## 
 
