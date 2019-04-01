@@ -85,7 +85,8 @@ public class GameActivity extends AppCompatActivity
 	private Pair lastRectColoured = new Pair( -1, -1 ); // stores the last coloured square coordinates
 	private Pair currentRectColoured = new Pair( -1, -1 ); // stores the current coloured square
 	private int currentSelectedIsCorrect = 0;
-	
+	//TODO TESTING
+
 	private Paint paintblack = new Paint();
 	private TextMatrix textMatrix; //stores the TextView for drawing the text
 	private Block[][] rectArr;
@@ -167,12 +168,14 @@ public class GameActivity extends AppCompatActivity
 	private int HORIZONTAL_BLOCK;
 	
 	private int[] rotation = { 0 };
+	private int[] undoBtnPressed = { 0 };
 
 	@Override
 	protected void onCreate( Bundle savedInstanceState )
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_game);
+
 
 		ZOOM_FIRST_TIME[0] = true;
 
@@ -311,7 +314,7 @@ public class GameActivity extends AppCompatActivity
 						 dX, dY, touchXZ, touchYZ, zoomButtonSafe, zoomClickSafe, zoomButtonDisableUpdate,
 						 bitmapSizeWidth, bitmapSizeHeight, wordArray, btnClicked, ZOOM_SCALE,
 						 COL_PER_BLOCK, ROW_PER_BLOCK, VERTICAL_BLOCK, HORIZONTAL_BLOCK, WORD_COUNT,
-						 barH ); // class used to draw/update square matrix
+						 barH, undoBtnPressed ); // class used to draw/update square matrix
 		
 		TableLayout tableLayout = findViewById( R.id.btn_keypad );
 		
@@ -321,7 +324,7 @@ public class GameActivity extends AppCompatActivity
 		listeners = new ButtonListener(currentRectColoured, usrSudokuArr,
 					drawR, touchX, touchY, lastRectColoured, usrLangPref, btnClicked,
 					Hint, wordArray, usrModePref, numArray, WORD_COUNT, COL_PER_BLOCK, ROW_PER_BLOCK,
-					this, tableLayout, orientation, state, orderArr, rotation);
+					this, tableLayout, orientation, state, orderArr, rotation, undoBtnPressed);
 		
 
 
@@ -371,20 +374,26 @@ public class GameActivity extends AppCompatActivity
 			    if (!usrSudokuArr.isCorrect) {
                     if (!usrSudokuArr.historyisEmpty()) {
                         usrSudokuArr.printHistory();
+
+                        undoBtnPressed[0] = 1; //set flag not to call setDrawParameter in ButtonListener
+
                         Entry lastEntry = usrSudokuArr.removeHistory();
                         int tempRow = lastEntry.getCoordinate().getRow();
                         int tempCol = lastEntry.getCoordinate().getColumn();
                         int cSiC;
-						Log.d( "debug-1", "currentRectColoured: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );
+						if( currentRectColoured.getRow() == -1 ){
+							Toast.makeText(v.getContext(), "Undo Error", Toast.LENGTH_LONG).show();
+							return;
+						}
 						drawR.getRectArr()[currentRectColoured.getRow()][currentRectColoured.getColumn()].deselect(); //deselect current from drw class
 						currentRectColoured.update(tempRow, tempCol);
 						Log.d( "highlight", "currentRectColoured after undo: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );
 						usrSudokuArr.setPuzzleVal(lastEntry.getValue(), tempRow, tempCol);
                         if (usrSudokuArr.checkDuplicate(tempRow, tempCol)) {
-                            Log.d("TESTI", "Duplicate in given coordinate detected");
+                            //Log.d("TESTI", "Duplicate in given coordinate detected");
                             cSiC = 2;
                         } else {
-                            Log.d("TESTI", "No duplicate detected");
+                            //Log.d("TESTI", "No duplicate detected");
                             cSiC = 1;
                         }
 						//deselect current and reselect last in rectArr in drw class
@@ -394,6 +403,7 @@ public class GameActivity extends AppCompatActivity
 						textMatrix.chooseLangAndDraw( currentRectColoured.getRow(), currentRectColoured.getColumn(),
 								wordArray, usrSudokuArr, usrLangPref );
 
+						// TODO: see if necessary implement similar undoBtnPressed[] flag for 'reset' btn - ie after resetting, press a btn and see what happens
 
                     } else {
                         //Toast.makeText(v.getContext(), "There is nothing to undo!", Toast.LENGTH_LONG).show();
@@ -1032,6 +1042,9 @@ public class GameActivity extends AppCompatActivity
 			Log.i("TAG", "normal click: (" + touchX[0] + ", " + touchY[0] + ")");
 		}
 		
+		undoBtnPressed[0] = 0; //once currentRectColured updated from touch, allow to call drw.setDrawParameter()
+		rotation[0] = 0; //allow drw.setDrawParameter() to update currentRectColoured
+
 		drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
 
 		if( currentRectColoured.getRow() != -1 ) {

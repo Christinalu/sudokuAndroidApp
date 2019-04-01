@@ -51,6 +51,7 @@ public class drw
 	private int HORIZONTAL_BLOCK;
 	private Context context; //context of GameActivity
 	private String lastColour;
+	private int[] undoBtnPressed;
 
 	
 	public drw( Context context2, RelativeLayout rectLayout2 )
@@ -69,7 +70,7 @@ public class drw
 				int[] touchXZ2, int[] touchYZ2, int[] zoomButtonSafe2, int[] zoomClickSafe2,
 				int[] zoomButtonDisableUpdate2, int bitmapSizeWidth2, int bitmapSizeHeight2, WordArray wordArray2, int[] btnClicked2,
 				float[] ZOOM_SCALE2, int COL_PER_BLOCK2, int ROW_PER_BLOCK2, int VERTICAL_BLOCK2, int HORIZONTAL_BLOCK2,
-				int WORD_COUNT2, int barH2 )
+				int WORD_COUNT2, int barH2, int[] undoBtnPressed2 )
 	{
 		paint = paint2;
 		rectArr = rectArr2;
@@ -98,7 +99,7 @@ public class drw
 		HORIZONTAL_BLOCK = HORIZONTAL_BLOCK2;
 		WORD_COUNT = WORD_COUNT2;
 		barH = barH2;
-		
+		undoBtnPressed = undoBtnPressed2;
 	}
 
 	

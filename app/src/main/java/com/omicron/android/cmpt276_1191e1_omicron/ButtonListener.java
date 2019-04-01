@@ -37,7 +37,8 @@ public class ButtonListener extends AppCompatActivity
 						  final int[] touchX, final int[] touchY, final Pair lastRectColoured,
 						  final int usrLangPref, final int[] btnClicked, final TextView Hint, final WordArray wordArray,
 						  final int usrModePref, final String[] numArray, int WORD_COUNT, int COL_PER_BLOCK,
-						  int ROW_PER_BLOCK, Context context, TableLayout tableLayout, int orientation, int state, int[] orderArr, final int[] rotation) {
+						  int ROW_PER_BLOCK, Context context, TableLayout tableLayout, int orientation, int state,
+						  int[] orderArr, final int[] rotation, final int[] undoBtnPressed ) {
 		// pulled out of button listeners
 		final Handler handler = new Handler();
 		int rowCount;
@@ -213,6 +214,9 @@ public class ButtonListener extends AppCompatActivity
 													 //if current button selected is valid and is not restricted
 													 int row = currentRectColoured.getRow();
 													 int col = currentRectColoured.getColumn();
+
+													 Log.d( "highlight", "btn pressed..." );
+
 													 if (row != -1 && usrSudokuArr.PuzzleOriginal[row][col] == 0) {
 														 // increase the count of inserted numbers if needed
 														 usrSudokuArr.track(currentRectColoured); //important, 'track' must occur before 'usrSudokuArr.Puzzle[][] = x'
@@ -226,6 +230,11 @@ public class ButtonListener extends AppCompatActivity
 															 usrSudokuArr.printHistory();
 														 }
 
+														 if( rotation[0] == 0 && undoBtnPressed[0] == 0 ){ //if rotate or pressed 'undo', skip setDrawParameter
+															Log.d( "highlight", "setDrawParameters called from ButtonListener" );
+															drawR.setDrawParameters(touchX, touchY, lastRectColoured, currentRectColoured);
+														 }
+
 														 // set the cell in the Puzzle to corresponding number based on button user input
 														 //if( zoomButtonDisableUpdate[0] == 0 ) // do not update entry when switching modes - causes errors
 														 usrSudokuArr.Puzzle[row][col] = var;
@@ -233,9 +242,13 @@ public class ButtonListener extends AppCompatActivity
 														 // redraw square matrix and text overlay
 														 btnClicked[0] = 1; //this flag allows (for efficiency) class drw to update TextView as well in zoom mode
 
-														 if( rotation[0] == 0 ) {
-															 drawR.setDrawParameters(touchX, touchY, lastRectColoured, currentRectColoured);
+														 if( undoBtnPressed[0] == 1 ){ //
+															//if user has 'undone' some some moves, when inserting a new entry, do not call drw.setDrawParameters because it resets currentRectColoured
 														 }
+
+
+														 //if( rotation[0] == 1 )
+														 //{ rotation[0] = 0; } //disable rotation flag after user inserted cell
 
 														 // check if there is a duplicate in row/col/section. MAKE SURE TO HAVE AFTER PUZZLE INPUT IS SET
 														 int currentSelectedisCorrect = 0;
@@ -252,7 +265,7 @@ public class ButtonListener extends AppCompatActivity
 														 btnClicked[0] = 0;
 														 //textOverlay.reDrawText( usrLangPref );
 
-														 Log.d("selectW", "btn clicked: " + var);
+														 Log.d("highlight", "btn clicked: " + var);
 
 														 //check if word inserted is correct (used to decrease probability of word being selected in WordArray.selectWord() )
 														 if (var == usrSudokuArr.getSolution()[row][col]) //if input matches solution
