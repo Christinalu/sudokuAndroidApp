@@ -19,18 +19,26 @@ public class RelativeAndPosTest {
 
     @Test
     public void setCoordinates() throws Exception{
-        mRelativeAndPos.setCoordinates(3,4);
-        assertEquals(3, mRelativeAndPos.getSqrT());
-        assertEquals(4, mRelativeAndPos.getSqrL());
+        int sqrt2 = 3;
+        int sqrtl2 = 4;
+        mRelativeAndPos.setCoordinates(sqrt2,sqrtl2);
+        assertEquals(sqrt2, mRelativeAndPos.getSqrT());
+        assertEquals(sqrtl2, mRelativeAndPos.getSqrL());
     }
 
     @Test
     public void getSqrT() {
-        assertEquals(0, mRelativeAndPos.getSqrT());
+        int sqrt2 = 3;
+        int sqrtl2 = 4;
+        mRelativeAndPos.setCoordinates(sqrt2,sqrtl2);
+        assertEquals(sqrt2, mRelativeAndPos.getSqrT());
     }
 
     @Test
     public void getSqrL() {
-        assertEquals(0, mRelativeAndPos.getSqrL());
+        int sqrt2 = 3;
+        int sqrtl2 = 4;
+        mRelativeAndPos.setCoordinates(sqrt2,sqrtl2);
+        assertEquals(sqrtl2, mRelativeAndPos.getSqrL());
     }
 }
