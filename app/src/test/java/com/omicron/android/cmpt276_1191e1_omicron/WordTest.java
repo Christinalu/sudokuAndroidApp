@@ -11,6 +11,8 @@ public class WordTest {
 
     @Test
     public void getNative() {
+        assertNotNull(mWord);
+        assertNotNull(mWord2);
         assertEquals("English", mWord.getNative());
         assertNotEquals("French", mWord.getNative());
     }

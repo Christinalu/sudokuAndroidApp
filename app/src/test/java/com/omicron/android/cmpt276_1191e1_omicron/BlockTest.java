@@ -12,6 +12,7 @@ public class BlockTest {
 
     @Test
     public void isSelected() throws Exception {
+        assertNotNull(mBlock);
         assertFalse(mBlock.isSelected());
     }
 

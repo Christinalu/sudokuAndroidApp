@@ -195,68 +195,6 @@ public class MainActivity extends AppCompatActivity
 
 
 
-//			// CHOOSE THE LEVEL OF DIFFICULTY
-//		Difficulty = findViewById(R.id.button_level);
-//		Difficulty.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-//			@Override
-//			public void onCheckedChanged(RadioGroup group, int checkedId) {
-//				int difficultyId = group.getCheckedRadioButtonId();
-//				switch(difficultyId)
-//				{
-//					case R.id.button_easy:
-//						usrDiffPref = 0;
-//						break;
-//
-//					case R.id.button_medium:
-//						usrDiffPref = 1;
-//						break;
-//
-//					case R.id.button_hard:
-//						usrDiffPref = 2;
-//						break;
-//				}
-//			}
-//		});
-//
-//
-//			// CHOOSE THE LANGUAGE
-//		Language=findViewById(R.id.button_language);
-//		Language.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-//			@Override
-//			public void onCheckedChanged(RadioGroup group, int checkedId) {
-//				int LanguageId = group.getCheckedRadioButtonId();
-//				switch (LanguageId)
-//				{
-//					case R.id.button_eng_fr:
-//						usrLangPref = 0;
-//						break;
-//
-//					case R.id.button_fr_eng:
-//						usrLangPref = 1;
-//						break;
-//				}
-//			}
-//		});
-//
-//		// CHOOSE THE MODE
-//		Mode=findViewById(R.id.button_mode);
-//		Mode.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-//			@Override
-//			public void onCheckedChanged(RadioGroup group, int checkedId) {
-//				int ModeId = group.getCheckedRadioButtonId();
-//				switch (ModeId)
-//				{
-//					case R.id.button_mStandard:
-//						usrModePref = 0;
-//						break;
-//
-//					case R.id.button_mSpeech:
-//						usrModePref = 1;
-//						break;
-//				}
-//			}
-//		});
-
 		lTTS = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
 			@Override
 			public void onInit(int status) {
@@ -304,8 +242,9 @@ public class MainActivity extends AppCompatActivity
 											 // Select Package from main activity
 											 RadioButton radBtnSelected = findViewById( pkgRadioGroup.getCheckedRadioButtonId() );
 											 String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex( pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
-
-											 startDialog(fileNameSelected);
+											 usrPuzzleTypePref = -1;
+											 state = 0;
+											 startDialog(fileNameSelected, state);
 
 										 }
 									 }
@@ -575,7 +514,7 @@ public class MainActivity extends AppCompatActivity
 		}
 	}
 
-	private  void startDialog(final String fileNameSelected){
+	private  void startDialog(final String fileNameSelected, final int state){
 
 		final View view = getLayoutInflater().inflate(R.layout.activity_sub_menu, null);
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this,R.style.Theme_AppCompat_DayNight_Dialog_Alert);
@@ -665,8 +604,6 @@ public class MainActivity extends AppCompatActivity
 			}
 		});
 
-
-
 		alertDialog.setNegativeButton(android.R.string.cancel, null);
 
 		alertDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -688,7 +625,6 @@ public class MainActivity extends AppCompatActivity
 				}
 
 				Intent gameActivity = new Intent(MainActivity.this, GameActivity.class);
-				state = 0;
 				//check to see for language format is correct and available
 				if (usrModePref == 1) {
 					if (usrLangPref == 0) {
@@ -746,7 +682,6 @@ public class MainActivity extends AppCompatActivity
 		//negativeButton.setBackground(getResources().getDrawable(R.drawable.buttons));
 		dialog.getWindow().getDecorView().setBackground(getResources().getDrawable(R.drawable.background));
 		//dialog.getWindow().setBackgroundDrawable(R.drawable.background);
-
 
 	}
 }

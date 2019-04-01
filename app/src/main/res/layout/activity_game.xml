@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/overcast"
+    android:background="@drawable/background_game"
     tools:context=".GameActivity">
 
     <RelativeLayout
@@ -16,6 +16,7 @@
             android:id="@+id/rect_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@android:color/transparent"
             android:layout_centerHorizontal="true"
             android:layout_marginStart="0dp"
             android:layout_marginTop="0dp"
@@ -25,7 +26,9 @@
         <RelativeLayout
             android:id="@+id/rect_txt_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true" />
 
         <ImageButton
             android:id="@+id/button_zoom_out"
@@ -34,12 +37,13 @@
             android:layout_above="@+id/btn_keypad"
             android:layout_alignBottom="@id/btn_keypad"
             android:layout_marginEnd="10dp"
-            android:layout_marginBottom="153dp"
+            android:layout_marginBottom="160dp"
             android:layout_toStartOf="@id/button_zoom_in"
-            android:background="@color/overcast"
+            android:background="@android:color/transparent"
             android:contentDescription="@string/zoom_out"
             android:scaleType="fitXY"
-            app:srcCompat="@android:drawable/btn_minus" />
+            app:srcCompat="@android:drawable/btn_minus"
+            app:layout_constraintBottom_toTopOf="@id/btn_keypad" />
 
         <ImageButton
             android:id="@+id/button_zoom_in"
@@ -49,11 +53,12 @@
             android:layout_alignParentEnd="true"
             android:layout_alignBottom="@id/btn_keypad"
             android:layout_marginEnd="4dp"
-            android:layout_marginBottom="153dp"
-            android:background="@color/overcast"
+            android:layout_marginBottom="160dp"
+            android:background="@android:color/transparent"
             android:contentDescription="@string/zoom_in"
             android:scaleType="fitXY"
-            app:srcCompat="@android:drawable/btn_plus" />
+            app:srcCompat="@android:drawable/btn_plus"
+            app:layout_constraintBottom_toTopOf="@id/btn_keypad"/>
 
 
         <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
