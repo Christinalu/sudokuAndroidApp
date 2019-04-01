@@ -167,6 +167,12 @@ public class SudokuGeneratorTest {
         if(usrSudokuArr.historyisEmpty()) {
             check++;
         }
+        //now remove the history to make sure it was added in the first place (test accuracy of historyisEmpty())
+        usrSudokuArr.removeHistory();
+        //will segmentation fault if History is empty (it is the user's responsibilty to call historyisEmpty() to check before removing)
+        if(!usrSudokuArr.historyisEmpty()) {
+            check++;
+        }
         assertEquals(0, check);
     }
 
