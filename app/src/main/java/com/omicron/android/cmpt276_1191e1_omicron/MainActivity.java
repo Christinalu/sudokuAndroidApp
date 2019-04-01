@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity
 	private int state = 0; //0=new start, 1=resume
 	private String language;
 	private boolean canStart = true;
-	private int usrPuzzleTypePref = -1; //determines if it is a 4x4, 6x6, 9x9 or 12x12 sudoku puzzle
+	private int[] usrPuzzleTypePref = {-1}; //determines if it is a 4x4, 6x6, 9x9 or 12x12 sudoku puzzle
 	private RadioGroup pkgRadioGroup;
 	private Boolean pressOK = false;
 
@@ -225,58 +225,18 @@ public class MainActivity extends AppCompatActivity
 
 		// used to switch to gameActivity
 		Button btnStart = findViewById( R.id.button_start );
-		btnStart.setOnClickListener( new View.OnClickListener(  )
-									 {
-										 @Override
-										 public void onClick( View v )
-										 {
-											 // Select Package from main activity
-											 RadioButton radBtnSelected = findViewById( pkgRadioGroup.getCheckedRadioButtonId() );
-											 String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex( pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
-											 usrPuzzleTypePref = -1;
-											 state = 0;
-											 startDialog(fileNameSelected, state);
+		btnStart.setOnClickListener( new View.OnClickListener(  ) {
+			 @Override
+			 public void onClick(View v) {
+				 // Select Package from main activity
+				 RadioButton radBtnSelected = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
+				 String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
+				 usrPuzzleTypePref[0] = -1;
+				 state = 0;
+				 startDialog(fileNameSelected, state);
 
-					Intent gameActivity = new Intent( MainActivity.this, GameActivity.class );
-					state = 0;
-					//check to see for language format is correct and available
-					if (usrModePref == 1) {
-						if (usrLangPref == 0) {
-							language = wordArray.getTranslationLang();
-							Log.e("lTTSs", "language is: "+language);
-						}
-						else {
-							language = wordArray.getNativeLang();
-							Log.e("lTTSs", "language is: "+language);
-						}
-						canStart = false;
-						for (int i=0; i<lTTSlangTags.size(); i++) {
-							//Log.e("lTTS", "language is: "+language+" langTag is: "+langTags.get(i));
-							if (Objects.equals(language,lTTSlanguage.get(i))) {
-								language = lTTSlangTags.get(i);
-								canStart = true;
-								if (canStart) {
-									break;
-								}
-							}
-						}
-						if (canStart) {
-							//save wordArray for Game Activity
-							gameSetup(gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB);
-							startActivityForResult(gameActivity,0);
-						}
-						else {
-							Toast.makeText(v.getContext(),R.string.no_language, Toast.LENGTH_LONG).show();
-						}
-					}
-					else {
-						//standard start
-						gameSetup(gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB);
-						startActivityForResult(gameActivity,0);
-					}
-				}
-			}
-		);
+			 }
+		 });
 
 
 		//implement STOP btn
@@ -594,6 +554,169 @@ public class MainActivity extends AppCompatActivity
 		gA.putExtra("usrPuzzSize", gs_usrPuzzleTypePref);
 		gA.putExtra( "HINT_CLICK_TO_MAX_PROB", HCTMP );
 	}
+
+	private  void startDialog(final String fileNameSelected, final int state){
+
+		final View view = getLayoutInflater().inflate(R.layout.activity_sub_menu, null);
+		AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this,R.style.Theme_AppCompat_DayNight_Dialog_Alert);
+		alertDialog.setView(view);
+
+		// CHOOSE THE DIFFICULTY
+		Difficulty = view.findViewById(R.id.button_level);
+		Difficulty.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				int difficultyId = group.getCheckedRadioButtonId();
+				switch(difficultyId)
+				{
+					case R.id.button_easy:
+						usrDiffPref = 0;
+						break;
+
+					case R.id.button_medium:
+						usrDiffPref = 1;
+						break;
+
+					case R.id.button_hard:
+						usrDiffPref = 2;
+						break;
+				}
+			}
+		});
+
+
+		// CHOOSE THE LANGUAGE
+		Language = view.findViewById(R.id.button_language);
+		Language.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				int LanguageId = group.getCheckedRadioButtonId();
+				switch (LanguageId)
+				{
+					case R.id.button_eng_fr:
+						usrLangPref = 0;
+						break;
+
+					case R.id.button_fr_eng:
+						usrLangPref = 1;
+						break;
+				}
+			}
+		});
+
+		// CHOOSE THE MODE
+		Mode = view.findViewById(R.id.button_mode);
+		Mode.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				int ModeId = group.getCheckedRadioButtonId();
+				switch (ModeId)
+				{
+					case R.id.button_mStandard:
+						usrModePref = 0;
+						break;
+
+					case R.id.button_mSpeech:
+						usrModePref = 1;
+						break;
+				}
+			}
+		});
+
+		// CHOOSE THE SIZE OF PUZZLE
+		Size = view.findViewById(R.id.btn_type);
+		Size.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				switch (checkedId){
+					case R.id.btn_4x4:
+						usrPuzzleTypePref[0] = 0;
+						break;
+					case R.id.btn_6x6:
+						usrPuzzleTypePref[0] = 1;
+						break;
+					case R.id.btn_9x9:
+						usrPuzzleTypePref[0] = 2;
+						break;
+					case R.id.btn_12x12:
+						usrPuzzleTypePref[0] = 3;
+						break;
+				}
+			}
+		});
+
+		alertDialog.setNegativeButton(android.R.string.cancel, null);
+
+		alertDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+
+				wordArray = new WordArray( usrPuzzleTypePref[0], MAX_CSV_ROW, HINT_CLICK_TO_MAX_PROB );
+
+				try {
+					//based on pkg, initialize the wordArray (select 'n' words)
+					int res = wordArray.initializeWordArray( MainActivity.this, fileNameSelected );
+					if( res == 1 ){
+						Log.d( "upload", "ERROR: initializeWordArray( ) returned an error" );
+						Toast.makeText(MainActivity.this, "Please select one of the Puzzle Types to start", Toast.LENGTH_SHORT).show();
+						return; //error: could not initialize wordArray
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				Intent gameActivity = new Intent( MainActivity.this, GameActivity.class );
+				//check to see for language format is correct and available
+				if (usrModePref == 1) {
+					if (usrLangPref == 0) {
+						language = wordArray.getTranslationLang();
+						Log.e("lTTSs", "language is: "+language);
+					}
+					else {
+						language = wordArray.getNativeLang();
+						Log.e("lTTSs", "language is: "+language);
+					}
+					canStart = false;
+					for (int i=0; i<lTTSlangTags.size(); i++) {
+						//Log.e("lTTS", "language is: "+language+" langTag is: "+langTags.get(i));
+						if (Objects.equals(language,lTTSlanguage.get(i))) {
+							language = lTTSlangTags.get(i);
+							canStart = true;
+							if (canStart) {
+								break;
+							}
+						}
+					}
+					if (canStart) {
+						//save wordArray for Game Activity
+						gameSetup(gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB);
+						startActivityForResult(gameActivity,0);
+					}
+					else {
+						Toast.makeText(view.getContext(),R.string.no_language, Toast.LENGTH_LONG).show();
+					}
+				}
+				else {
+					//standard start
+					gameSetup(gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB);
+					startActivityForResult(gameActivity,0);
+				}
+			}
+		});
+
+		AlertDialog dialog = alertDialog.create();
+		dialog.show();
+		Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+		//positiveButton.setBackground(getResources().getDrawable(R.drawable.buttons));
+		positiveButton.setTextColor(getResources().getColor(R.color.glacierblue));
+		Button negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+		negativeButton.setTextColor(getResources().getColor(R.color.colorAccent));
+		//negativeButton.setBackground(getResources().getDrawable(R.drawable.buttons));
+		dialog.getWindow().getDecorView().setBackground(getResources().getDrawable(R.drawable.background));
+		//dialog.getWindow().setBackgroundDrawable(R.drawable.background);
+
+	}
+
 }
 
 

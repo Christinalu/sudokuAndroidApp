@@ -15,7 +15,7 @@
         <ImageButton
             android:id="@+id/button_undo"
             android:layout_width="40dp"
-            android:layout_height="35dp"
+            android:layout_height="40dp"
             android:layout_alignBottom="@+id/button_reset"
             android:layout_marginEnd="25dp"
             android:layout_marginBottom="42dp"
@@ -24,21 +24,22 @@
             android:contentDescription="@string/button_undo"
             android:elevation="10dp"
             android:scaleType="fitXY"
-            app:srcCompat="@drawable/ic_undo" />
+            app:srcCompat="@android:drawable/ic_menu_revert" />
 
         <ImageButton
             android:id="@+id/button_reset"
             android:layout_width="40dp"
-            android:layout_height="35dp"
+            android:layout_height="40dp"
             android:layout_alignBottom="@+id/button_zoom_in"
             android:layout_marginEnd="25dp"
-            android:layout_marginBottom="42dp"
+            android:layout_marginBottom="50dp"
+            android:layout_above="@+id/button_zoom_in"
             android:layout_toStartOf="@id/btn_keypad"
             android:background="@android:color/transparent"
             android:contentDescription="@string/button_reset"
             android:elevation="10dp"
             android:scaleType="fitXY"
-            app:srcCompat="@drawable/ic_reset" />
+            app:srcCompat="@android:drawable/ic_menu_delete" />
 
         <ImageButton
             android:id="@+id/button_zoom_in"
