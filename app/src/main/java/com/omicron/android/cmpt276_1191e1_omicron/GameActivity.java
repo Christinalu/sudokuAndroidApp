@@ -381,11 +381,9 @@ public class GameActivity extends AppCompatActivity
                         int tempRow = lastEntry.getCoordinate().getRow();
                         int tempCol = lastEntry.getCoordinate().getColumn();
                         int cSiC;
-						if( currentRectColoured.getRow() == -1 ){
-							Toast.makeText(v.getContext(), "Undo Error", Toast.LENGTH_LONG).show();
-							return;
+						if( currentRectColoured.getRow() != -1 ){
+							drawR.getRectArr()[currentRectColoured.getRow()][currentRectColoured.getColumn()].deselect(); //deselect current from drw class
 						}
-						drawR.getRectArr()[currentRectColoured.getRow()][currentRectColoured.getColumn()].deselect(); //deselect current from drw class
 						currentRectColoured.update(tempRow, tempCol);
 						Log.d( "highlight", "currentRectColoured after undo: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );
 						usrSudokuArr.setPuzzleVal(lastEntry.getValue(), tempRow, tempCol);
