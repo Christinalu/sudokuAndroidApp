@@ -34,5 +34,11 @@ public class BlockTest {
         assertEquals(expected.top, mBlock.getRect().top);
         assertEquals(expected.right, mBlock.getRect().right);
         assertEquals(expected.bottom, mBlock.getRect().bottom);
+
+        //False case
+        assertNotEquals(20, mBlock.getRect().left);
+        assertNotEquals(33, mBlock.getRect().top);
+        assertNotEquals(23,mBlock.getRect().right);
+        assertNotEquals(90,mBlock.getRect().bottom);
     }
 }

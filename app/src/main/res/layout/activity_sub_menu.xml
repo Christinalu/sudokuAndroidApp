@@ -99,8 +99,6 @@
                 android:orientation="horizontal"
                 android:textSize="15sp">
 
-
-
                 <RadioButton
                     android:id="@+id/button_eng_fr"
                     android:layout_width="wrap_content"
@@ -122,9 +120,6 @@
 
             </RadioGroup>
         </LinearLayout>
-
-
-
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/linearLayoutModeSelection"
@@ -203,8 +198,6 @@
                 android:orientation="horizontal"
                 android:textSize="15sp">
 
-
-
                 <RadioButton
                     android:id="@+id/btn_4x4"
                     android:layout_width="wrap_content"
@@ -230,7 +223,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:buttonTint="@color/navy"
-                    android:checked="true"
+                    android:checked="false"
                     android:text="9x9"
                     android:fontFamily="casual"
                     android:textSize="15sp" />

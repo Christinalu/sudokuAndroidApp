@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity
 	private int state = 0; //0=new start, 1=resume
 	private String language;
 	private boolean canStart = true;
-	private int usrPuzzleTypePref = 2; //determines if it is a 4x4, 6x6, 9x9 or 12x12 sudoku puzzle
+	private int usrPuzzleTypePref = -1; //determines if it is a 4x4, 6x6, 9x9 or 12x12 sudoku puzzle
 	private RadioGroup pkgRadioGroup;
 	private Boolean pressOK = false;
 
@@ -153,19 +153,19 @@ public class MainActivity extends AppCompatActivity
 		//create button which will start new UploadActivity to upload and process .csv file
 		Button btn_upload = findViewById( R.id.btn_upload );
 		btn_upload.setOnClickListener(new View.OnClickListener( )
-								{
-									@Override
-									public void onClick( View v )
-									{
+									  {
+										  @Override
+										  public void onClick( View v )
+										  {
 
-										Intent uploadActivityIntent = new Intent( MainActivity.this, UploadActivity.class );
-										uploadActivityIntent.putExtra( "MAX_WORD_PKG", MAX_WORD_PKG );
-										uploadActivityIntent.putExtra( "MAX_CSV_ROW", MAX_CSV_ROW );
-										uploadActivityIntent.putExtra( "MIN_CSV_ROW", MIN_CSV_ROW );
+											  Intent uploadActivityIntent = new Intent( MainActivity.this, UploadActivity.class );
+											  uploadActivityIntent.putExtra( "MAX_WORD_PKG", MAX_WORD_PKG );
+											  uploadActivityIntent.putExtra( "MAX_CSV_ROW", MAX_CSV_ROW );
+											  uploadActivityIntent.putExtra( "MIN_CSV_ROW", MIN_CSV_ROW );
 
-										startActivity( uploadActivityIntent );
-									}
-								}
+											  startActivity( uploadActivityIntent );
+										  }
+									  }
 		);
 
 
@@ -193,6 +193,69 @@ public class MainActivity extends AppCompatActivity
 									  }
 		);
 
+
+
+//			// CHOOSE THE LEVEL OF DIFFICULTY
+//		Difficulty = findViewById(R.id.button_level);
+//		Difficulty.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//			@Override
+//			public void onCheckedChanged(RadioGroup group, int checkedId) {
+//				int difficultyId = group.getCheckedRadioButtonId();
+//				switch(difficultyId)
+//				{
+//					case R.id.button_easy:
+//						usrDiffPref = 0;
+//						break;
+//
+//					case R.id.button_medium:
+//						usrDiffPref = 1;
+//						break;
+//
+//					case R.id.button_hard:
+//						usrDiffPref = 2;
+//						break;
+//				}
+//			}
+//		});
+//
+//
+//			// CHOOSE THE LANGUAGE
+//		Language=findViewById(R.id.button_language);
+//		Language.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//			@Override
+//			public void onCheckedChanged(RadioGroup group, int checkedId) {
+//				int LanguageId = group.getCheckedRadioButtonId();
+//				switch (LanguageId)
+//				{
+//					case R.id.button_eng_fr:
+//						usrLangPref = 0;
+//						break;
+//
+//					case R.id.button_fr_eng:
+//						usrLangPref = 1;
+//						break;
+//				}
+//			}
+//		});
+//
+//		// CHOOSE THE MODE
+//		Mode=findViewById(R.id.button_mode);
+//		Mode.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//			@Override
+//			public void onCheckedChanged(RadioGroup group, int checkedId) {
+//				int ModeId = group.getCheckedRadioButtonId();
+//				switch (ModeId)
+//				{
+//					case R.id.button_mStandard:
+//						usrModePref = 0;
+//						break;
+//
+//					case R.id.button_mSpeech:
+//						usrModePref = 1;
+//						break;
+//				}
+//			}
+//		});
 
 		lTTS = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
 			@Override
@@ -229,40 +292,40 @@ public class MainActivity extends AppCompatActivity
 		});
 
 
-			/** START GAME BUTTON **/
+		/** START GAME BUTTON **/
 
 		// used to switch to gameActivity
 		Button btnStart = findViewById( R.id.button_start );
 		btnStart.setOnClickListener( new View.OnClickListener(  )
-			{
-				@Override
-				public void onClick( View v )
-				{
-					// Select Package from main activity
-					RadioButton radBtnSelected = findViewById( pkgRadioGroup.getCheckedRadioButtonId() );
-					String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex( pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
-					state = 0;
-					startDialog(fileNameSelected, state);
+									 {
+										 @Override
+										 public void onClick( View v )
+										 {
+											 // Select Package from main activity
+											 RadioButton radBtnSelected = findViewById( pkgRadioGroup.getCheckedRadioButtonId() );
+											 String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex( pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
 
-				}
-			}
+											 startDialog(fileNameSelected);
+
+										 }
+									 }
 		);
 
 
 		//implement STOP btn
 		Button btnStop = (Button) findViewById( R.id.button_stop );
 		btnStop.setOnClickListener( new View.OnClickListener(  )
-			{
-				@Override
-				public void onClick( View v )
-				{
-					state = 0;
-					btn_remove.setEnabled( true ); //allow user to remove pkg
-					removeBtnEnable[0] = true;
-					Button btnResume = findViewById( R.id.button_resume );
-					btnResume.setEnabled( false );
-				}
-			}
+									{
+										@Override
+										public void onClick( View v )
+										{
+											state = 0;
+											btn_remove.setEnabled( true ); //allow user to remove pkg
+											removeBtnEnable[0] = true;
+											Button btnResume = findViewById( R.id.button_resume );
+											btnResume.setEnabled( false );
+										}
+									}
 		);
 
 
@@ -310,9 +373,7 @@ public class MainActivity extends AppCompatActivity
 	{
 		super.onStart( );
 
-
-
-			/** WHEN USER RETURNING FROM UPLOAD ACTIVITY, UPDATE WORD PKG LIST **/
+		/** WHEN USER RETURNING FROM UPLOAD ACTIVITY, UPDATE WORD PKG LIST **/
 
 		FileCSV fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
 		int CURRENT_WORD_PKG_COUNT_RETURN;
@@ -402,13 +463,12 @@ public class MainActivity extends AppCompatActivity
 //	}
 
 
-
 	private int checkIfJustInstalledAndSetUpPackagesAlreadyInstalled( )
 	{
 		//return 0 on success
 
-			/* TEST IF USER JUST INSTALLED APP - IF USER HAS, LOAD DEFAULT FILES */
-			/* ELSE, SET UP wordPackageFileIndexArr to store all packages so far, and create Package Scroll */
+		/* TEST IF USER JUST INSTALLED APP - IF USER HAS, LOAD DEFAULT FILES */
+		/* ELSE, SET UP wordPackageFileIndexArr to store all packages so far, and create Package Scroll */
 
 		int usrNewInstall = fileCSV.checkIfCurrentWordPkgCountFileExists( this ); //0==files already exist
 
@@ -439,7 +499,7 @@ public class MainActivity extends AppCompatActivity
 			return 1;
 		}
 
-			/* UPDATE THE WORD PKG SCROLL */
+		/* UPDATE THE WORD PKG SCROLL */
 
 		RadioButton radBtn;
 		ColorStateList colorStateList = new ColorStateList(
@@ -500,7 +560,6 @@ public class MainActivity extends AppCompatActivity
 			Log.d("upload", "USER DELETED A PKG");
 			CURRENT_WORD_PKG_COUNT = CURRENT_WORD_PKG_COUNT_RETURN; //update pkg count because it decreased
 
-
 			// IMPORTANT: the following procedure limits to deleting only 1 file at a time
 			//			  to delete multiple files at one, have to delete and re-create all radio buttons in RadioGroup
 
@@ -509,7 +568,6 @@ public class MainActivity extends AppCompatActivity
 			//reselect top radio btn
 			( (RadioButton) pkgRadioGroup.getChildAt(0)).setChecked( true );
 
-
 		}
 		else
 		{
@@ -517,11 +575,11 @@ public class MainActivity extends AppCompatActivity
 		}
 	}
 
-    private  void startDialog(final String fileNameSelected, final int state){
+	private  void startDialog(final String fileNameSelected){
 
-        final View view = getLayoutInflater().inflate(R.layout.activity_sub_menu, null);
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this,R.style.Theme_AppCompat_DayNight_Dialog_Alert);
-        alertDialog.setView(view);
+		final View view = getLayoutInflater().inflate(R.layout.activity_sub_menu, null);
+		AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this,R.style.Theme_AppCompat_DayNight_Dialog_Alert);
+		alertDialog.setView(view);
 
 		// CHOOSE THE DIFFICULTY
 		Difficulty = view.findViewById(R.id.button_level);
@@ -607,22 +665,22 @@ public class MainActivity extends AppCompatActivity
 			}
 		});
 
-		// Cancel and go back to main page
+
+
 		alertDialog.setNegativeButton(android.R.string.cancel, null);
-		// Collect data and start game to game activity
+
 		alertDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 
-				System.out.println("Size: "+ usrPuzzleTypePref);
 				wordArray = new WordArray( usrPuzzleTypePref, MAX_CSV_ROW, HINT_CLICK_TO_MAX_PROB );
 
 				try {
 					//based on pkg, initialize the wordArray (select 'n' words)
 					int res = wordArray.initializeWordArray( MainActivity.this, fileNameSelected );
-					if( res == 1 ){
+					if( res == 1 ) {
 						Log.d( "upload", "ERROR: initializeWordArray( ) returned an error" );
-						Toast.makeText(MainActivity.this, "Something went wrong. Could not start Game", Toast.LENGTH_SHORT).show();
+						Toast.makeText(MainActivity.this, "Please select one of the Puzzle Type to start", Toast.LENGTH_SHORT).show();
 						return; //error: could not initialize wordArray
 					}
 				} catch (IOException e) {
@@ -630,7 +688,7 @@ public class MainActivity extends AppCompatActivity
 				}
 
 				Intent gameActivity = new Intent(MainActivity.this, GameActivity.class);
-
+				state = 0;
 				//check to see for language format is correct and available
 				if (usrModePref == 1) {
 					if (usrLangPref == 0) {
