@@ -2,7 +2,7 @@
 
 <img src="/uploads/4865e9849dfacb383f905d5325e9c84a/new_logo.png" width="250">
 
->Created by (https://wordart.com)
+>The logo is created by (https://wordart.com)
 
 
 ## Introduction
