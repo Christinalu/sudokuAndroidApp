@@ -1,4 +1,4 @@
-package com.omicron.android.cmpt276_1191e1_omicron;
+package com.omicron.android.cmpt276_1191e1_omicron.Model;
 
 import android.content.Context;
 import android.graphics.Rect;

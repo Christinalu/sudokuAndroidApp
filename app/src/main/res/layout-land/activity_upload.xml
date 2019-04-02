@@ -6,7 +6,7 @@
 	android:layout_height="match_parent"
 	android:gravity="center"
 	android:background="@drawable/background"
-	tools:context=".UploadActivity"
+	tools:context=".Controller.UploadActivity"
 	android:orientation="vertical">
 
 	<EditText

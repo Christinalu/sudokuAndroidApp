@@ -2,6 +2,8 @@ package com.omicron.android.cmpt276_1191e1_omicron;
 
 import android.graphics.Rect;
 
+import com.omicron.android.cmpt276_1191e1_omicron.Model.Block;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;

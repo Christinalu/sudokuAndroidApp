@@ -1,5 +1,7 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
+import com.omicron.android.cmpt276_1191e1_omicron.Model.Pair;
+
 import org.junit.Test;
 
 import static java.lang.Math.sqrt;

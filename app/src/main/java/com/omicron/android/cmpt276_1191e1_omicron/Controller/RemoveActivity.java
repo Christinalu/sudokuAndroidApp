@@ -1,4 +1,4 @@
-package com.omicron.android.cmpt276_1191e1_omicron;
+package com.omicron.android.cmpt276_1191e1_omicron.Controller;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,10 +9,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.omicron.android.cmpt276_1191e1_omicron.R;
+
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;

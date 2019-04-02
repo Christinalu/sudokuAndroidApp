@@ -1,11 +1,9 @@
-package com.omicron.android.cmpt276_1191e1_omicron;
+package com.omicron.android.cmpt276_1191e1_omicron.View;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Handler;
-import android.support.annotation.ColorInt;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
@@ -16,10 +14,12 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.List;
-import java.util.Random;
+import com.omicron.android.cmpt276_1191e1_omicron.Model.Pair;
+import com.omicron.android.cmpt276_1191e1_omicron.R;
+import com.omicron.android.cmpt276_1191e1_omicron.SudokuGenerator;
+import com.omicron.android.cmpt276_1191e1_omicron.View.drw;
+import com.omicron.android.cmpt276_1191e1_omicron.WordArray;
 
 
 public class ButtonListener extends AppCompatActivity

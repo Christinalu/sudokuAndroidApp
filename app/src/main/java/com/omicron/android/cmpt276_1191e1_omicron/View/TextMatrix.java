@@ -1,13 +1,16 @@
-package com.omicron.android.cmpt276_1191e1_omicron;
+package com.omicron.android.cmpt276_1191e1_omicron.View;
 
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.omicron.android.cmpt276_1191e1_omicron.Model.RelativeAndPos;
+import com.omicron.android.cmpt276_1191e1_omicron.SudokuGenerator;
+import com.omicron.android.cmpt276_1191e1_omicron.WordArray;
 
 public class TextMatrix
 {
@@ -174,8 +177,8 @@ public class TextMatrix
 	}
 
 
-	public void chooseLangAndDraw( int i, int j, WordArray wordArray, SudokuGenerator usrSudokuArr,
-								   int usrLangPref )
+	public void chooseLangAndDraw(int i, int j, WordArray wordArray, SudokuGenerator usrSudokuArr,
+                                  int usrLangPref )
 	{
 		// CHOOSE WHAT LANGUAGE TO DRAW IN  TEXT-VIEW MARQUEE
 		// note: usrLangPref refers to text that the user is typing in the puzzle (ie if usrLangPref = 0 = native, then the (unchangeable) text inside puzzle is translation)

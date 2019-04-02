@@ -18,6 +18,13 @@ import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import com.omicron.android.cmpt276_1191e1_omicron.Model.Block;
+import com.omicron.android.cmpt276_1191e1_omicron.Model.Entry;
+import com.omicron.android.cmpt276_1191e1_omicron.Model.Pair;
+import com.omicron.android.cmpt276_1191e1_omicron.View.ButtonListener;
+import com.omicron.android.cmpt276_1191e1_omicron.View.TextMatrix;
+import com.omicron.android.cmpt276_1191e1_omicron.View.drw;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

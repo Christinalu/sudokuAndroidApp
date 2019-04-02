@@ -1,7 +1,8 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
 import android.content.Context;
-import android.widget.RelativeLayout;
+
+import com.omicron.android.cmpt276_1191e1_omicron.Model.RelativeAndPos;
 
 import org.junit.Test;
 

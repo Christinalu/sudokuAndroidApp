@@ -4,9 +4,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.omicron.android.cmpt276_1191e1_omicron.Model.Entry;
+import com.omicron.android.cmpt276_1191e1_omicron.Model.Pair;
+
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import static java.lang.Math.sqrt;

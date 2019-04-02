@@ -4,15 +4,15 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
-import android.view.View;
-import android.widget.RadioGroup;
+
+import com.omicron.android.cmpt276_1191e1_omicron.Model.Range;
+import com.omicron.android.cmpt276_1191e1_omicron.Model.Word;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.util.Random;
 
 public class WordArray implements Parcelable
