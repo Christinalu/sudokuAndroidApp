@@ -31,69 +31,90 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/btn_keypad"
-            android:layout_alignBottom="@id/btn_keypad"
-            android:layout_marginBottom="187dp"
-            android:gravity="end"
-            android:layout_centerVertical="true"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="@+id/rect_layout"
-            app:layout_constraintTop_toTopOf="@id/btn_keypad">
-
-            <ImageButton
-                android:id="@+id/button_undo"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@android:color/transparent"
-                android:contentDescription="@string/button_undo"
-                android:scaleType="fitXY"
-                app:srcCompat="@android:drawable/ic_menu_revert" />
-
-            <ImageButton
-                android:id="@+id/button_reset"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@android:color/transparent"
-                android:contentDescription="@string/button_reset"
-                android:scaleType="fitXY"
-                android:tooltipText="@string/reset"
-                app:srcCompat="@android:drawable/ic_menu_delete" />
-
-            <ImageButton
-                android:id="@+id/button_zoom_out"
-                android:layout_width="wrap_content"
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:background="@android:color/transparent"
-                android:contentDescription="@string/zoom_out"
-                android:scaleType="fitXY"
-                app:layout_constraintBottom_toTopOf="@id/btn_keypad"
-                app:srcCompat="@android:drawable/btn_minus" />
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                app:layout_constraintGuide_percent="0.9">
 
-            <ImageButton
-                android:id="@+id/button_zoom_in"
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:contentDescription="@string/zoom_in"
-                android:scaleType="fitXY"
-                app:srcCompat="@android:drawable/btn_plus" />
-        </LinearLayout>
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent">
 
-        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/btn_keypad"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
-            android:orientation="vertical"
-            android:stretchColumns="*">
+            <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/btn_keypad"
+                android:layout_width="0dip"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginEnd="-10dp"
+                android:layout_gravity="bottom"
+                android:gravity="bottom"
+                android:layout_weight="1.2"
+                android:stretchColumns="*">
+            </TableLayout>
 
-        </TableLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="5dp"
+                    android:gravity="end"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintRight_toRightOf="parent">
+
+                    <ImageButton
+                        android:id="@+id/button_undo"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:background="@android:color/transparent"
+                        android:contentDescription="@string/button_undo"
+                        android:scaleType="fitXY"
+                        app:srcCompat="@android:drawable/ic_menu_revert" />
+
+                    <ImageButton
+                        android:id="@+id/button_reset"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:background="@android:color/transparent"
+                        android:contentDescription="@string/button_reset"
+                        android:scaleType="fitXY"
+                        android:tooltipText="@string/reset"
+                        app:srcCompat="@android:drawable/ic_menu_delete" />
+
+                    <ImageButton
+                        android:id="@+id/button_zoom_out"
+                        android:layout_width="60dp"
+                        android:layout_height="35dp"
+                        android:layout_marginEnd="10dp"
+                        android:background="@android:color/transparent"
+                        android:contentDescription="@string/zoom_out"
+                        android:scaleType="fitXY"
+                        app:layout_constraintBottom_toTopOf="@id/btn_keypad"
+                        app:srcCompat="@android:drawable/btn_minus" />
+
+                    <ImageButton
+                        android:id="@+id/button_zoom_in"
+                        android:layout_width="60dp"
+                        android:layout_height="35dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="-16dp"
+                        android:background="@android:color/transparent"
+                        android:contentDescription="@string/zoom_in"
+                        android:scaleType="fitXY"
+                        app:srcCompat="@android:drawable/btn_plus" />
+                </LinearLayout>
+            </LinearLayout>
+        </android.support.constraint.ConstraintLayout>
+
 
     </RelativeLayout>
 
