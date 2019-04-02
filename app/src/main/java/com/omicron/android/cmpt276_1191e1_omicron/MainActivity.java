@@ -356,7 +356,6 @@ public class MainActivity extends AppCompatActivity
 				currentSelectedIsCorrect = (int) resumeSrc.getSerializableExtra("currentSelectedIsCorrect");
 				Button btnResume = (Button) findViewById(R.id.button_resume);
 				btnResume.setEnabled(true);
-				btnResume.setTextColor(getResources().getColor(R.color.navy));
 				Button btnRemove = (Button) findViewById(R.id.btn_remove); //block user from deleting pkg while playing game
 				btnRemove.setEnabled(false);
 
