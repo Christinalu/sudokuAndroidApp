@@ -63,7 +63,6 @@
 				android:paddingRight="20dp"
 				android:text="@string/start"
 				android:textColor="@color/navy"
-				android:textIsSelectable="true"
 				android:textStyle="bold"/>
 
 			<LinearLayout
@@ -81,10 +80,7 @@
 					android:paddingLeft="20dp"
 					android:paddingRight="20dp"
 					android:layout_marginRight="5dp"
-
 					android:text="@string/resume"
-					android:textColor="@color/navy"
-					android:textIsSelectable="true"
 					android:textStyle="bold"/>
 
 				<Button
@@ -98,7 +94,6 @@
 					android:layout_marginLeft="5dp"
 					android:text="@string/stop_game"
 					android:textColor="@color/navy"
-					android:textIsSelectable="true"
 					android:textStyle="bold"/>
 			</LinearLayout>
 
@@ -121,7 +116,6 @@
 
 					android:text="@string/upload"
 					android:textColor="@color/navy"
-					android:textIsSelectable="true"
 					android:textStyle="bold"/>
 
 				<Button
@@ -135,7 +129,6 @@
 					android:layout_marginLeft="5dp"
 					android:text="@string/remove"
 					android:textColor="@color/navy"
-					android:textIsSelectable="true"
 					android:textStyle="bold"/>
 			</LinearLayout>
 
@@ -143,6 +136,7 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="10sp"
+				android:fontFamily="casual"
 				android:text="@string/available_package"/>
 
 
@@ -150,7 +144,7 @@
 				android:id="@+id/radio_scroll_view"
 				android:layout_width="match_parent"
 				android:layout_height="80dp"
-				android:fontFamily="casual"
+
 				android:paddingHorizontal="10dp">
 
 				<RadioGroup
