@@ -173,8 +173,6 @@ public class ButtonListener extends AppCompatActivity
 													 public boolean onLongClick(View v) {
 														 Log.d("selectW", "long button press");
 														 Hint.setBackgroundColor(R.drawable.buttons);
-														 final Drawable buttonBackground = btnArr[index].getBackground();
-														 btnArr[index].setBackgroundColor(R.drawable.buttons);
 														 if (usrLangPref == 0) {
 															 if (usrModePref == 1) {
 																 Hint.setText(wordArray.getWordNativeAtIndex(index) + " : " + numArray[index]);
@@ -199,7 +197,7 @@ public class ButtonListener extends AppCompatActivity
 																 // Do something after 5s = 5000ms
 																 Hint.setBackgroundColor(Color.TRANSPARENT);
 																 Hint.setText("");
-																 btnArr[index].setBackground(buttonBackground);
+
 															 }
 														 }, 4000);
 
