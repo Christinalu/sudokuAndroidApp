@@ -63,25 +63,25 @@ public class TextMatrix
 		
 		// NOTE: ZOOM_SCALE should be >=1
 		if( puzzleTypeSize == 4 ){ // if 4x4 puzzle type
-			TXT_SIZE_NORMAL = 15;//sqrSizeHeight * TXT_SIZE_RATIO_4x4;
+			TXT_SIZE_NORMAL = 14;//sqrSizeHeight * TXT_SIZE_RATIO_4x4;
 			ZOOM_SCALE_TXT = (ZOOM_SCALE[0] - 1f)/2f + 1; //when zooming in, increase text font size but at a slower rate than square size, so in zoom mode, it will fit more of a word
 			//TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT); //use this when scaling text as well
 			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL; //keep the same text size when zooming
 		}
 		else if( puzzleTypeSize == 6 ){
-			TXT_SIZE_NORMAL = 15;//sqrSizeHeight * TXT_SIZE_RATIO_6x6;
+			TXT_SIZE_NORMAL = 13;//sqrSizeHeight * TXT_SIZE_RATIO_6x6;
 			ZOOM_SCALE_TXT = (ZOOM_SCALE[0] - 1f)/2f + 1;
 			//TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
 			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL;
 		}
-		else if( puzzleTypeSize == 12 ){
-			TXT_SIZE_NORMAL = 15;//sqrSizeHeight * TXT_SIZE_RATIO_12x12;
+		else if( puzzleTypeSize == 13 ){
+			TXT_SIZE_NORMAL = 12;//sqrSizeHeight * TXT_SIZE_RATIO_12x12;
 			ZOOM_SCALE_TXT = (ZOOM_SCALE[0] - 1f)/2f + 1;
 			//TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
 			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL;
 		}
 		else {
-			TXT_SIZE_NORMAL = 15;//sqrSizeHeight * TXT_SIZE_RATIO_9x9;
+			TXT_SIZE_NORMAL = 13;//sqrSizeHeight * TXT_SIZE_RATIO_9x9;
 			ZOOM_SCALE_TXT = (ZOOM_SCALE[0] - 1f)/2f + 1;
 			//TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
 			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL;
@@ -93,6 +93,30 @@ public class TextMatrix
 	{
 		RelativeLayout.LayoutParams parameter = new RelativeLayout.LayoutParams( (int)( sqrSizeWidth*ZOOM_SCALE),
 													(int)( sqrSizeHeight*ZOOM_SCALE ) );//height and width are in pixel
+		
+		//SCALE TEXT IN ZOOM MODE
+		//SCALING ADAPTS TO ZOOM: as zoom increases, so does text size, but at a slower rate
+		//	so that more of the word can be shown
+		if( ZOOM_SCALE == 1 ){ //do not do anything in default zoom
+			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL;
+		}
+		else if( puzzleTypeSize == 4  ){
+			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * ((ZOOM_SCALE - 1f)/5f + 1);
+			
+		}
+		else if( puzzleTypeSize == 6  ){
+			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * ((ZOOM_SCALE - 1f)/4f + 1);
+			
+		}
+		else if( puzzleTypeSize == 9  ){
+			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * ((ZOOM_SCALE - 1f)/5.5f + 1);
+			
+		}
+		else if( puzzleTypeSize == 12 ){
+			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * ((ZOOM_SCALE - 1f)/11f + 1);
+		}
+		
+		Log.d( "zoom-1", "TXT_SIZE_ZOOM: " + TXT_SIZE_ZOOM );
 		
 		//this method scales all of the text in "zoom in" mode
 		for( int i=0; i<puzzleTypeSize; i++ )
