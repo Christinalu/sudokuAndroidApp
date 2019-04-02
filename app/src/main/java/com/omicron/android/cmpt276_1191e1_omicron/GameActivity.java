@@ -131,7 +131,7 @@ public class GameActivity extends AppCompatActivity
 	private static float[] ZOOM_SCALE_OLD = { 1f };
 	private static boolean[] ZOOM_FIRST_TIME = { true };
 	private static float ZOOM_SCALE_ORIGINAL;
-	private static float ZOOM_SCALE_4x4 = 1.2f; // zoom factor of how much to zoom in puzzle in "zoom" mode
+	private static float ZOOM_SCALE_4x4 = 1.3f; // zoom factor of how much to zoom in puzzle in "zoom" mode
 	private static float ZOOM_SCALE_4x4_ORIGINAL = ZOOM_SCALE_4x4;
 	private static float ZOOM_SCALE_6x6 = 1.4f; // zoom factor of how much to zoom in puzzle in "zoom" mode
 	private static float ZOOM_SCALE_6x6_ORIGINAL = ZOOM_SCALE_6x6;
