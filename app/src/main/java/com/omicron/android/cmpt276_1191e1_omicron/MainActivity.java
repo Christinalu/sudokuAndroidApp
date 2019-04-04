@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity
 	private int state = 0; //0=new start, 1=resume
 	private String language;
 	private boolean canStart = true;
-	private int[] usrPuzzleTypePref = {-1}; //determines if it is a 4x4, 6x6, 9x9 or 12x12 sudoku puzzle
+	private int[] usrPuzzleTypePref = {0}; //determines if it is a 4x4, 6x6, 9x9 or 12x12 sudoku puzzle
 	private RadioGroup pkgRadioGroup;
 	private Boolean pressOK = false;
 
@@ -219,8 +219,7 @@ public class MainActivity extends AppCompatActivity
 				 RadioButton radBtnSelected = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
 				 String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
 				 usrPuzzleTypePref[0] = -1;
-				 state = 0;
-				 startDialog(fileNameSelected, state);
+				 startDialog(fileNameSelected);
 
 			 }
 		 });
@@ -546,7 +545,7 @@ public class MainActivity extends AppCompatActivity
 		gA.putExtra( "HINT_CLICK_TO_MAX_PROB", HCTMP );
 	}
 
-	private  void startDialog(final String fileNameSelected, final int state){
+	private void startDialog(final String fileNameSelected){
 
 		final View view = getLayoutInflater().inflate(R.layout.activity_sub_menu, null);
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this,R.style.Theme_AppCompat_DayNight_Dialog_Alert);
@@ -680,6 +679,7 @@ public class MainActivity extends AppCompatActivity
 					}
 					if (canStart) {
 						//save wordArray for Game Activity
+						state = 0;
 						gameSetup(gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB);
 						startActivityForResult(gameActivity,0);
 					}
@@ -689,6 +689,7 @@ public class MainActivity extends AppCompatActivity
 				}
 				else {
 					//standard start
+					state = 0;
 					gameSetup(gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB);
 					startActivityForResult(gameActivity,0);
 				}
