@@ -13,6 +13,21 @@
         android:layout_alignParentEnd="true">
 
         <ImageButton
+            android:id="@+id/button_speak"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/button_undo"
+            android:layout_marginEnd="18dp"
+            android:layout_marginBottom="28dp"
+            android:layout_toStartOf="@id/btn_keypad"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/microphone"
+            android:padding="16dp"
+            android:elevation="10dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_microphone" />
+
+        <ImageButton
             android:id="@+id/button_undo"
             android:layout_width="40dp"
             android:layout_height="40dp"

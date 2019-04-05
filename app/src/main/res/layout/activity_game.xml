@@ -7,6 +7,11 @@
     android:background="@drawable/background_game"
     tools:context=".GameActivity">
 
+    <TextView
+        android:id="@+id/voiceInput"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <RelativeLayout
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
@@ -70,6 +75,16 @@
                     android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintRight_toRightOf="parent">
+
+                    <ImageButton
+                        android:id="@+id/button_speak"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        android:contentDescription="@string/microphone"
+                        android:padding="16dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_microphone" />
 
                     <ImageButton
                         android:id="@+id/button_undo"

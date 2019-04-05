@@ -1,11 +1,14 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -17,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.omicron.android.cmpt276_1191e1_omicron.Model.Block;
 import com.omicron.android.cmpt276_1191e1_omicron.Model.Entry;
@@ -31,6 +35,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Random;
 
@@ -50,13 +55,20 @@ public class GameActivity extends AppCompatActivity
 	private int usrModePref; //0=standard, 1=speech
 	private int usrPuzzSize; //stores puzzle size
 	private int usrPuzzleTypePref; //stores puzzle size 4x4 ... 1 = 4x4, 2 = 6x6, 3 = 9x9, 4 = 12x12
-
-	private TextToSpeech mTTS;
-	private String theWord;
-	private String language;
 	private int row;
 	private int col;
 	private int val;
+
+	//Text to Speech
+	private TextToSpeech mTTS;
+	private String theWord;
+	private String language;
+
+	//Speech to Text
+	private TextView mVoiceInputTEXTVIEW;
+	private ImageButton mSpeakBtn;
+	private static final int REQ_CODE_SPEECH_INPUT = 100;
+	private String speechWord;
 
 	private Paint paint = new Paint( );
 	//private Bitmap bitMap;
@@ -205,6 +217,7 @@ public class GameActivity extends AppCompatActivity
 					HINT_CLICK_TO_MAX_PROB = (int) gameSrc.getSerializableExtra( "HINT_CLICK_TO_MAX_PROB" );
 					usrDiffPref = (int) gameSrc.getSerializableExtra("usrDiffPref");
 					usrPuzzSize = (int) gameSrc.getSerializableExtra("usrPuzzSize");
+					language = (String) gameSrc.getSerializableExtra("language");
 					if (usrModePref == 1) {
 						//create separate array to draw from for this mode
 						WORD_COUNT = wordArray.getWordCount( );
@@ -223,7 +236,6 @@ public class GameActivity extends AppCompatActivity
 								wordArray.setWordNativeAtIndex( i, Integer.toString(i + 1) );
 							}
 						}
-						language = (String) gameSrc.getSerializableExtra("language");
 					}
 					usrSudokuArr = new SudokuGenerator(usrDiffPref, usrPuzzSize);
 				}
@@ -247,12 +259,12 @@ public class GameActivity extends AppCompatActivity
 						Locale locale = new Locale(language);
 						int result = mTTS.setLanguage(locale);
 						if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-							Log.e("mTTS", "ERROR: language initialization failed. Language = "+language);
+							Log.d("mTTS", "ERROR: language initialization failed. Language = "+language);
 						}
-						Log.e("mTTS", "SUCCESS: language initialization successful. Language = "+language);
+						Log.d("mTTS", "SUCCESS: language initialization successful. Language = "+language);
 					}
 					else {
-						Log.e("mTTS", "ERROR: TextToSpeech FAILED");
+						Log.d("mTTS", "ERROR: TextToSpeech FAILED");
 					}
 				}
 			});
@@ -489,7 +501,6 @@ public class GameActivity extends AppCompatActivity
 			}
 		);
 		
-		
 			/* ZOOM OUT BUTTON */
 
 		ImageButton btnZoomOut = findViewById( R.id.button_zoom_out );
@@ -549,6 +560,23 @@ public class GameActivity extends AppCompatActivity
 					}
 		);
 
+			/* SPEECH BUTTON */
+
+		//mVoiceInputTEXTVIEW = (TextView) findViewById(R.id.voiceInput);
+		mSpeakBtn = (ImageButton) findViewById(R.id.button_speak);
+		mSpeakBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				//startVoiceInput();
+				Intent speakSrc = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+				speakSrc.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+				speakSrc.putExtra(RecognizerIntent.EXTRA_LANGUAGE,language);
+				speakSrc.putExtra(RecognizerIntent.EXTRA_PROMPT,"Hello, How can I help you?");
+				try {
+					startActivityForResult(speakSrc, REQ_CODE_SPEECH_INPUT);
+				} catch (ActivityNotFoundException a) {}
+			}
+		});
 
 			// Legend:
 			// dX : pixel drag on screen non-scaled
@@ -797,6 +825,80 @@ public class GameActivity extends AppCompatActivity
 		for( int i=0; i<WORD_COUNT; i++ )
 		{
 			wordArray.wordUpdateHintClickAtIndex( i, 0 );
+		}
+	}
+	//TODO: need to implement on match input to puzzle
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode,resultCode,data);
+		switch(requestCode) {
+			case REQ_CODE_SPEECH_INPUT: {
+				if (resultCode == RESULT_OK && null != data) {
+					ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+					speechWord = result.get(0);
+					//mVoiceInputTEXTVIEW.setText(speechWord);
+					Log.d("TESTI","Speech returned: "+result.get(0));
+					//Speech to Text is not capable of converting numbers
+					//Test to see if string is a number
+					int test;
+					try {
+						test = Integer.parseInt(speechWord);
+					} catch (NumberFormatException e){
+						test = -1;
+					}
+					if (test == -1) {
+						if (usrModePref == 0) {
+							//playing a standard game
+							if (usrLangPref == 0) {
+								for (int i = 0; i < WORD_COUNT; i++) {
+									if (speechWord.equalsIgnoreCase(wordArray.getWordTranslationAtIndex(i))) {
+										Toast.makeText(getApplicationContext(), "match found with: " + speechWord, Toast.LENGTH_LONG).show();
+										test = 1;
+										break;
+									}
+								}
+							} else {
+								for (int i = 0; i < WORD_COUNT; i++) {
+									if (speechWord.equalsIgnoreCase(wordArray.getWordNativeAtIndex(i))) {
+										Toast.makeText(getApplicationContext(), "match found with: " + speechWord, Toast.LENGTH_LONG).show();
+										test = 1;
+										break;
+									}
+								}
+							}
+						}
+						else {
+							//playing a listening comprehension game
+							if (usrLangPref == 0) {
+								for (int i = 0; i < WORD_COUNT; i++) {
+									if (speechWord.equalsIgnoreCase(numArray[i])) {
+										Toast.makeText(getApplicationContext(), "match found with: " + speechWord, Toast.LENGTH_LONG).show();
+										test = 1;
+										break;
+									}
+								}
+							} else {
+								for (int i = 0; i < WORD_COUNT; i++) {
+									if (speechWord.equalsIgnoreCase(numArray[i])) {
+										Toast.makeText(getApplicationContext(), "match found with: " + speechWord, Toast.LENGTH_LONG).show();
+										test = 1;
+										break;
+									}
+								}
+							}
+						}
+						if (test == -1) {
+							Toast.makeText(getApplicationContext(), "no match found with: " + speechWord, Toast.LENGTH_SHORT).show();
+						}
+					}
+					else {
+						Toast.makeText(getApplicationContext(),R.string.no_numbers, Toast.LENGTH_LONG).show();
+					}
+				}
+				else {
+					Toast.makeText(getApplicationContext(),R.string.no_speech, Toast.LENGTH_LONG).show();
+				}
+			}
 		}
 	}
 	
@@ -1071,7 +1173,6 @@ public class GameActivity extends AppCompatActivity
 		}
 		
 	}
-	
 	
 	private void actionMove( )
 	{

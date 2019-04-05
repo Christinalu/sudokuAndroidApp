@@ -189,14 +189,14 @@ public class MainActivity extends AppCompatActivity
 							localeList.add(LO);
 							//store all available language tag (String)
 							lTTSlangTags.add(LO.toLanguageTag());
-							//Log.e("lTTS", "LanguageTag is: "+lTTSlangTags.get(counter));
+							//Log.d("lTTS", "LanguageTag is: "+lTTSlangTags.get(counter));
 							//For optional implementations
 							//store all available locales in language - country format (strings)
 							TTSlanguage = LO.getDisplayLanguage();
 							lTTSlanguage.add(TTSlanguage);
 							TTScountry = LO.getDisplayCountry();
 							lTTScountry.add(TTScountry);
-							//Log.e("lTTS", "Language and Country is: "+lTTSlanguage.get(counter)+" - "+lTTScountry.get(counter));
+							//Log.d("lTTS", "Language and Country is: "+lTTSlanguage.get(counter)+" - "+lTTScountry.get(counter));
 							//counter++;
 						}
 					}
@@ -656,32 +656,33 @@ public class MainActivity extends AppCompatActivity
 				}
 
 				Intent gameActivity = new Intent( MainActivity.this, GameActivity.class );
-				//check to see for language format is correct and available
-				if (usrModePref == 1) {
-					if (usrLangPref == 0) {
-						language = wordArray.getTranslationLang();
-						Log.e("lTTSs", "language is: "+language);
-					}
-					else {
-						language = wordArray.getNativeLang();
-						Log.e("lTTSs", "language is: "+language);
-					}
-					canStart = false;
-					for (int i=0; i<lTTSlangTags.size(); i++) {
-						//Log.e("lTTS", "language is: "+language+" langTag is: "+langTags.get(i));
-						if (Objects.equals(language,lTTSlanguage.get(i))) {
-							language = lTTSlangTags.get(i);
-							canStart = true;
-							if (canStart) {
-								break;
-							}
+				//check to see for language format (also used for STT) is correct and available
+				if (usrLangPref == 0) {
+					language = wordArray.getTranslationLang();
+					Log.d("lTTSs", "language is: "+language);
+				}
+				else {
+					language = wordArray.getNativeLang();
+					Log.d("lTTSs", "language is: "+language);
+				}
+				//canStart only used if usrModePref = 1
+				canStart = false;
+				for (int i=0; i<lTTSlangTags.size(); i++) {
+					//Log.d("lTTS", "language is: "+language+" langTag is: "+lTTSlangTags.get(i));
+					if (language.equalsIgnoreCase(lTTSlanguage.get(i))) {
+						language = lTTSlangTags.get(i);
+						canStart = true;
+						if (canStart) {
+							break;
 						}
 					}
+				}
+				if (usrModePref == 1) {
 					if (canStart) {
 						//save wordArray for Game Activity
 						state = 0;
 						gameSetup(gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB);
-						startActivityForResult(gameActivity,0);
+						startActivityForResult(gameActivity, 0);
 					}
 					else {
 						Toast.makeText(view.getContext(),R.string.no_language, Toast.LENGTH_LONG).show();

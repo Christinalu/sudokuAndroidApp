@@ -15,6 +15,8 @@
     <string name="resume">Resume</string>
     <string name="no_resume">No previous game played!</string>
     <string name="no_language">Language not supported!\nPlease check spelling in CSV Package!</string>
+    <string name="no_speech">Sorry! This language is not supported by Speech to Text!</string>
+    <string name="no_numbers">Sorry! Speech to Text can not recognize numbers!</string>
     <string name="languageselect">Supported Languages</string>
     <string name="mode_selection">Mode</string>
     <string name="stop_game">Stop Game</string>
@@ -32,5 +34,6 @@
     <string name="mSpeech">Listening Comprehension</string>
     <string name="available_package">Available Packages: </string>
     <string name="reset">Reset game</string>
+    <string name="microphone">Microphone</string>
     <string name="uploadInstruction">Sudoku Word allows you to import CSV files with your own vocabulary to practice.\nEasiest way is to download the CSV files from a website. These files should be stored in your "Downloads" folder, and accessible through the app. It is also possible to upload a file through Google Drive (you have to set up Google Drive on the emulator). Another possibility is to connect the device via USB to a computer, and upload the files to the Downloads directory, if your CSV files are stored on your computer, and not on your Android device. You may be required to press the vertical column with 3 dots on top right of screen to show additional storage options. This step is dependent on the Android version. For Android Oreo, you have to allow to show "internal storage", to access all features. This step is necessary on an emulator. For an emulator, since it is not a real phone, the easiest way is to manually put the CSV files in the phone\'s Downloads folder, using Android Studio. All other options work as well, but may be harder on an emulator. Additionally, the name of the Word Package should not exceed 35 characters. The format of a CSV file must contain exactly two columns with at least 9 words. All cells must not be empty and contain exactly 2 entries. The first row is interpreted as the language for the list of words under it. The CSV file must not contain any string delimiters. The app checks for correct CSV format. A correct format may look like:\n\nEnglish,French\nOne,Un\nTwo,Deux\n\nAnd so on.</string>
 </resources>
