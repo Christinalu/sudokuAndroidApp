@@ -1,6 +1,7 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -16,6 +17,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
@@ -36,6 +38,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
 
@@ -55,9 +58,6 @@ public class GameActivity extends AppCompatActivity
 	private int usrModePref; //0=standard, 1=speech
 	private int usrPuzzSize; //stores puzzle size
 	private int usrPuzzleTypePref; //stores puzzle size 4x4 ... 1 = 4x4, 2 = 6x6, 3 = 9x9, 4 = 12x12
-	private int row;
-	private int col;
-	private int val;
 
 	//Text to Speech
 	private TextToSpeech mTTS;
@@ -827,7 +827,8 @@ public class GameActivity extends AppCompatActivity
 			wordArray.wordUpdateHintClickAtIndex( i, 0 );
 		}
 	}
-	//TODO: need to implement on match input to puzzle
+
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode,resultCode,data);
@@ -841,54 +842,81 @@ public class GameActivity extends AppCompatActivity
 					//Speech to Text is not capable of converting numbers
 					//Test to see if string is a number
 					int test;
+                    Context v = getApplicationContext();
 					try {
 						test = Integer.parseInt(speechWord);
 					} catch (NumberFormatException e){
 						test = -1;
 					}
 					if (test == -1) {
-						if (usrModePref == 0) {
-							//playing a standard game
-							if (usrLangPref == 0) {
-								for (int i = 0; i < WORD_COUNT; i++) {
-									if (speechWord.equalsIgnoreCase(wordArray.getWordTranslationAtIndex(i))) {
-										Toast.makeText(getApplicationContext(), "match found with: " + speechWord, Toast.LENGTH_LONG).show();
-										test = 1;
-										break;
+						if (currentRectColoured.getRow() != -1 && usrSudokuArr.PuzzleOriginal[currentRectColoured.getRow()][currentRectColoured.getColumn()]==0) {
+							Button[] btnArr = listeners.getbtnArr();
+							if (usrModePref == 0) {
+								//playing a standard game
+								if (usrLangPref == 0) {
+									for (int i = 0; i < WORD_COUNT; i++) {
+										if (speechWord.equalsIgnoreCase(wordArray.getWordTranslationAtIndex(i))) {
+											//Toast.makeText(getApplicationContext(), "match found with: " + speechWord, Toast.LENGTH_LONG).show();
+											test = 1;
+											btnArr[i].performClick();
+											break;
+										}
 									}
-								}
-							} else {
-								for (int i = 0; i < WORD_COUNT; i++) {
-									if (speechWord.equalsIgnoreCase(wordArray.getWordNativeAtIndex(i))) {
-										Toast.makeText(getApplicationContext(), "match found with: " + speechWord, Toast.LENGTH_LONG).show();
-										test = 1;
-										break;
-									}
-								}
-							}
-						}
-						else {
-							//playing a listening comprehension game
-							if (usrLangPref == 0) {
-								for (int i = 0; i < WORD_COUNT; i++) {
-									if (speechWord.equalsIgnoreCase(numArray[i])) {
-										Toast.makeText(getApplicationContext(), "match found with: " + speechWord, Toast.LENGTH_LONG).show();
-										test = 1;
-										break;
-									}
-								}
-							} else {
-								for (int i = 0; i < WORD_COUNT; i++) {
-									if (speechWord.equalsIgnoreCase(numArray[i])) {
-										Toast.makeText(getApplicationContext(), "match found with: " + speechWord, Toast.LENGTH_LONG).show();
-										test = 1;
-										break;
+								} else {
+									for (int i = 0; i < WORD_COUNT; i++) {
+										if (speechWord.equalsIgnoreCase(wordArray.getWordNativeAtIndex(i))) {
+											//Toast.makeText(getApplicationContext(), "match found with: " + speechWord, Toast.LENGTH_LONG).show();
+											test = 1;
+											btnArr[i].performClick();
+											break;
+										}
 									}
 								}
 							}
-						}
-						if (test == -1) {
-							Toast.makeText(getApplicationContext(), "no match found with: " + speechWord, Toast.LENGTH_SHORT).show();
+							else {
+								//playing a listening comprehension game
+								if (usrLangPref == 0) {
+									for (int i = 0; i < WORD_COUNT; i++) {
+										if (speechWord.equalsIgnoreCase(numArray[i])) {
+											//Toast.makeText(getApplicationContext(), "match found with: " + speechWord, Toast.LENGTH_LONG).show();
+											test = 1;
+											for (int j=0; j<WORD_COUNT; j++) {
+												if (orderArr[j] == i) {
+													btnArr[j].performClick();
+													break;
+												}
+											}
+											break;
+										}
+									}
+								} else {
+									for (int i = 0; i < WORD_COUNT; i++) {
+										if (speechWord.equalsIgnoreCase(numArray[i])) {
+											//Toast.makeText(getApplicationContext(), "match found with: " + speechWord, Toast.LENGTH_LONG).show();
+											test = 1;
+											for (int j=0; j<WORD_COUNT; j++) {
+												if (orderArr[j] == i) {
+													btnArr[j].performClick();
+													break;
+												}
+											}
+											break;
+										}
+									}
+								}
+								/*
+								//DEBUG
+								Log.d("TESTI", "orderArray is: " + Arrays.toString(orderArr));
+								Log.d("TESTI", "numArray is: " + Arrays.toString(numArray));
+								Log.d("TESTI", "button text is: ");
+								for (int k = 0; k < WORD_COUNT; k++) {
+									Log.d("TESTI", btnArr[k].getText().toString());
+								}
+								*/
+							}
+							if (test == -1) {
+								Toast.makeText(getApplicationContext(), "Sorry! Mo match found with: " + speechWord, Toast.LENGTH_SHORT).show();
+							}
 						}
 					}
 					else {
@@ -1156,11 +1184,11 @@ public class GameActivity extends AppCompatActivity
 
 		// TEXT TO SPEECH
 		if (usrModePref == 1) {
-			row = currentRectColoured.getRow();
-			col = currentRectColoured.getColumn();
-			
+			int row = currentRectColoured.getRow();
+			int col = currentRectColoured.getColumn();
+
 			if (row < WORD_COUNT && col < WORD_COUNT && row > -1 && col > -1) {
-				val = usrSudokuArr.PuzzleOriginal[row][col];
+				int val = usrSudokuArr.PuzzleOriginal[row][col];
 				if (val != 0) {
 					theWord = numArray[val-1];
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -1361,6 +1389,7 @@ public class GameActivity extends AppCompatActivity
 			}
 		}
 	}
+
 	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP, Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect) {
 		if (RorS == 0) {
 			//we are receiving

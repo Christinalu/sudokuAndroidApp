@@ -40,7 +40,7 @@ public class ButtonListener extends AppCompatActivity
 						  final int usrLangPref, final int[] btnClicked, final TextView Hint, final WordArray wordArray,
 						  final int usrModePref, final String[] numArray, int WORD_COUNT, int COL_PER_BLOCK,
 						  int ROW_PER_BLOCK, Context context, TableLayout tableLayout, int orientation, int state,
-						  int[] orderArr, final int[] rotation, final int[] undoBtnPressed ) {
+						  final int[] orderArr, final int[] rotation, final int[] undoBtnPressed ) {
 		// pulled out of button listeners
 		final Handler handler = new Handler();
 		int rowCount;
@@ -175,15 +175,19 @@ public class ButtonListener extends AppCompatActivity
 														 Hint.setBackgroundColor(R.drawable.buttons);
 														 if (usrLangPref == 0) {
 															 if (usrModePref == 1) {
-																 Hint.setText(wordArray.getWordNativeAtIndex(index) + " : " + numArray[index]);
+															 	//listening comprehension mode
+																 Hint.setText(wordArray.getWordNativeAtIndex(orderArr[index]) + " : " + numArray[orderArr[index]]);
 															 } else {
+															 	//standard mode
 																 Hint.setText(wordArray.getWordNativeAtIndex(index) + " : " + wordArray.getWordTranslationAtIndex(index));
 															 }
 														 } else {
 															 if (usrModePref == 1) {
+															 	//listening comprehension mode
 																 Hint.setText(wordArray.getWordTranslationAtIndex(index) + " : " + numArray[index]);
 															 } else {
-																 Hint.setText(wordArray.getWordTranslationAtIndex(index) + " : " + wordArray.getWordNativeAtIndex(index));
+															 	//standard mode
+																 Hint.setText(wordArray.getWordTranslationAtIndex(orderArr[index]) + " : " + wordArray.getWordNativeAtIndex(orderArr[index]));
 															 }
 														 }
 														 wordArray.wordIncrementHintClickAtIndex(index);
@@ -300,4 +304,5 @@ public class ButtonListener extends AppCompatActivity
 			}
 		}
 	}
+	public Button[] getbtnArr () {return btnArr;}
 }
