@@ -14,6 +14,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.omicron.android.cmpt276_1191e1_omicron.Controller.MiniGameActivity;
 import com.omicron.android.cmpt276_1191e1_omicron.Controller.RemoveActivity;
 import com.omicron.android.cmpt276_1191e1_omicron.Controller.UploadActivity;
 import com.omicron.android.cmpt276_1191e1_omicron.Model.Pair;
@@ -208,7 +209,7 @@ public class MainActivity extends AppCompatActivity
 		});
 
 
-		/** START GAME BUTTON **/
+			/** START GAME BUTTON **/
 
 		// used to switch to gameActivity
 		Button btnStart = findViewById( R.id.button_start );
@@ -290,7 +291,7 @@ public class MainActivity extends AppCompatActivity
 	{
 		super.onStart( );
 
-		/** WHEN USER RETURNING FROM UPLOAD ACTIVITY, UPDATE WORD PKG LIST **/
+			/** WHEN USER RETURNING FROM UPLOAD ACTIVITY, UPDATE WORD PKG LIST **/
 
 		FileCSV fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
 		int CURRENT_WORD_PKG_COUNT_RETURN;
@@ -607,6 +608,10 @@ public class MainActivity extends AppCompatActivity
 					case R.id.button_mSpeech:
 						usrModePref = 1;
 						break;
+					
+					case R.id.button_mini_game:
+						usrModePref = 3;
+						break;
 				}
 			}
 		});
@@ -639,7 +644,7 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 
-				wordArray = new WordArray( usrPuzzleTypePref[0], MAX_CSV_ROW, HINT_CLICK_TO_MAX_PROB );
+				wordArray = new WordArray( usrPuzzleTypePref[0], MAX_CSV_ROW, HINT_CLICK_TO_MAX_PROB, usrModePref );
 
 				try {
 					//based on pkg, initialize the wordArray (select 'n' words)
@@ -652,8 +657,14 @@ public class MainActivity extends AppCompatActivity
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-
-				Intent gameActivity = new Intent( MainActivity.this, GameActivity.class );
+				
+				Intent gameActivity;
+				if( usrModePref == 3 ){ //if mini-game mode
+					gameActivity = new Intent(MainActivity.this, MiniGameActivity.class);
+				}
+				else{
+					gameActivity = new Intent(MainActivity.this, GameActivity.class);
+				}
 				//check to see for language format is correct and available
 				if (usrModePref == 1) {
 					if (usrLangPref == 0) {
@@ -683,6 +694,12 @@ public class MainActivity extends AppCompatActivity
 					else {
 						Toast.makeText(view.getContext(),R.string.no_language, Toast.LENGTH_LONG).show();
 					}
+				}
+				else if( usrModePref == 3 )
+				{
+					//if in mini-game mode
+					gameSetup( gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB );
+					startActivityForResult( gameActivity,5 );
 				}
 				else {
 					//standard start
