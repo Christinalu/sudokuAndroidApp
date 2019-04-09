@@ -358,7 +358,10 @@ public class MainActivity extends AppCompatActivity
 				btnResume.setEnabled(true);
 				Button btnRemove = (Button) findViewById(R.id.btn_remove); //block user from deleting pkg while playing game
 				btnRemove.setEnabled(false);
-
+				usrLangPref = 0;
+				usrModePref = 0;
+				usrDiffPref = 0;
+				usrPuzzleTypePref[0] = 0;
 				removeBtnEnable[0] = false;
 			}
 		}
