@@ -35,8 +35,10 @@ public class WordArray implements Parcelable
 	private static int size9x9 = 2;
 	private static int size12x12 = 3;
 	
+	private int usrModePref; //stores if mini game mode
 	
-		/* Override Parcelable */
+	
+	/* Override Parcelable */
 	@Override
 	public int describeContents() {
 		return 0;
@@ -54,6 +56,8 @@ public class WordArray implements Parcelable
 		dest.writeInt( size6x6 );
 		dest.writeInt( size9x9 );
 		dest.writeInt( size12x12 );
+		
+		dest.writeInt( usrModePref );
 	}
 	
 	public WordArray( Parcel in )
@@ -70,6 +74,8 @@ public class WordArray implements Parcelable
 		size6x6 = in.readInt( );
 		size9x9 = in.readInt( );
 		size12x12 = in.readInt( );
+		
+		usrModePref = in.readInt( );
 	}
 	
 	public static final Parcelable.Creator<WordArray> CREATOR = new Parcelable.Creator<WordArray>() {
@@ -84,7 +90,8 @@ public class WordArray implements Parcelable
 	};
 	
 	
-	public WordArray( int usrPuzzleTypePref2, int MAX_CSV_ROW2, int HINT_CLICK_TO_MAX_PROB2 )
+	public WordArray( int usrPuzzleTypePref2, int MAX_CSV_ROW2, int HINT_CLICK_TO_MAX_PROB2,
+					  int usrModePref2 )
 	{
 		// SET UP ARRAY TO STORE WORDS
 		// a Word (pair) contains the word in native language, and its translation
@@ -94,13 +101,17 @@ public class WordArray implements Parcelable
 		usrPuzzleTypePref = usrPuzzleTypePref2;
 		MAX_CSV_ROW = MAX_CSV_ROW2;
 		HINT_CLICK_TO_MAX_PROB = HINT_CLICK_TO_MAX_PROB2;
+		usrModePref = usrModePref2;
 	}
 	
 	
 	public int setUpBasedOnUserTypePreference( )
 	{
 		// returns -1 if user preference not initialized
-		if( usrPuzzleTypePref == size4x4 )
+		
+		if( usrModePref == 3 ) //if mini game mode
+		{ wordCount = 9; }
+		else if( usrPuzzleTypePref == size4x4 )
 		{ wordCount = 4; }
 		else if( usrPuzzleTypePref == size6x6 )
 		{ wordCount = 6; }
