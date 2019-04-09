@@ -310,6 +310,26 @@ public class WordArray implements Parcelable
 		wordArray[i].setDoNotAllowToDecreaseDifficulty( );
 		return 0;
 	}
+
+	public boolean getWordStateAtIndex( int i )
+	{
+		//returns empty string on error
+		if( i < 0 || i >= wordCount )
+		{ return false; } //invalid index
+
+		return wordArray[i].getWordState( );
+	}
+
+	public boolean setWordStateAtIndex( int i, boolean state )
+	{
+		//returns empty string on error
+		if( i < 0 || i >= wordCount )
+		{ return false; } //invalid index
+
+		wordArray[i].setWordState(state);
+
+		return true;
+	}
 		
 	
 	

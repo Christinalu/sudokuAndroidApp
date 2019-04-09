@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity
 	RadioGroup Language;
 	RadioGroup Mode;
 	RadioGroup Size;
+	private ProgressBar Progress;
 	private int usrModePref = 0; // 0=standard, 1=speech
 	private int usrLangPref = 0; // 0=eng_fr, 1=fr_eng; 0 == native(squares that cannot be modified); 1 == translation(the words that the user inserts)
 	private int usrDiffPref; //0=easy,1=medium,2=difficult
@@ -102,6 +104,9 @@ public class MainActivity extends AppCompatActivity
 			savetheInstanceState(0, savedInstanceState, state, wordArrayResume, usrLangPrefResume, usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume, 0, currentRectColoured, currentSelectedIsCorrect);
 		}
 
+		Progress=(ProgressBar)findViewById(R.id.progressBar) ;
+		//Progress.setProgress(10);
+
 		fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
 
 		pkgRadioGroup = findViewById( R.id.pkg_radio_group ); //stores all the radio buttons with file names
@@ -120,6 +125,9 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				int pkgSelectId = group.getCheckedRadioButtonId();
+                RadioButton radBtnSelected1 = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
+                String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected1)).getInternalFileName(); //get pkg internal file name to find csv
+                //int pkglength=wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected1)).getWordPackageName();
 				switch(pkgSelectId)
 				{
 					//void
