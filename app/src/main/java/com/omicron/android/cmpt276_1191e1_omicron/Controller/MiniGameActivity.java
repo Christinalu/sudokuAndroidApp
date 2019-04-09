@@ -3,11 +3,14 @@ package com.omicron.android.cmpt276_1191e1_omicron.Controller;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Canvas;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.WindowManager;
 import android.widget.GridLayout;
+import android.widget.Toast;
 
+import com.omicron.android.cmpt276_1191e1_omicron.Model.CardArray;
 import com.omicron.android.cmpt276_1191e1_omicron.R;
 import com.omicron.android.cmpt276_1191e1_omicron.WordArray;
 
@@ -17,6 +20,7 @@ public class MiniGameActivity extends AppCompatActivity
 	private GridLayout gridLayout;
 	private int gridColCount; //how many columns depending in screen orientation
 	private int gridRowCount; //rows in card gridlayout based on word count
+	CardArray cardStringArray; //stores the strings to be displayed for each card
 	
 	
 	@Override
@@ -31,6 +35,10 @@ public class MiniGameActivity extends AppCompatActivity
 		// TODO: dont include SudokuArray in intent
 		// TODO: allow constant word card count ie always 9 words == 18 cards
 		// TODO: when initializing word array, make it to always initialize 9 words
+		// TODO: make sure to also save on rotation in MainActivity
+		// TODO: once game finished, make sure it stays finished even when resuming
+		// TODO: also do unit tests for Card and CardArray
+		// TODO: remove Card object if not necassary
 		
 		Intent intentSrc = getIntent( );
 		if( intentSrc == null )
@@ -38,7 +46,23 @@ public class MiniGameActivity extends AppCompatActivity
 		
 		wordArray = (WordArray) intentSrc.getParcelableExtra("wordArray");
 		
+		int orientation = getResources().getConfiguration().orientation;
+		if( orientation == Configuration.ORIENTATION_LANDSCAPE ){ //based on orientation, create grid (column) size
+			gridColCount = 3; //allow 3 words per row in landscape
+			gridRowCount = 6;
+		} else {
+			gridColCount = 2;
+			gridRowCount = 9;
+		}
 		
+		cardStringArray = new CardArray( gridRowCount, gridColCount );
+		cardStringArray.initializeStringArray( wordArray );
+		
+//		int res = cardStringArray.initializeStringArray( wordArray );
+//		if( res != 0 ){ //initialization failed
+//			Toast.makeText( this, "Unable to start game", Toast.LENGTH_LONG ).show( );
+//			return;
+//		}
 		
 		gridLayout = new GridLayout( this ); //layout to store the cards
 		viewCardArraySetUp( gridLayout );
@@ -56,17 +80,10 @@ public class MiniGameActivity extends AppCompatActivity
 	private void viewCardArraySetUp( GridLayout gridLayout )
 	{
 		/*
-		 * This function sets up the card array to display the card words
+		 * This function sets up the card array View to display the card words
 		 */
 		
-		int orientation = getResources().getConfiguration().orientation;
-		if( orientation == Configuration.ORIENTATION_LANDSCAPE ){ //based on orientation, create grid (column) size
-			gridColCount = 3; //allow 3 words per row in landscape
-			gridRowCount = 6;
-		} else {
-			gridColCount = 2;
-			gridRowCount = 9;
-		}
+		
 		
 		gridLayout.setColumnCount( gridColCount );
 		gridLayout.setRowCount( gridRowCount );
