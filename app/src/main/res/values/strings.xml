@@ -17,7 +17,7 @@
     <string name="no_language">Language not supported!\nPlease check spelling in CSV Package!</string>
     <string name="no_speech">Sorry! This language is not supported by Speech to Text!</string>
     <string name="no_match">"Sorry! No match found with: </string>
-    <string name="no_numbers">Sorry! Speech to Text can not recognize numbers!</string>
+    <string name="no_numbers">Sorry! Speech to Text BETA can not recognize all numbers yet!</string>
     <string name="languageselect">Supported Languages</string>
     <string name="mode_selection">Mode</string>
     <string name="stop_game">Stop Game</string>
