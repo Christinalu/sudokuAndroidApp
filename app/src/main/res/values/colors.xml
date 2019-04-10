@@ -28,12 +28,8 @@
     <color name="navy2">#1C40C2</color>
     <color name="redpepper">#C60000</color>
     <color name="transparent">#00000000</color>
-    <!-- card colours -->
     <color name="card_background">#88ffff</color>
     <color name="card_background_2">#50ffff</color>
     <color name="card_background_3">#bbbbff</color>
     <color name="card_background_4">#ffffaa</color>
-    <color name="card_shadow_1">#d4d4d4</color>
-    <color name="card_shadow_2">#dddddd</color>
-    <color name="card_detailing">#eee</color>
 </resources>
