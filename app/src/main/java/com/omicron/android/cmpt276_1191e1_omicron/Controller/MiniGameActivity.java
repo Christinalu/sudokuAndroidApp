@@ -3,15 +3,21 @@ package com.omicron.android.cmpt276_1191e1_omicron.Controller;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.Display;
 import android.view.WindowManager;
 import android.widget.GridLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.omicron.android.cmpt276_1191e1_omicron.Model.CardArray;
 import com.omicron.android.cmpt276_1191e1_omicron.R;
+import com.omicron.android.cmpt276_1191e1_omicron.View.CardView;
 import com.omicron.android.cmpt276_1191e1_omicron.WordArray;
 
 public class MiniGameActivity extends AppCompatActivity
@@ -20,7 +26,8 @@ public class MiniGameActivity extends AppCompatActivity
 	private GridLayout gridLayout;
 	private int gridColCount; //how many columns depending in screen orientation
 	private int gridRowCount; //rows in card gridlayout based on word count
-	CardArray cardStringArray; //stores the strings to be displayed for each card
+	private CardArray cardStringArray; //stores the strings to be displayed for each card
+	private CardView cardView; //stores the card view array
 	
 	
 	@Override
@@ -38,7 +45,7 @@ public class MiniGameActivity extends AppCompatActivity
 		// TODO: make sure to also save on rotation in MainActivity
 		// TODO: once game finished, make sure it stays finished even when resuming
 		// TODO: also do unit tests for Card and CardArray
-		// TODO: remove Card object if not necassary
+		// TODO: remove Card object if not necessary
 		
 		Intent intentSrc = getIntent( );
 		if( intentSrc == null )
@@ -58,15 +65,30 @@ public class MiniGameActivity extends AppCompatActivity
 		cardStringArray = new CardArray( gridRowCount, gridColCount );
 		cardStringArray.initializeStringArray( wordArray );
 		
-//		int res = cardStringArray.initializeStringArray( wordArray );
-//		if( res != 0 ){ //initialization failed
-//			Toast.makeText( this, "Unable to start game", Toast.LENGTH_LONG ).show( );
-//			return;
-//		}
+		RelativeLayout relativeLayout = findViewById( R.id.relativeLayout ); //main layout
 		
 		gridLayout = new GridLayout( this ); //layout to store the cards
-		viewCardArraySetUp( gridLayout );
 		
+		
+		// get display metrics
+		DisplayMetrics displayMetrics = new DisplayMetrics( );
+		Display screen = getWindowManager( ).getDefaultDisplay( ); //get general display
+		screen.getMetrics( displayMetrics );
+		
+		int screenH = displayMetrics.heightPixels;
+		int screenW = displayMetrics.widthPixels;
+		
+		int barH = getStatusBarHeight( );
+		
+		//convert relativeLayout dp offset to pixel
+		Resources r = getResources();
+//		int edgeOffset = (int) TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP,
+//									relativeLayout.getPaddingLeft(), r.getDisplayMetrics( ) );
+		
+		int edgeOffset = relativeLayout.getPaddingLeft();
+		
+		cardView = new CardView( gridRowCount, gridColCount, relativeLayout, this,
+								 cardStringArray, screenW, screenH, edgeOffset, barH );
 		
 		
 		
@@ -85,8 +107,19 @@ public class MiniGameActivity extends AppCompatActivity
 		
 		
 		
-		gridLayout.setColumnCount( gridColCount );
-		gridLayout.setRowCount( gridRowCount );
+		
+	}
+	
+	// GET TOP MENU BAR OFFSET
+	public int getStatusBarHeight( )
+	{
+		int result = 0;
+		int resourceId = getResources().getIdentifier( "status_bar_height", "dimen", "android" );
+		if( resourceId > 0 )
+		{
+			result = getResources().getDimensionPixelSize( resourceId );
+		}
+		return result;
 	}
 }
 
