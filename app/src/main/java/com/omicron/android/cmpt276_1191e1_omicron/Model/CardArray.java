@@ -128,6 +128,40 @@ public class CardArray implements Serializable
 		///////////////////////////////
 		
 	}
+	
+	
+	public boolean checkIfPairMatch( Pair p1, Pair p2 )
+	{
+		/*
+		 * This function checks if the two coordinate pairs both
+		 * are from that same word (if both strings are from same word)
+		 * Return true if they match
+		 * On out of bounds return false
+		 */
+		
+		int p1row = p1.getRow();
+		int p1col = p1.getColumn();
+		int p2row = p2.getRow();
+		int p2col = p2.getColumn();
+		
+		if( 0 > p1row || p1row >= gridRowCount || //out of bounds
+			0 > p1col || p1col >= gridColCount ||
+			0 > p2row || p2row >= gridRowCount ||
+			0 > p2col || p2col >= gridColCount )
+		{ return false; }
+		
+		if( cardKey[p1row][p1col] == cardKey[p2row][p2col] ) //if both strings from same word
+		{ return true; }
+		else { return false; }
+	}
+	
+	public String getCardStringAtIndex( int i, int j )
+	{
+		/*
+		 * Return string associated with that card
+		 */
+		return  cardArray[i][j];
+	}
 }
 
 

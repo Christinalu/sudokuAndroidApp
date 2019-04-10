@@ -3,9 +3,13 @@ package com.omicron.android.cmpt276_1191e1_omicron.Controller;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.Display;
 import android.view.WindowManager;
 import android.widget.GridLayout;
 import android.widget.RelativeLayout;
@@ -64,8 +68,27 @@ public class MiniGameActivity extends AppCompatActivity
 		RelativeLayout relativeLayout = findViewById( R.id.relativeLayout ); //main layout
 		
 		gridLayout = new GridLayout( this ); //layout to store the cards
-
-		cardView = new CardView( gridRowCount, gridColCount, relativeLayout, this );
+		
+		
+		// get display metrics
+		DisplayMetrics displayMetrics = new DisplayMetrics( );
+		Display screen = getWindowManager( ).getDefaultDisplay( ); //get general display
+		screen.getMetrics( displayMetrics );
+		
+		int screenH = displayMetrics.heightPixels;
+		int screenW = displayMetrics.widthPixels;
+		
+		int barH = getStatusBarHeight( );
+		
+		//convert relativeLayout dp offset to pixel
+		Resources r = getResources();
+//		int edgeOffset = (int) TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP,
+//									relativeLayout.getPaddingLeft(), r.getDisplayMetrics( ) );
+		
+		int edgeOffset = relativeLayout.getPaddingLeft();
+		
+		cardView = new CardView( gridRowCount, gridColCount, relativeLayout, this,
+								 cardStringArray, screenW, screenH, edgeOffset, barH );
 		
 		
 		
@@ -85,6 +108,18 @@ public class MiniGameActivity extends AppCompatActivity
 		
 		
 		
+	}
+	
+	// GET TOP MENU BAR OFFSET
+	public int getStatusBarHeight( )
+	{
+		int result = 0;
+		int resourceId = getResources().getIdentifier( "status_bar_height", "dimen", "android" );
+		if( resourceId > 0 )
+		{
+			result = getResources().getDimensionPixelSize( resourceId );
+		}
+		return result;
 	}
 }
 
