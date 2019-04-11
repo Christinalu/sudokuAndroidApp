@@ -10,23 +10,30 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.omicron.android.cmpt276_1191e1_omicron.Controller.EventActivity;
 import com.omicron.android.cmpt276_1191e1_omicron.Controller.RemoveActivity;
 import com.omicron.android.cmpt276_1191e1_omicron.Controller.UploadActivity;
 import com.omicron.android.cmpt276_1191e1_omicron.Model.Pair;
 
+
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
 
-public class MainActivity extends AppCompatActivity
-{
+public class MainActivity extends AppCompatActivity {
+	private static final String TAG = "Event test";
 	/*
 	 *  This Main Activity is the activity that will act as the Start Menu
 	 */
@@ -52,8 +59,8 @@ public class MainActivity extends AppCompatActivity
 	private SudokuGenerator usrSudokuArrResume;
 	int usrModePrefResume;
 	String languageResume;
-	private Pair currentRectColoured = new Pair( -1, -1 ); // stores the current coloured square
-	private int currentSelectedIsCorrect=0;
+	private Pair currentRectColoured = new Pair(-1, -1); // stores the current coloured square
+	private int currentSelectedIsCorrect = 0;
 
 	//used only for user entering language check//convert to appropriate tag
 	private TextToSpeech lTTS;
@@ -70,58 +77,42 @@ public class MainActivity extends AppCompatActivity
 	private int CURRENT_WORD_PKG_COUNT = 0; //stores current number of packages the user has uploaded
 	private int HINT_CLICK_TO_MAX_PROB = 15; //defines how many HintClicks are required for a word to reach MAX_WORD_UNIT_LIMIT
 	private FileCSV fileCSV; //object containing CSV functions
-	private int[] indexOfRadBtnToRemove = { -1 }; //which radio btn to remove
-	private boolean[] removeBtnEnable = { true }; //when false, do not allow "REMOVE PKG" button (required because GameActivity may be using that file to save "Hint Click")
+	private int[] indexOfRadBtnToRemove = {-1}; //which radio btn to remove
+	private boolean[] removeBtnEnable = {true}; //when false, do not allow "REMOVE PKG" button (required because GameActivity may be using that file to save "Hint Click")
 
 	private WordArray wordArray;
-	/*private Word[] wordArray =new Word[]
-			{
-					new Word( "Un", "Un", 1, 1 ),
-					new Word( "Two", "Deux", 2, 1 ),
-					new Word( "Three", "Trois", 3, 1 ),
-					new Word( "Four", "Quatre", 4, 1 ),
-					new Word( "Five", "Cinq", 5, 1 ),
-					new Word( "Six", "Six", 6, 1 ),
-					new Word( "Seven", "Sept", 7, 1 ),
-					new Word( "Eight", "Huit", 8, 1 ),
-					new Word( "Nine", "Neuf", 9, 1 ),
-					new Word( "en-US", "fr-FR", -1, -1 ), //lang
-					new Word( "pkg_n.csv", "", -1, -1 ) //pkg name
-			};*/
 
-
-	// TODO: separate all of Intent activity.putExtra( ) outside of MainActivity in different functions
-
+	public static String packageName;
+	private ImageButton calendar_button;
+	private Calendar mCalendar;
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+	private Date curDate;
 
 	@Override
-	protected void onCreate( Bundle savedInstanceState )
-	{
-		super.onCreate( savedInstanceState );
-		setContentView( R.layout.activity_main );
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
 		if (savedInstanceState != null) {
 			savetheInstanceState(0, savedInstanceState, state, wordArrayResume, usrLangPrefResume, usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume, 0, currentRectColoured, currentSelectedIsCorrect);
 		}
 
-		fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
+		fileCSV = new FileCSV(MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW);
 
-		pkgRadioGroup = findViewById( R.id.pkg_radio_group ); //stores all the radio buttons with file names
+		pkgRadioGroup = findViewById(R.id.pkg_radio_group); //stores all the radio buttons with file names
 
-		int res = checkIfJustInstalledAndSetUpPackagesAlreadyInstalled( );
+		int res = checkIfJustInstalledAndSetUpPackagesAlreadyInstalled();
 
-		if( res != 0 ) //some exception occurred
-		{ return; }
-
+		if (res != 0) //some exception occurred
+		{
+			return;
+		}
 
 		// SET LISTENERS TO WHICH PKG IS SELECTED //
-
-
-
-		pkgRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
+		pkgRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				int pkgSelectId = group.getCheckedRadioButtonId();
-				switch(pkgSelectId)
-				{
+				switch (pkgSelectId) {
 					//void
 				}
 			}
@@ -129,48 +120,43 @@ public class MainActivity extends AppCompatActivity
 
 
 		//create button which will start new UploadActivity to upload and process .csv file
-		Button btn_upload = findViewById( R.id.btn_upload );
-		btn_upload.setOnClickListener(new View.OnClickListener( )
-									  {
+		Button btn_upload = findViewById(R.id.btn_upload);
+		btn_upload.setOnClickListener(new View.OnClickListener() {
 										  @Override
-										  public void onClick( View v )
-										  {
+										  public void onClick(View v) {
 
-											  Intent uploadActivityIntent = new Intent( MainActivity.this, UploadActivity.class );
-											  uploadActivityIntent.putExtra( "MAX_WORD_PKG", MAX_WORD_PKG );
-											  uploadActivityIntent.putExtra( "MAX_CSV_ROW", MAX_CSV_ROW );
-											  uploadActivityIntent.putExtra( "MIN_CSV_ROW", MIN_CSV_ROW );
+											  Intent uploadActivityIntent = new Intent(MainActivity.this, UploadActivity.class);
+											  uploadActivityIntent.putExtra("MAX_WORD_PKG", MAX_WORD_PKG);
+											  uploadActivityIntent.putExtra("MAX_CSV_ROW", MAX_CSV_ROW);
+											  uploadActivityIntent.putExtra("MIN_CSV_ROW", MIN_CSV_ROW);
 
-											  startActivity( uploadActivityIntent );
+											  startActivity(uploadActivityIntent);
 										  }
 									  }
 		);
 
 
 		//create button which will remove file
-		final Button btn_remove = findViewById( R.id.btn_remove );
-		btn_remove.setOnClickListener(new View.OnClickListener( )
-									  {
+		final Button btn_remove = findViewById(R.id.btn_remove);
+		btn_remove.setOnClickListener(new View.OnClickListener() {
 										  @Override
-										  public void onClick( View v )
-										  {
+										  public void onClick(View v) {
 											  //FIND WHICH BUTTON IS SELECTED
-											  int indexOfRadBtnToRemove2 = pkgRadioGroup.indexOfChild( findViewById( (pkgRadioGroup.getCheckedRadioButtonId()) ) );
+											  int indexOfRadBtnToRemove2 = pkgRadioGroup.indexOfChild(findViewById((pkgRadioGroup.getCheckedRadioButtonId())));
 											  indexOfRadBtnToRemove[0] = indexOfRadBtnToRemove2; //save a local copy needed for onStop() to remove radio btn
 
-											  String pkgInternalFileName = wordPackageFileIndexArr.getPackageFileAtIndex( indexOfRadBtnToRemove2 ).getInternalFileName( ); //find internal file name of pkg to remove
-											  String pkgName = wordPackageFileIndexArr.getPackageFileAtIndex( indexOfRadBtnToRemove2 ).getWordPackageName( ); //user defined pkg name
+											  String pkgInternalFileName = wordPackageFileIndexArr.getPackageFileAtIndex(indexOfRadBtnToRemove2).getInternalFileName(); //find internal file name of pkg to remove
+											  String pkgName = wordPackageFileIndexArr.getPackageFileAtIndex(indexOfRadBtnToRemove2).getWordPackageName(); //user defined pkg name
 
-											  Intent removeActivityIntent = new Intent( MainActivity.this, RemoveActivity.class );
-											  removeActivityIntent.putExtra( "indexOfRadBtnToRemove", indexOfRadBtnToRemove2 );
-											  removeActivityIntent.putExtra( "pkgInternalFileName", pkgInternalFileName );
-											  removeActivityIntent.putExtra( "pkgName", pkgName );
+											  Intent removeActivityIntent = new Intent(MainActivity.this, RemoveActivity.class);
+											  removeActivityIntent.putExtra("indexOfRadBtnToRemove", indexOfRadBtnToRemove2);
+											  removeActivityIntent.putExtra("pkgInternalFileName", pkgInternalFileName);
+											  removeActivityIntent.putExtra("pkgName", pkgName);
 
-											  startActivity( removeActivityIntent );
+											  startActivity(removeActivityIntent);
 										  }
 									  }
 		);
-
 
 
 		lTTS = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
@@ -200,46 +186,60 @@ public class MainActivity extends AppCompatActivity
 							//counter++;
 						}
 					}
-				}
-				else {
+				} else {
 					Log.e("lTTS", "TTS failed to initiate");
 				}
 			}
 		});
 
-
 		/** START GAME BUTTON **/
 
 		// used to switch to gameActivity
-		Button btnStart = findViewById( R.id.button_start );
-		btnStart.setOnClickListener( new View.OnClickListener(  ) {
-			 @Override
-			 public void onClick(View v) {
-				 // Select Package from main activity
-				 RadioButton radBtnSelected = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
-				 String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
-				 usrPuzzleTypePref[0] = -1;
-				 state = 0;
-				 startDialog(fileNameSelected, state);
+		Button btnStart = findViewById(R.id.button_start);
+		btnStart.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// Select Package from main activity
+				RadioButton radBtnSelected = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
+				String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
+				usrPuzzleTypePref[0] = -1;
+				state = 0;
+				startDialog(fileNameSelected, state);
 
-			 }
-		 });
+				// Pass the package name user selected to Calendar event
+				Intent eventActivity = new Intent(MainActivity.this, EventActivity.class);
+				eventActivity.putExtra("PackageName", packageName);
+			}
+		});
+
+
+		// SET UP CALENDAR DIALOG
+
+		calendar_button = findViewById(R.id.calendar_button);
+		calendar_button.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				curDate = new Date();
+				Intent eventActivityIntent = new Intent(MainActivity.this, EventActivity.class);
+				eventActivityIntent.putExtra("ActivityDate", dateFormat.format(curDate));
+				startActivity(eventActivityIntent);
+			}
+		});
+
 
 
 		//implement STOP btn
-		Button btnStop = (Button) findViewById( R.id.button_stop );
-		btnStop.setOnClickListener( new View.OnClickListener(  )
-									{
-										@Override
-										public void onClick( View v )
-										{
-											state = 0;
-											btn_remove.setEnabled( true ); //allow user to remove pkg
-											removeBtnEnable[0] = true;
-											Button btnResume = findViewById( R.id.button_resume );
-											btnResume.setEnabled( false );
-										}
-									}
+		Button btnStop = (Button) findViewById(R.id.button_stop);
+		btnStop.setOnClickListener(new View.OnClickListener() {
+									   @Override
+									   public void onClick(View v) {
+										   state = 0;
+										   btn_remove.setEnabled(true); //allow user to remove pkg
+										   removeBtnEnable[0] = true;
+										   Button btnResume = findViewById(R.id.button_resume);
+										   btnResume.setEnabled(false);
+									   }
+								   }
 		);
 
 
@@ -248,8 +248,7 @@ public class MainActivity extends AppCompatActivity
 			btnResume.setEnabled(false); //block Resume button unless a previous game is saved
 			//DISABLE "REMOVE PKG" button when game is started
 			removeBtnEnable[0] = true;
-		}
-		else {
+		} else {
 			removeBtnEnable[0] = false;
 		}
 
@@ -272,13 +271,12 @@ public class MainActivity extends AppCompatActivity
 						resumeActivity.putExtra("orderArr", orderArrResume);
 					}
 					resumeActivity.putExtra("language", languageResume);
-					resumeActivity.putExtra( "HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB );
+					resumeActivity.putExtra("HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB);
 					resumeActivity.putExtra("currentRectColoured", currentRectColoured);
 					resumeActivity.putExtra("currentSelectedIsCorrect", currentSelectedIsCorrect);
 					startActivityForResult(resumeActivity, 0);
-				}
-				else {
-					Toast.makeText(v.getContext(),R.string.no_resume, Toast.LENGTH_LONG).show();
+				} else {
+					Toast.makeText(v.getContext(), R.string.no_resume, Toast.LENGTH_LONG).show();
 				}
 			}
 		});
@@ -286,45 +284,44 @@ public class MainActivity extends AppCompatActivity
 
 
 	@Override
-	public void onStart( )
-	{
-		super.onStart( );
+	public void onStart() {
+		super.onStart();
 
 		/** WHEN USER RETURNING FROM UPLOAD ACTIVITY, UPDATE WORD PKG LIST **/
 
-		FileCSV fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
+		FileCSV fileCSV = new FileCSV(MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW);
 		int CURRENT_WORD_PKG_COUNT_RETURN;
 		try {
-			CURRENT_WORD_PKG_COUNT_RETURN = fileCSV.findCurrentPackageCount( this ); //get current Packages count so far
+			CURRENT_WORD_PKG_COUNT_RETURN = fileCSV.findCurrentPackageCount(this); //get current Packages count so far
 		} catch (IOException e) {
 			CURRENT_WORD_PKG_COUNT_RETURN = CURRENT_WORD_PKG_COUNT;
 			e.printStackTrace();
 		}
 
 		// ENABLE OR DISABLE REMOVE BTN
-		if( removeBtnEnable[0] == true ) //enable btn
+		if (removeBtnEnable[0] == true) //enable btn
 		{
-			Button btn = findViewById( R.id.btn_remove );
-			btn.setEnabled( true );
+			Button btn = findViewById(R.id.btn_remove);
+			btn.setEnabled(true);
 		} else {
-			Button btn = findViewById( R.id.btn_remove );
-			btn.setEnabled( false );
+			Button btn = findViewById(R.id.btn_remove);
+			btn.setEnabled(false);
 		}
 
 
 		// read all packages the user has uploaded so far, and get an array with name and file
 		try {
-			wordPackageFileIndexArr = new WordPackageFileIndex( this, MAX_WORD_PKG, CURRENT_WORD_PKG_COUNT_RETURN ); //allow a maximum of X packages
-		} catch( IOException e ){
-			e.printStackTrace( );
+			wordPackageFileIndexArr = new WordPackageFileIndex(this, MAX_WORD_PKG, CURRENT_WORD_PKG_COUNT_RETURN); //allow a maximum of X packages
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
 		pkgRadioGroup = findViewById(R.id.pkg_radio_group);
 
 		//update scroll pkg view
-		updatePkgViewAfterUploadOrRemoval( CURRENT_WORD_PKG_COUNT_RETURN );
+		updatePkgViewAfterUploadOrRemoval(CURRENT_WORD_PKG_COUNT_RETURN);
 
-		Log.d( "upload", "onStart() called from MainActivity" );
+		Log.d("upload", "onStart() called from MainActivity");
 	}
 
 	@Override
@@ -365,7 +362,7 @@ public class MainActivity extends AppCompatActivity
 	}
 
 	@Override
-	public void onSaveInstanceState (Bundle savedInstanceState) {
+	public void onSaveInstanceState(Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
 		savetheInstanceState(1, savedInstanceState, state, wordArrayResume, usrLangPrefResume, usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect);
 	}
@@ -381,39 +378,37 @@ public class MainActivity extends AppCompatActivity
 //	}
 
 
-	private int checkIfJustInstalledAndSetUpPackagesAlreadyInstalled( )
-	{
+	private int checkIfJustInstalledAndSetUpPackagesAlreadyInstalled() {
 		//return 0 on success
 
 		/* TEST IF USER JUST INSTALLED APP - IF USER HAS, LOAD DEFAULT FILES */
 		/* ELSE, SET UP wordPackageFileIndexArr to store all packages so far, and create Package Scroll */
 
-		int usrNewInstall = fileCSV.checkIfCurrentWordPkgCountFileExists( this ); //0==files already exist
+		int usrNewInstall = fileCSV.checkIfCurrentWordPkgCountFileExists(this); //0==files already exist
 
-		if( usrNewInstall == 0 ) //if app was already installed and has correct files - get current_word_pkg_count
+		if (usrNewInstall == 0) //if app was already installed and has correct files - get current_word_pkg_count
 			try {
-				CURRENT_WORD_PKG_COUNT = fileCSV.findCurrentPackageCount( this ); //get current Packages count so far
+				CURRENT_WORD_PKG_COUNT = fileCSV.findCurrentPackageCount(this); //get current Packages count so far
 			} catch (IOException e) {
 				e.printStackTrace();
 				return 1;
 			}
 		else //fresh app install
 		{
-			try
-			{
-				fileCSV.importDefaultPkg( this ); //load default Word Package
-				CURRENT_WORD_PKG_COUNT = fileCSV.findCurrentPackageCount( this ); //get current Packages count so far
-			} catch( IOException e ) {
-				e.printStackTrace( );
+			try {
+				fileCSV.importDefaultPkg(this); //load default Word Package
+				CURRENT_WORD_PKG_COUNT = fileCSV.findCurrentPackageCount(this); //get current Packages count so far
+			} catch (IOException e) {
+				e.printStackTrace();
 				return 1;
 			}
 		}
 
 		// read all packages the user has uploaded so far, and get an array with name and file
 		try {
-			wordPackageFileIndexArr = new WordPackageFileIndex( this, MAX_WORD_PKG, CURRENT_WORD_PKG_COUNT ); //allow a maximum of X packages
-		} catch( IOException e ){
-			e.printStackTrace( );
+			wordPackageFileIndexArr = new WordPackageFileIndex(this, MAX_WORD_PKG, CURRENT_WORD_PKG_COUNT); //allow a maximum of X packages
+		} catch (IOException e) {
+			e.printStackTrace();
 			return 1;
 		}
 
@@ -428,40 +423,37 @@ public class MainActivity extends AppCompatActivity
 				},
 				new int[]{R.color.navy, R.color.white}
 		);
-		for( int i=0; i<CURRENT_WORD_PKG_COUNT; i++ )
-		{
-			radBtn = new RadioButton( this );
+		for (int i = 0; i < CURRENT_WORD_PKG_COUNT; i++) {
+			radBtn = new RadioButton(this);
 
-			radBtn.setText( wordPackageFileIndexArr.getPackageFileAtIndex( i ).getWordPackageName( ) );
+			radBtn.setText(wordPackageFileIndexArr.getPackageFileAtIndex(i).getWordPackageName());
 			radBtn.setButtonTintList(colorStateList);
 
 			pkgRadioGroup.addView(radBtn);
 		}
 
 		//automatically select first button
-		( (RadioButton) (pkgRadioGroup.getChildAt(0)) ).setChecked( true );
+		((RadioButton) (pkgRadioGroup.getChildAt(0))).setChecked(true);
 
 		return 0;
 	}
 
 
-	private void updatePkgViewAfterUploadOrRemoval( int CURRENT_WORD_PKG_COUNT_RETURN )
-	{
+	private void updatePkgViewAfterUploadOrRemoval(int CURRENT_WORD_PKG_COUNT_RETURN) {
 		/*
 		 * After user returns from Uploading or Removing Activity
 		 * This function updates the user Scroll View with what packages are available after removal/upload
 		 */
 		RadioButton radBtn;
 
-		if( CURRENT_WORD_PKG_COUNT_RETURN > CURRENT_WORD_PKG_COUNT ) //usr uploaded a pkg
+		if (CURRENT_WORD_PKG_COUNT_RETURN > CURRENT_WORD_PKG_COUNT) //usr uploaded a pkg
 		{
 			/* USER UPLOADED A PKG */
 
 			CURRENT_WORD_PKG_COUNT = CURRENT_WORD_PKG_COUNT_RETURN; //update pkg count because it increased
 			Log.d("upload", "USER UPLOADED A PKG");
 			//find how many pkg are available and if user user
-			for( int i=pkgRadioGroup.getChildCount(); i<CURRENT_WORD_PKG_COUNT; i++ )
-			{
+			for (int i = pkgRadioGroup.getChildCount(); i < CURRENT_WORD_PKG_COUNT; i++) {
 				radBtn = new RadioButton(this);
 
 				//radBtn.setText( allPkgName[i] );
@@ -470,9 +462,7 @@ public class MainActivity extends AppCompatActivity
 				pkgRadioGroup.addView(radBtn);
 
 			}
-		}
-		else if( CURRENT_WORD_PKG_COUNT_RETURN < CURRENT_WORD_PKG_COUNT )
-		{
+		} else if (CURRENT_WORD_PKG_COUNT_RETURN < CURRENT_WORD_PKG_COUNT) {
 			/* USER DELETED A PKG */
 
 			Log.d("upload", "USER DELETED A PKG");
@@ -481,18 +471,17 @@ public class MainActivity extends AppCompatActivity
 			// IMPORTANT: the following procedure limits to deleting only 1 file at a time
 			//			  to delete multiple files at one, have to delete and re-create all radio buttons in RadioGroup
 
-			pkgRadioGroup.removeViewAt( indexOfRadBtnToRemove[0] );
+			pkgRadioGroup.removeViewAt(indexOfRadBtnToRemove[0]);
 
 			//reselect top radio btn
-			( (RadioButton) pkgRadioGroup.getChildAt(0)).setChecked( true );
+			((RadioButton) pkgRadioGroup.getChildAt(0)).setChecked(true);
 
-		}
-		else
-		{
+		} else {
 			Log.d("upload", "USER DID NOT MODIFY A PKG");
 		}
 	}
-	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP, Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect) {
+
+	public void savetheInstanceState(int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int[] sis_orderArr, int sis_HCTMP, Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect) {
 		if (RorS == 0) {
 			//we are receiving
 			state = (int) savedInstanceState.getSerializable("state");
@@ -510,8 +499,7 @@ public class MainActivity extends AppCompatActivity
 					orderArrResume = (int[]) savedInstanceState.getSerializable("orderArr");
 				}
 			}
-		}
-		else {
+		} else {
 			//we are sending
 			savedInstanceState.putInt("state", sis_state);
 			if (sis_state > 0) {
@@ -521,7 +509,7 @@ public class MainActivity extends AppCompatActivity
 				savedInstanceState.putSerializable("SudokuArr", sis_usrSudokuArr);
 				savedInstanceState.putInt("usrMode", sis_usrModePref);
 				savedInstanceState.putString("language", sis_language);
-				savedInstanceState.putInt( "HINT_CLICK_TO_MAX_PROB", sis_HCTMP );
+				savedInstanceState.putInt("HINT_CLICK_TO_MAX_PROB", sis_HCTMP);
 				savedInstanceState.putSerializable("currentRectColoured", sis_currentRectColoured);
 				savedInstanceState.putSerializable("currentSelectedIsCorrect", sis_currentSelectedIsCorrect);
 
@@ -532,21 +520,22 @@ public class MainActivity extends AppCompatActivity
 			}
 		}
 	}
+
 	public void gameSetup(Intent gA, int gs_state, WordArray gs_wordArray, int gs_usrLangPref, int gs_usrDiffPref, int gs_usrModePref, String gs_language, int gs_usrPuzzleTypePref, int HCTMP) {
 		gA.putExtra("state", gs_state);
-		gA.putExtra( "wordArray", gs_wordArray );
-		gA.putExtra( "usrLangPref", gs_usrLangPref );
-		gA.putExtra("usrDiffPref",gs_usrDiffPref);
+		gA.putExtra("wordArray", gs_wordArray);
+		gA.putExtra("usrLangPref", gs_usrLangPref);
+		gA.putExtra("usrDiffPref", gs_usrDiffPref);
 		gA.putExtra("usrMode", gs_usrModePref);
 		gA.putExtra("language", gs_language);
 		gA.putExtra("usrPuzzSize", gs_usrPuzzleTypePref);
-		gA.putExtra( "HINT_CLICK_TO_MAX_PROB", HCTMP );
+		gA.putExtra("HINT_CLICK_TO_MAX_PROB", HCTMP);
 	}
 
-	private  void startDialog(final String fileNameSelected, final int state){
+	private void startDialog(final String fileNameSelected, final int state) {
 
 		final View view = getLayoutInflater().inflate(R.layout.activity_sub_menu, null);
-		AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this,R.style.Theme_AppCompat_DayNight_Dialog_Alert);
+		AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this, R.style.Theme_AppCompat_DayNight_Dialog_Alert);
 		alertDialog.setView(view);
 
 		// CHOOSE THE DIFFICULTY
@@ -555,8 +544,7 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				int difficultyId = group.getCheckedRadioButtonId();
-				switch(difficultyId)
-				{
+				switch (difficultyId) {
 					case R.id.button_easy:
 						usrDiffPref = 0;
 						break;
@@ -579,8 +567,7 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				int LanguageId = group.getCheckedRadioButtonId();
-				switch (LanguageId)
-				{
+				switch (LanguageId) {
 					case R.id.button_eng_fr:
 						usrLangPref = 0;
 						break;
@@ -598,8 +585,7 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				int ModeId = group.getCheckedRadioButtonId();
-				switch (ModeId)
-				{
+				switch (ModeId) {
 					case R.id.button_mStandard:
 						usrModePref = 0;
 						break;
@@ -616,7 +602,7 @@ public class MainActivity extends AppCompatActivity
 		Size.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				switch (checkedId){
+				switch (checkedId) {
 					case R.id.btn_4x4:
 						usrPuzzleTypePref[0] = 0;
 						break;
@@ -639,13 +625,13 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 
-				wordArray = new WordArray( usrPuzzleTypePref[0], MAX_CSV_ROW, HINT_CLICK_TO_MAX_PROB );
+				wordArray = new WordArray(usrPuzzleTypePref[0], MAX_CSV_ROW, HINT_CLICK_TO_MAX_PROB);
 
 				try {
 					//based on pkg, initialize the wordArray (select 'n' words)
-					int res = wordArray.initializeWordArray( MainActivity.this, fileNameSelected );
-					if( res == 1 ){
-						Log.d( "upload", "ERROR: initializeWordArray( ) returned an error" );
+					int res = wordArray.initializeWordArray(MainActivity.this, fileNameSelected);
+					if (res == 1) {
+						Log.d("upload", "ERROR: initializeWordArray( ) returned an error");
 						Toast.makeText(MainActivity.this, "Please select one of the Puzzle Types to start", Toast.LENGTH_SHORT).show();
 						return; //error: could not initialize wordArray
 					}
@@ -653,21 +639,20 @@ public class MainActivity extends AppCompatActivity
 					e.printStackTrace();
 				}
 
-				Intent gameActivity = new Intent( MainActivity.this, GameActivity.class );
+				Intent gameActivity = new Intent(MainActivity.this, GameActivity.class);
 				//check to see for language format is correct and available
 				if (usrModePref == 1) {
 					if (usrLangPref == 0) {
 						language = wordArray.getTranslationLang();
-						Log.e("lTTSs", "language is: "+language);
-					}
-					else {
+						Log.e("lTTSs", "language is: " + language);
+					} else {
 						language = wordArray.getNativeLang();
-						Log.e("lTTSs", "language is: "+language);
+						Log.e("lTTSs", "language is: " + language);
 					}
 					canStart = false;
-					for (int i=0; i<lTTSlangTags.size(); i++) {
+					for (int i = 0; i < lTTSlangTags.size(); i++) {
 						//Log.e("lTTS", "language is: "+language+" langTag is: "+langTags.get(i));
-						if (Objects.equals(language,lTTSlanguage.get(i))) {
+						if (Objects.equals(language, lTTSlanguage.get(i))) {
 							language = lTTSlangTags.get(i);
 							canStart = true;
 							if (canStart) {
@@ -678,16 +663,14 @@ public class MainActivity extends AppCompatActivity
 					if (canStart) {
 						//save wordArray for Game Activity
 						gameSetup(gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB);
-						startActivityForResult(gameActivity,0);
+						startActivityForResult(gameActivity, 0);
+					} else {
+						Toast.makeText(view.getContext(), R.string.no_language, Toast.LENGTH_LONG).show();
 					}
-					else {
-						Toast.makeText(view.getContext(),R.string.no_language, Toast.LENGTH_LONG).show();
-					}
-				}
-				else {
+				} else {
 					//standard start
 					gameSetup(gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB);
-					startActivityForResult(gameActivity,0);
+					startActivityForResult(gameActivity, 0);
 				}
 			}
 		});
@@ -704,6 +687,41 @@ public class MainActivity extends AppCompatActivity
 		//dialog.getWindow().setBackgroundDrawable(R.drawable.background);
 
 	}
+
+//	public void showCalendar() {
+////		datePickerDialog = new DatePickerDialog(
+////				this, new DatePickerDialog.OnDateSetListener() {
+////			@Override
+////			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+////				eventView();
+////			}
+////		},
+////				mCalendar.get(Calendar.YEAR),
+////				mCalendar.get(Calendar.MONTH),
+////				mCalendar.get(Calendar.DAY_OF_MONTH));
+////		datePickerDialog.show();
+//		//v = getLayoutInflater().inflate(R.layout.activity_calendar, null);
+//
+//		AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this,R.style.Theme_AppCompat_DayNight_Dialog_Alert);
+//		alertDialog.setView(R.layout.activity_calendar);
+//
+//
+//		AlertDialog dialog = alertDialog.create();
+//		dialog.show();
+//	}
+
+//	public void eventView(){
+//		View event = getLayoutInflater().inflate(R.layout.calendar_event, null);
+//		AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this,R.style.Theme_AppCompat_DayNight_Dialog_Alert);
+//		alertDialog.setView(event);
+//
+//		TextView eventView = findViewById(R.id.event_view);
+//		eventView.setText("This is for testing");
+//		eventView.setTextColor(getResources().getColor(R.color.navy));
+//
+//		AlertDialog dialog = alertDialog.create();
+//		dialog.show();
+//	}
 
 }
 
