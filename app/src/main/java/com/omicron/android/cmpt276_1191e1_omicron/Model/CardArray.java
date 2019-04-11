@@ -1,5 +1,6 @@
 package com.omicron.android.cmpt276_1191e1_omicron.Model;
 
+import android.os.Bundle;
 import android.util.Log;
 
 import com.omicron.android.cmpt276_1191e1_omicron.WordArray;
@@ -161,6 +162,32 @@ public class CardArray implements Serializable
 		 * Return string associated with that card
 		 */
 		return  cardArray[i][j];
+	}
+	
+	public void saveDataForRotation( Bundle state )
+	{
+		/*
+		 * This function adds all necessary data to intent to be saved
+		 */
+		
+		state.putSerializable( "cardArray", cardArray );
+		state.putSerializable( "cardKey", cardKey );
+		state.putInt( "gridRowCount", gridRowCount );
+		state.putInt( "gridColCount", gridColCount );
+		state.putInt( "size", size );
+	}
+	
+	public void restoreFromRotation( Bundle state )
+	{
+		/*
+		 * This function restores data when device rotated
+		 */
+		
+		cardArray = (String[][]) state.getSerializable( "cardArray" );
+		cardKey = (int[][]) state.getSerializable( "cardKey" );
+		gridRowCount = state.getInt( "gridRowCount" );
+		gridColCount = state.getInt( "gridColCount" );
+		size = state.getInt( "size" );
 	}
 }
 

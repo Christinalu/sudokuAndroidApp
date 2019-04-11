@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -22,6 +23,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.RotateAnimation;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -46,7 +48,7 @@ public class CardView extends Activity
 	private int colCount;
 	private TableLayout tableLayout; //id of grid layout
 	private TableLayout tableLayoutText;
-	private int[][] viewInvisible; //1==view is invisible
+	private int[][] viewInvisible; //1==view is invisible (text shown)
 	private int i = 0;
 	private int j = 0;
 	private Pair[] selectedPairLast; //first pair stores first selected card, second stores second selected
@@ -202,6 +204,7 @@ public class CardView extends Activity
 				allowToSelect[0] = false; //do not allow to select while animating
 				
 					/* IF CARD PAIR SELECTED CORRECT */
+				
 				selectedPairLast[1].update( row, col ); //update with current selected coordinate Pair
 				if( cardArray.checkIfPairMatch( selectedPairLast[0], selectedPairLast[1] ) )
 				{
@@ -209,21 +212,26 @@ public class CardView extends Activity
 					colLast = selectedPairLast[0].getColumn();
 					
 					//change text background colour
-					((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col ))).getChildAt(0).setBackgroundResource( R.drawable.card_text_correct );
-					((RelativeLayout) (((TableRow) (tableLayout.getChildAt( rowLast ))).getChildAt( colLast ))).getChildAt(0).setBackgroundResource( R.drawable.card_text_correct );
+					((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col )))
+							.getChildAt(0).setBackgroundResource( R.drawable.card_text_correct );
+					((RelativeLayout) (((TableRow) (tableLayout.getChildAt( rowLast ))).getChildAt( colLast )))
+							.getChildAt(0).setBackgroundResource( R.drawable.card_text_correct );
 					
 					
 					Log.d( "cardArray", "card match..." );
 					
 					//add fade out animation to show text
-					((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col ))).getChildAt(1).animate().alpha(0f)
+					((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col )))
+							.getChildAt(1).animate().alpha(0f)
 							.setDuration(shortAnimationDuration).setStartDelay(0)
 							.setListener(new AnimatorListenerAdapter() {
 								@Override
 								public void onAnimationEnd(Animator animation) {
 									//disable both card view
-									((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col ))).getChildAt(1).setVisibility( View.INVISIBLE );
-									((RelativeLayout) (((TableRow) (tableLayout.getChildAt( rowLast ))).getChildAt( colLast ))).getChildAt(1).setVisibility( View.INVISIBLE );
+									((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row )))
+											.getChildAt( col ))).getChildAt(1).setVisibility( View.INVISIBLE );
+									((RelativeLayout) (((TableRow) (tableLayout.getChildAt( rowLast )))
+											.getChildAt( colLast ))).getChildAt(1).setVisibility( View.INVISIBLE );
 									allowToSelect[0] = true; //once animation finished allow to select next pair
 								}
 							});
@@ -238,7 +246,7 @@ public class CardView extends Activity
 				}
 				else
 				{
-					/* IF CARD PAIR SELECTED INCORRECT */
+						/* IF CARD PAIR SELECTED INCORRECT */
 					
 					rowLast = selectedPairLast[0].getRow();
 					colLast = selectedPairLast[0].getColumn();
@@ -253,35 +261,41 @@ public class CardView extends Activity
 					
 					//add fade out/in animation to show text
 					allowToSelect[0] = false; //do not allow to select while animating
-					((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col ))).getChildAt(1).animate().alpha(0f)
+					((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col )))
+							.getChildAt(1).animate().alpha(0f)
 							.setDuration(shortAnimationDuration).setStartDelay( 0 )
 							.setListener(new AnimatorListenerAdapter() {
 								@Override
 								public void onAnimationEnd(Animator animation) {
-									((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col ))).getChildAt(1).setAlpha(0);
+									((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col )))
+											.getChildAt(1).setAlpha(0);
 									
 									//add fade in animation to hide words
 									
 									Log.d( "cardArray", "selectedPairLast[0] row: " + rowLast + " col: " + colLast );
 									
 									//hide first word
-									((RelativeLayout) (((TableRow) (tableLayout.getChildAt( rowLast ))).getChildAt( colLast ))).getChildAt(1).animate().alpha(1f)
+									((RelativeLayout) (((TableRow) (tableLayout.getChildAt( rowLast )))
+											.getChildAt( colLast ))).getChildAt(1).animate().alpha(1f)
 											.setDuration(shortAnimationDuration).setStartDelay( animationDelay )
 											.setListener(new AnimatorListenerAdapter() {
 												@Override
 												public void onAnimationEnd(Animator animation) {
-													((RelativeLayout) (((TableRow) (tableLayout.getChildAt( rowLast ))).getChildAt( colLast ))).getChildAt(1).setAlpha(1);
+													((RelativeLayout) (((TableRow) (tableLayout.getChildAt( rowLast )))
+															.getChildAt( colLast ))).getChildAt(1).setAlpha(1);
 													allowToSelect[0] = true; //once animation finished allow to select next pair
 												}
 											});
 									
 									//hide current word
-									((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col ))).getChildAt(1).animate().alpha(1f)
+									((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col )))
+											.getChildAt(1).animate().alpha(1f)
 											.setDuration(shortAnimationDuration).setStartDelay( animationDelay )
 											.setListener(new AnimatorListenerAdapter() {
 												@Override
 												public void onAnimationEnd(Animator animation) {
-													((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col ))).getChildAt(1).setAlpha(1);
+													((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row )))
+															.getChildAt( col ))).getChildAt(1).setAlpha(1);
 													allowToSelect[0] = true; //once animation finished allow to select next pair
 												}
 											});
@@ -301,17 +315,94 @@ public class CardView extends Activity
 				selectedPairLast[0].update( row, col );
 				
 				//add fade out animation to show text
-				((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col ))).getChildAt(1).animate().alpha(0f)
+				((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col )))
+						.getChildAt(1).animate().alpha(0f)
 						.setDuration(shortAnimationDuration).setStartDelay( 0 )
 						.setListener(new AnimatorListenerAdapter() {
 							@Override
 							public void onAnimationEnd(Animator animation) {
-								((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col ))).getChildAt(1).setAlpha(0);
+								((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row )))
+										.getChildAt( col ))).getChildAt(1).setAlpha(0);
 							}
 						});
 			}
 			
 			
+		}
+	}
+	
+	
+	public void saveDataForRotation( Bundle state )
+	{
+		/*
+		 * This function adds all necessary data to intent to be saved
+		 */
+		
+		state.putSerializable( "viewInvisible", viewInvisible );
+		state.putBoolean( "allowToSelect", allowToSelect[0] );
+		state.putSerializable( "selectedPairLast", selectedPairLast );
+
+		// TODO: also save String[][] from cardArray
+	}
+	
+	
+	public void reDrawOnRotation( Bundle state )
+	{
+		/*
+		 * This function re draws the cards when device rotated
+		 * and restores View data
+		 */
+		
+		viewInvisible = (int[][]) state.getSerializable( "viewInvisible" );
+		allowToSelect[0] = state.getBoolean( "allowToSelect" );
+		selectedPairLast = (Pair[]) state.getSerializable( "selectedPairLast" );
+		
+		reDrawCard( );
+	}
+	
+	
+	private void reDrawCard( )
+	{
+		/*
+		 * This function redraws all cards after rotation
+		 */
+		
+		// LOOP AND DRAW ALL CARDS SELECTED OR MATCHED
+		for( i=0; i<rowCount; i++ ) //
+		{
+			final int row = i;
+			for( j=0; j<colCount; j++ ) //
+			{
+				final int col = j;
+				
+				// show all cards that were matched
+				if( viewInvisible[i][j] == 1 ) //if card already matched or selected
+				{
+					//change text background colour
+					((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col )))
+							.getChildAt(0).setBackgroundResource( R.drawable.card_text_correct );
+					
+					//reveal card
+					((RelativeLayout) ((TableRow) (tableLayout.getChildAt(i))).getChildAt(j)) //get card
+							.getChildAt(1).setAlpha( 0f );
+							
+					//temporarely disable card
+					((RelativeLayout) ((TableRow) (tableLayout.getChildAt(i))).getChildAt(j)) //get card
+							.getChildAt(1).setVisibility( View.INVISIBLE );
+							
+				}
+			}
+		}
+		
+		// RE DRAW SINGLE SELECTED CARD
+		if( selectedPairLast[0].getRow() != -1 ) //if previously selected card
+		{
+			int n = selectedPairLast[0].getRow( );
+			int m = selectedPairLast[0].getColumn( );
+			
+			//enable card
+			((RelativeLayout) ((TableRow) (tableLayout.getChildAt( n ))).getChildAt( m )) //get card
+					.getChildAt(1).setVisibility( View.VISIBLE );
 		}
 	}
 }
