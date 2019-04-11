@@ -48,12 +48,13 @@ public class CardView extends Activity
 	private int colCount;
 	private TableLayout tableLayout; //id of grid layout
 	private TableLayout tableLayoutText;
-	private int[][] viewInvisible; //1==view is invisible (text shown)
+	private int[] viewInvisible; //1==view is invisible (text shown)
 	private int i = 0;
 	private int j = 0;
-	private Pair[] selectedPairLast; //first pair stores first selected card, second stores second selected
+	private int[] selectedLast; //first index stores first selected card (1D array format), second stores second selected
 	private boolean[] allowToSelect = { true }; //only let user select another pair after animation ended
 	
+	private int size; //number of all cards
 	private int rowLast = -1; //save to use after fade out animation runs
 	private int colLast = -1;
 	private int screenH;
@@ -75,17 +76,18 @@ public class CardView extends Activity
 	{
 		rowCount = rowCount2;
 		colCount = colCount2;
+		size = rowCount * colCount;
 		screenW = screenW2;
 		screenH = screenH2;
 		edgeOffset = edgeOffset2;
 		barH = barH2;
 		tableLayout = new TableLayout( context );
 		tableLayoutText = new TableLayout( context );
-		viewInvisible = new int[rowCount][colCount];
+		viewInvisible = new int[rowCount*colCount];
 		
-		selectedPairLast = new Pair[2];
-		selectedPairLast[0] = new Pair( -1, -1); //no first card selected
-		selectedPairLast[1] = new Pair( -1, -1); //no second card selected
+		selectedLast = new int[2];
+		selectedLast[0] = -1; //no first card selected
+		selectedLast[1] = -1; //no second card selected
 		
 		relativeLayout.addView( tableLayout );
 		relativeLayout.addView( tableLayoutText );
@@ -112,7 +114,7 @@ public class CardView extends Activity
 				ImageView imgView = new ImageView( context );
 				TextView textView = new TextView( context );
 				
-				textView.setText( cardArray.getCardStringAtIndex( i, j ) );
+				textView.setText( cardArray.getCardStringAtIndex( i, j, colCount ) );
 				textView.setBackgroundResource( R.drawable.card_text_selected );
 				textView.setTextSize( 16 );
 				textView.setEllipsize( TextUtils.TruncateAt.MARQUEE );
@@ -192,25 +194,30 @@ public class CardView extends Activity
 			// FOR ONE CARD, PROCESS TOUCH
 			// this fades the card to reveal the word
 		
-		if( viewInvisible[row][col] == 0 && allowToSelect[0] == true ) //if card touched not previously selected; only allow to select after animation
+			// NOTE: TableLayout is a 2D grid, however the String and Card data are 1D
+		
+		if( viewInvisible[row*colCount+col] == 0 && allowToSelect[0] == true ) //if card touched not previously selected; only allow to select after animation
 		{
 			Log.d( "cardArray", "selected card: ( " + row + ", " + col + " )" );
 			
-			viewInvisible[row][col] = 1; //mark as invisible - selected
+			viewInvisible[row*colCount+col] = 1; //mark as invisible - selected
 			
-			if( selectedPairLast[0].getRow() != -1 ) 	//if another card previously selected
-			// (other than this) - check for match
+			if( selectedLast[0] != -1 ) //if another card previously selected (other than this), check for match
 			{
 				allowToSelect[0] = false; //do not allow to select while animating
 				
 					/* IF CARD PAIR SELECTED CORRECT */
 				
-				selectedPairLast[1].update( row, col ); //update with current selected coordinate Pair
-				if( cardArray.checkIfPairMatch( selectedPairLast[0], selectedPairLast[1] ) )
+				selectedLast[1] = row*colCount + col; //update with current selected coordinate Pair
+				
+				//get 2D coordinates from 1D
+				rowLast = selectedLast[0] / colCount;
+				colLast = selectedLast[0] - (selectedLast[0]/colCount)*colCount;
+				
+				Log.d( "cardArray", "rowLast: " + rowLast + " colLasr: " + colLast );
+				
+				if( cardArray.checkIfPairMatch( selectedLast[0], selectedLast[1] ) )
 				{
-					rowLast = selectedPairLast[0].getRow();
-					colLast = selectedPairLast[0].getColumn();
-					
 					//change text background colour
 					((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col )))
 							.getChildAt(0).setBackgroundResource( R.drawable.card_text_correct );
@@ -237,8 +244,8 @@ public class CardView extends Activity
 							});
 					
 					//remove any selected Pair
-					selectedPairLast[0].update( -1, -1 ); //remove first selected
-					selectedPairLast[1].update( -1, -1 ); //remove current selected
+					selectedLast[0] = -1; //remove first selected
+					selectedLast[1] = -1; //remove current selected
 					
 					// TODO: check if all cards completed - finish game
 					// TODO: check if user can select/play/cheat while card animating
@@ -248,16 +255,13 @@ public class CardView extends Activity
 				{
 						/* IF CARD PAIR SELECTED INCORRECT */
 					
-					rowLast = selectedPairLast[0].getRow();
-					colLast = selectedPairLast[0].getColumn();
-					
 					//deselect cards from viewInvisible[][] since we hide cards again
-					viewInvisible[row][col] = 0; //hide current
-					viewInvisible[rowLast][colLast] = 0; //hide previously selected
+					viewInvisible[row*colCount+col] = 0; //hide current
+					viewInvisible[rowLast*colCount+colLast] = 0; //hide previously selected
 					
 					//remove any selected Pair
-					selectedPairLast[0].update( -1, -1 ); //remove first selected
-					selectedPairLast[1].update( -1, -1 ); //remove current selected
+					selectedLast[0] = -1; //remove first selected
+					selectedLast[1] = -1; //remove current selected
 					
 					//add fade out/in animation to show text
 					allowToSelect[0] = false; //do not allow to select while animating
@@ -312,7 +316,7 @@ public class CardView extends Activity
 			else //no other card previously selected - select this one
 			{
 				//add card selected to selectedPair
-				selectedPairLast[0].update( row, col );
+				selectedLast[0] = row*colCount + col;
 				
 				//add fade out animation to show text
 				((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col )))
@@ -340,7 +344,7 @@ public class CardView extends Activity
 		
 		state.putSerializable( "viewInvisible", viewInvisible );
 		state.putBoolean( "allowToSelect", allowToSelect[0] );
-		state.putSerializable( "selectedPairLast", selectedPairLast );
+		state.putSerializable( "selectedLast", selectedLast[0] );
 
 		// TODO: also save String[][] from cardArray
 	}
@@ -353,9 +357,9 @@ public class CardView extends Activity
 		 * and restores View data
 		 */
 		
-		viewInvisible = (int[][]) state.getSerializable( "viewInvisible" );
+		viewInvisible = (int[]) state.getSerializable( "viewInvisible" );
 		allowToSelect[0] = state.getBoolean( "allowToSelect" );
-		selectedPairLast = (Pair[]) state.getSerializable( "selectedPairLast" );
+		selectedLast[0] = (int) state.getSerializable( "selectedLast" );
 		
 		reDrawCard( );
 	}
@@ -367,38 +371,40 @@ public class CardView extends Activity
 		 * This function redraws all cards after rotation
 		 */
 		
+		Log.d( "cardArray", "selectedLast: " + selectedLast[0] );
+		
 		// LOOP AND DRAW ALL CARDS SELECTED OR MATCHED
-		for( i=0; i<rowCount; i++ ) //
+		for( int k=0; k<size; k++ ) //
 		{
-			final int row = i;
-			for( j=0; j<colCount; j++ ) //
+			// show all cards that were matched
+			if( viewInvisible[k] == 1 ) //if card already matched or selected
 			{
-				final int col = j;
+				int row = k / colCount;
+				int col = k - (k/colCount)*colCount;
 				
-				// show all cards that were matched
-				if( viewInvisible[i][j] == 1 ) //if card already matched or selected
-				{
-					//change text background colour
-					((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col )))
-							.getChildAt(0).setBackgroundResource( R.drawable.card_text_correct );
+				//change text background colour
+				((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col )))
+						.getChildAt(0).setBackgroundResource( R.drawable.card_text_correct );
 					
-					//reveal card
-					((RelativeLayout) ((TableRow) (tableLayout.getChildAt(i))).getChildAt(j)) //get card
-							.getChildAt(1).setAlpha( 0f );
+				//reveal card
+				((RelativeLayout) ((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col )) //get card
+						.getChildAt(1).setAlpha( 0f );
 							
-					//temporarely disable card
-					((RelativeLayout) ((TableRow) (tableLayout.getChildAt(i))).getChildAt(j)) //get card
-							.getChildAt(1).setVisibility( View.INVISIBLE );
-							
-				}
+				//temporarely disable card
+				((RelativeLayout) ((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col )) //get card
+						.getChildAt(1).setVisibility( View.INVISIBLE );
 			}
 		}
 		
 		// RE DRAW SINGLE SELECTED CARD
-		if( selectedPairLast[0].getRow() != -1 ) //if previously selected card
+		if( selectedLast[0] != -1 ) //if previously selected a card
 		{
-			int n = selectedPairLast[0].getRow( );
-			int m = selectedPairLast[0].getColumn( );
+			int n = selectedLast[0] / colCount;
+			int m = selectedLast[0] - (selectedLast[0]/colCount)*colCount;
+			
+			//change text background colour
+			((RelativeLayout) (((TableRow) (tableLayout.getChildAt( n ))).getChildAt( m )))
+					.getChildAt(0).setBackgroundResource( R.drawable.card_text_selected );
 			
 			//enable card
 			((RelativeLayout) ((TableRow) (tableLayout.getChildAt( n ))).getChildAt( m )) //get card
