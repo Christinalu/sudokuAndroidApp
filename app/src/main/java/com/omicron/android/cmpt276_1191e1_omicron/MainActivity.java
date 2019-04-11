@@ -413,7 +413,7 @@ public class MainActivity extends AppCompatActivity
 			}
 		}
 
-		// read all packages the user has uploaded so far, and get an array with name and file
+		// READ ALL PACKAGES THE USER HAS UPLOADED SO FAR, and get an array with name and file
 		try {
 			wordPackageFileIndexArr = new WordPackageFileIndex( this, MAX_WORD_PKG, CURRENT_WORD_PKG_COUNT ); //allow a maximum of X packages
 		} catch( IOException e ){
@@ -438,6 +438,9 @@ public class MainActivity extends AppCompatActivity
 
 			radBtn.setText( wordPackageFileIndexArr.getPackageFileAtIndex( i ).getWordPackageName( ) );
 			radBtn.setButtonTintList(colorStateList);
+			
+			Log.d( "fileCSV", wordPackageFileIndexArr.getPackageFileAtIndex( i ).getWordPackageName( )
+					+ " word pair count: " + wordPackageFileIndexArr.getPackageFileAtIndex( i ).getPackageWordPairCount() );
 
 			pkgRadioGroup.addView(radBtn);
 		}
