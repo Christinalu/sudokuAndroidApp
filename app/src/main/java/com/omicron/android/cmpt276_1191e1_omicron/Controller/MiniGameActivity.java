@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.WindowManager;
@@ -28,6 +29,7 @@ public class MiniGameActivity extends AppCompatActivity
 	private int gridRowCount; //rows in card gridlayout based on word count
 	private CardArray cardStringArray; //stores the strings to be displayed for each card
 	private CardView cardView; //stores the card view array
+	private boolean rotation = false; //flag if device rotated
 	
 	
 	@Override
@@ -35,6 +37,16 @@ public class MiniGameActivity extends AppCompatActivity
 	{
 		super.onCreate( savedInstanceState );
 		setContentView( R.layout.activity_mini_game );
+		
+		if( savedInstanceState != null )
+		{
+			//IMPORT DATA FROM ROTATION
+			Log.d( "cardArray", "importing data from rotation..." );
+			
+			wordArray = (WordArray) savedInstanceState.getParcelable( "wordArray" );
+			
+			rotation = true;
+		}
 		
 		// TODO: add resume option
 		// TODO: save data on 'back' btn press
@@ -46,12 +58,16 @@ public class MiniGameActivity extends AppCompatActivity
 		// TODO: once game finished, make sure it stays finished even when resuming
 		// TODO: also do unit tests for Card and CardArray
 		// TODO: remove Card object if not necessary
+		// TODO: play mini game, go to main menu, rotate screen, then resume game
+		// TODO: test when rotating, while animating, before animation ends, if allowToSelect[] gets properly changed/saved
 		
 		Intent intentSrc = getIntent( );
 		if( intentSrc == null )
 		{ return; }
 		
-		wordArray = (WordArray) intentSrc.getParcelableExtra("wordArray");
+		if( rotation == false ){
+			wordArray = (WordArray) intentSrc.getParcelableExtra("wordArray");
+		}
 		
 		int orientation = getResources().getConfiguration().orientation;
 		if( orientation == Configuration.ORIENTATION_LANDSCAPE ){ //based on orientation, create grid (column) size
@@ -63,7 +79,12 @@ public class MiniGameActivity extends AppCompatActivity
 		}
 		
 		cardStringArray = new CardArray( gridRowCount, gridColCount );
-		cardStringArray.initializeStringArray( wordArray );
+		
+		if( rotation == true ){
+			cardStringArray.restoreFromRotation( savedInstanceState );
+		}else{
+			cardStringArray.initializeStringArray(wordArray);
+		}
 		
 		RelativeLayout relativeLayout = findViewById( R.id.relativeLayout ); //main layout
 		
@@ -90,7 +111,9 @@ public class MiniGameActivity extends AppCompatActivity
 		cardView = new CardView( gridRowCount, gridColCount, relativeLayout, this,
 								 cardStringArray, screenW, screenH, edgeOffset, barH );
 		
-		
+		if( rotation == true ){
+			cardView.reDrawOnRotation( savedInstanceState );
+		}
 		
 		
 		
@@ -98,17 +121,6 @@ public class MiniGameActivity extends AppCompatActivity
 		
 	}
 	
-	
-	private void viewCardArraySetUp( GridLayout gridLayout )
-	{
-		/*
-		 * This function sets up the card array View to display the card words
-		 */
-		
-		
-		
-		
-	}
 	
 	// GET TOP MENU BAR OFFSET
 	public int getStatusBarHeight( )
@@ -120,6 +132,22 @@ public class MiniGameActivity extends AppCompatActivity
 			result = getResources().getDimensionPixelSize( resourceId );
 		}
 		return result;
+	}
+	
+	
+	@Override
+	public void onSaveInstanceState( Bundle savedInstanceState )
+	{
+		super.onSaveInstanceState(savedInstanceState);
+		
+		//SAVE DATA ON ROTATION
+		
+		Log.d( "cardArr", "saving data on rotation..." );
+		
+		savedInstanceState.putParcelable( "wordArray", wordArray );
+		
+		cardStringArray.saveDataForRotation( savedInstanceState );
+		cardView.saveDataForRotation( savedInstanceState );
 	}
 }
 

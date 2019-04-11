@@ -1,5 +1,6 @@
 package com.omicron.android.cmpt276_1191e1_omicron.Model;
 
+import android.os.Bundle;
 import android.util.Log;
 
 import com.omicron.android.cmpt276_1191e1_omicron.WordArray;
@@ -14,10 +15,11 @@ public class CardArray implements Serializable
 	 * 2D array format, if selected
 	 */
 	
-	private String[][] cardArray; // 2D array holding the strings to display on "card"
-	private int[][] cardKey;  	//stores index of which word the native/translation is from ie cardKey[0][1]
-								// and cardKey[1][0] are both the same (same word index == 5),
-								// it implies the translations match and are from 5th index word pair
+	private String[] cardArray; // 1D array holding the strings to display on "card"
+	private int[] cardKey;  	//stores index of which word the native/translation is from
+								// ie  if cardKey[0] and cardKey[2] are both the same (same word index == 5),
+								// it implies the translations match that is, both are from 5th word pair
+								// (cardKey[0] --> Four, cardKey[2] --> Quattre; translations of same word)
 	private int gridRowCount;
 	private int gridColCount;
 	private int size;
@@ -29,8 +31,8 @@ public class CardArray implements Serializable
 		gridColCount = gridColCount2;
 		size = gridRowCount * gridColCount;
 		
-		cardArray = new String[gridRowCount][gridColCount];
-		cardKey = new int[gridRowCount][gridColCount];
+		cardArray = new String[gridRowCount*gridColCount];
+		cardKey = new int[gridRowCount*gridColCount];
 	}
 	
 	
@@ -90,47 +92,44 @@ public class CardArray implements Serializable
 		int k=0; //index to loop in 1D mark
 		int index; //which word to get from word array; ie index==2 means 2nd word native; index==1 first word translation
 		int wordIndex; //which index pair from wordArray
-		for( int i=0; i<gridRowCount; i++ ) //for each mask, get the actual word array string
+		for( int i=0; i<size; i++ ) //for each mask, get the actual word array string
 		{
-			for( int j=0; j<gridColCount; j++ )
-			{
-				index = wordArrayMask[k]; //for each mask
-				wordIndex = index/2; //index of word pair
+			index = wordArrayMask[k]; //for each mask
+			wordIndex = index/2; //index of word pair
 				
-				if( wordIndex*2 == index ){ //if native word
-					cardArray[i][j] = wordArray.getWordNativeAtIndex( wordIndex );
-					cardKey[i][j] = wordIndex; //save which word pair this is
-					Log.d( "cardArray", index + " native" );
-				}else{ //remainder 1
-					cardArray[i][j] = wordArray.getWordTranslationAtIndex( wordIndex );
-					cardKey[i][j] = wordIndex; //save which word pair this is
-					Log.d( "cardArray", index + " translation" );
-				}
-				
-				k++;
+			if( wordIndex*2 == index ){ //if native word
+				cardArray[i] = wordArray.getWordNativeAtIndex( wordIndex );
+				cardKey[i] = wordIndex; //save which word pair this is
+				//Log.d( "cardArray", index + " native" );
+			}else{ //remainder 1
+				cardArray[i] = wordArray.getWordTranslationAtIndex( wordIndex );
+				cardKey[i] = wordIndex; //save which word pair this is
+				//Log.d( "cardArray", index + " translation" );
 			}
+				
+			k++;
 		}
 		
 		
 		////// debug //////////////////
-		if( size == 18 ){ //debug
-			for( int i=0; i<gridRowCount; i++ )
-			{
-				if( gridColCount == 2 ) {
-					Log.d("cardArray", "cardArray: " + cardArray[i][0] + ", " + cardArray[i][1] + " - from word pair: " + cardKey[i][0] + " , " + cardKey[i][1] );
-				}
-				else if( gridColCount == 3 ){
-					Log.d("cardArray", "cardArray: " + cardArray[i][0] + ", " + cardArray[i][1] + ", " + cardArray[i][2] + " - from word pair: " + cardKey[i][0] + " , " + cardKey[i][1] + " , " + cardKey[i][2] );
-				}
-			}
-			
+		if( size == 18 ){
+			Log.d("cardArray", "cardArray: "+cardArray[0]+", "+cardArray[1]+", "+cardArray[2]+", "+cardArray[3]+", "
+					+cardArray[4]+", "+cardArray[5]+", "+cardArray[6]+", "+cardArray[7]+", "+cardArray[8]+", "+cardArray[9]+", "
+					+cardArray[10]+", "+cardArray[11]+", "+cardArray[12]+", "+cardArray[13]+", "+cardArray[14]+", "+cardArray[15]+", "
+					+cardArray[16]+", "+cardArray[17]);
+		}
+		if( size == 18 ){
+			Log.d("cardArray", "cardKey: "+cardKey[0]+", "+cardKey[1]+", "+cardKey[2]+", "+cardKey[3]+", "
+					+cardKey[4]+", "+cardKey[5]+", "+cardKey[6]+", "+cardKey[7]+", "+cardKey[8]+", "+cardKey[9]+", "
+					+cardKey[10]+", "+cardKey[11]+", "+cardKey[12]+", "+cardKey[13]+", "+cardKey[14]+", "+cardKey[15]+", "
+					+cardKey[16]+", "+cardKey[17]);
 		}
 		///////////////////////////////
 		
 	}
 	
 	
-	public boolean checkIfPairMatch( Pair p1, Pair p2 )
+	public boolean checkIfPairMatch( int p1, int p2 )
 	{
 		/*
 		 * This function checks if the two coordinate pairs both
@@ -139,28 +138,58 @@ public class CardArray implements Serializable
 		 * On out of bounds return false
 		 */
 		
-		int p1row = p1.getRow();
-		int p1col = p1.getColumn();
-		int p2row = p2.getRow();
-		int p2col = p2.getColumn();
+//		int p1row = p1.getRow();
+//		int p1col = p1.getColumn();
+//		int p2row = p2.getRow();
+//		int p2col = p2.getColumn();
+//
+//		if( 0 > p1row || p1row >= gridRowCount || //out of bounds
+//			0 > p1col || p1col >= gridColCount ||
+//			0 > p2row || p2row >= gridRowCount ||
+//			0 > p2col || p2col >= gridColCount )
+//		{ return false; }
 		
-		if( 0 > p1row || p1row >= gridRowCount || //out of bounds
-			0 > p1col || p1col >= gridColCount ||
-			0 > p2row || p2row >= gridRowCount ||
-			0 > p2col || p2col >= gridColCount )
+		if( p1 < 0 || p1 >= size || p2 < 0 || p2 >= size ) //out of bounds
 		{ return false; }
 		
-		if( cardKey[p1row][p1col] == cardKey[p2row][p2col] ) //if both strings from same word
+		if( cardKey[p1] == cardKey[p2] ) //if both strings from same word
 		{ return true; }
 		else { return false; }
 	}
 	
-	public String getCardStringAtIndex( int i, int j )
+	public String getCardStringAtIndex( int i, int j, int colCount )
 	{
 		/*
 		 * Return string associated with that card
+		 * from 1D array extract using 2D coordinate
 		 */
-		return  cardArray[i][j];
+		return  cardArray[i*colCount+j];
+	}
+	
+	public void saveDataForRotation( Bundle state )
+	{
+		/*
+		 * This function adds all necessary data to intent to be saved
+		 */
+		
+		state.putSerializable( "cardArray", cardArray );
+		state.putSerializable( "cardKey", cardKey );
+		state.putInt( "gridRowCount", gridRowCount );
+		state.putInt( "gridColCount", gridColCount );
+		state.putInt( "size", size );
+	}
+	
+	public void restoreFromRotation( Bundle state )
+	{
+		/*
+		 * This function restores data when device rotated
+		 */
+		
+		cardArray = (String[]) state.getSerializable( "cardArray" );
+		cardKey = (int[]) state.getSerializable( "cardKey" );
+		gridRowCount = state.getInt( "gridRowCount" );
+		gridColCount = state.getInt( "gridColCount" );
+		size = state.getInt( "size" );
 	}
 }
 
