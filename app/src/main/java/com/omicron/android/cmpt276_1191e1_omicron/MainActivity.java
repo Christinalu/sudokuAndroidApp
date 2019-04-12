@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity
 	RadioGroup Language;
 	RadioGroup Mode;
 	RadioGroup Size;
-	private int usrModePref = 0; // 0=standard, 1=speech
+	private int usrModePref = 0; // 0=standard, 1=speech, 3=mini game
 	private int usrLangPref = 0; // 0=eng_fr, 1=fr_eng; 0 == native(squares that cannot be modified); 1 == translation(the words that the user inserts)
 	private int usrDiffPref; //0=easy,1=medium,2=difficult
 	private int state = 0; //0=new start, 1=resume
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				int pkgSelectId = group.getCheckedRadioButtonId();
-				packageName =((RadioButton)findViewById(pkgSelectId)).getText().toString();
+				packageName =((RadioButton)findViewById(checkedId)).getText().toString();
 				switch (pkgSelectId) {
 					//void
 				}
@@ -237,10 +237,8 @@ public class MainActivity extends AppCompatActivity
                                              // Select Package from main activity
                                              RadioButton radBtnSelected = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
                                              String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
-                                             usrPuzzleTypePref[0] = -1;
-                                             state = 0;
                                              resumingMiniGame = false;
-                                             startDialog(fileNameSelected, state);
+                                             startDialog(fileNameSelected);
                                          }
                                      });
 
@@ -685,11 +683,14 @@ public class MainActivity extends AppCompatActivity
 		gA.putExtra( "HINT_CLICK_TO_MAX_PROB", HCTMP );
 	}
 
-	private  void startDialog(final String fileNameSelected, final int state){
+	private  void startDialog(final String fileNameSelected){
 
 		final View view = getLayoutInflater().inflate(R.layout.activity_sub_menu, null);
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this,R.style.Theme_AppCompat_DayNight_Dialog_Alert);
 		alertDialog.setView(view);
+
+		usrPuzzleTypePref[0] = -1;
+		usrModePref = 0;
 
 		// CHOOSE THE DIFFICULTY
 		Difficulty = view.findViewById(R.id.button_level);
@@ -785,15 +786,18 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 
+				state = 0;
 				wordArray = new WordArray( usrPuzzleTypePref[0], MAX_CSV_ROW, HINT_CLICK_TO_MAX_PROB, usrModePref );
 
 				try {
 					//based on pkg, initialize the wordArray (select 'n' words)
-					int res = wordArray.initializeWordArray( MainActivity.this, fileNameSelected );
-					if( res == 1 ){
-						Log.d( "upload", "ERROR: initializeWordArray( ) returned an error" );
+
+					int res = wordArray.initializeWordArray(MainActivity.this, fileNameSelected);
+					if (res == 1 && usrModePref != 3) {
+						Log.d("upload", "ERROR: initializeWordArray( ) returned an error");
 						Toast.makeText(MainActivity.this, "Please select one of the Puzzle Types to start", Toast.LENGTH_SHORT).show();
 						return; //error: could not initialize wordArray
+
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
