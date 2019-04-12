@@ -135,12 +135,13 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="@string/available_package"
-			android:fontFamily="casual"
-			android:layout_gravity="left"
-			android:layout_margin="10sp"/>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+			android:fontFamily="casual"/>
+		<LinearLayout
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_margin="10sp"
+			android:orientation="horizontal">
+
 			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
@@ -161,8 +162,8 @@
 					<ScrollView
 						android:id="@+id/radio_scroll_view"
 						android:layout_width="match_parent"
-						android:layout_height="80dp"
-						android:layout_margin="20dp"
+						android:layout_height="match_parent"
+
 						android:paddingHorizontal="10dp">
 
 						<RadioGroup
@@ -170,6 +171,7 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:orientation="vertical"
+							android:layout_gravity="left"
 							android:fontFamily="casual"/>
 
 					</ScrollView>
@@ -184,8 +186,8 @@
 					app:layout_constraintRight_toRightOf="parent">
 					<ProgressBar
 						android:id="@+id/progressBar"
-						android:layout_width="80sp"
-						android:layout_height="80sp"
+						android:layout_width="wrap_content"
+						android:layout_height="match_parent"
 						android:indeterminate="false"
 						android:progressDrawable="@drawable/circular_progress_bar"
 						android:background="@drawable/circle_shape"
@@ -195,7 +197,8 @@
 						android:layout_height="wrap_content" />
 				</LinearLayout>
 			</LinearLayout>
-        </RelativeLayout>
+
+		</LinearLayout>
 	</LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
