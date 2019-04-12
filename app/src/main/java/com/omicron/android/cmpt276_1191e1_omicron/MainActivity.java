@@ -1,5 +1,6 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -73,7 +74,20 @@ public class MainActivity extends AppCompatActivity
 	private FileCSV fileCSV; //object containing CSV functions
 	private int[] indexOfRadBtnToRemove = { -1 }; //which radio btn to remove
 	private boolean[] removeBtnEnable = { true }; //when false, do not allow "REMOVE PKG" button (required because GameActivity may be using that file to save "Hint Click")
-
+	
+	private static final int MINI_GAME_REQUEST_CODE = 5;
+	private boolean resumingMiniGame = false; //flag when returning from MiniGameActivity to resume game
+	
+	//data saved for mini game resume
+	private int[] viewInvisible;
+	//private boolean allowToSelect;
+	private int selectedLast;
+	private String[] cardArray;
+	private int[] cardKey;
+	private int gridRowCount;
+	private int gridColCount;
+	private int size;
+	
 	private WordArray wordArray;
 	/*private Word[] wordArray =new Word[]
 			{
@@ -92,7 +106,9 @@ public class MainActivity extends AppCompatActivity
 
 
 	// TODO: separate all of Intent activity.putExtra( ) outside of MainActivity in different functions
-
+	
+	// TODO: fix bug where when starting Sudoky game, then going to main menu, press 'start new game' but
+	// TODO:	then press cancel... it does not resume the game
 
 	@Override
 	protected void onCreate( Bundle savedInstanceState )
@@ -115,8 +131,6 @@ public class MainActivity extends AppCompatActivity
 
 		// SET LISTENERS TO WHICH PKG IS SELECTED //
 
-
-
 		pkgRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -128,6 +142,9 @@ public class MainActivity extends AppCompatActivity
 			}
 		});
 
+		
+		Log.d( "resume", "state: " + state );
+		
 
 		//create button which will start new UploadActivity to upload and process .csv file
 		Button btn_upload = findViewById( R.id.btn_upload );
@@ -221,6 +238,7 @@ public class MainActivity extends AppCompatActivity
 				 String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
 				 usrPuzzleTypePref[0] = -1;
 				 state = 0;
+				 resumingMiniGame = false;
 				 startDialog(fileNameSelected, state);
 
 			 }
@@ -235,6 +253,7 @@ public class MainActivity extends AppCompatActivity
 										public void onClick( View v )
 										{
 											state = 0;
+											resumingMiniGame = false;
 											btn_remove.setEnabled( true ); //allow user to remove pkg
 											removeBtnEnable[0] = true;
 											Button btnResume = findViewById( R.id.button_resume );
@@ -245,7 +264,7 @@ public class MainActivity extends AppCompatActivity
 
 
 		Button btnResume = (Button) findViewById(R.id.button_resume);
-		if (state == 0) {
+		if (state == 0 && resumingMiniGame == false ) {
 			btnResume.setEnabled(false); //block Resume button unless a previous game is saved
 			//DISABLE "REMOVE PKG" button when game is started
 			removeBtnEnable[0] = true;
@@ -260,6 +279,9 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(View v) {
 				if (state > 0) {
+					
+					Log.d( "resume", "resuming sudoku game..." );
+					
 					//load previous game preferences to prepare for export to new Game Activity
 					Intent resumeActivity = new Intent(MainActivity.this, GameActivity.class);
 					//save preferences for Game Activity to read
@@ -277,6 +299,28 @@ public class MainActivity extends AppCompatActivity
 					resumeActivity.putExtra("currentRectColoured", currentRectColoured);
 					resumeActivity.putExtra("currentSelectedIsCorrect", currentSelectedIsCorrect);
 					startActivityForResult(resumeActivity, 0);
+				}
+				else if( resumingMiniGame == true )
+				{
+					Log.d( "resume", "resuming mini game..." );
+					
+					// RESUME MINI GAME
+					Intent resumeIntent = new Intent( MainActivity.this, MiniGameActivity.class );
+					
+					//CardView data
+					resumeIntent.putExtra( "viewInvisible", viewInvisible );
+					//resumeIntent.putExtra( "allowToSelect", allowToSelect );
+					resumeIntent.putExtra( "selectedLast", selectedLast );
+					
+					//CardArray data
+					resumeIntent.putExtra( "resumeGame", true ); //resume existing game flag
+					resumeIntent.putExtra( "cardArray", cardArray );
+					resumeIntent.putExtra( "cardKey", cardKey );
+					resumeIntent.putExtra( "gridRowCount", gridRowCount );
+					resumeIntent.putExtra( "gridColCount", gridColCount );
+					resumeIntent.putExtra( "size", size );
+					
+					startActivityForResult( resumeIntent,  MINI_GAME_REQUEST_CODE );
 				}
 				else {
 					Toast.makeText(v.getContext(),R.string.no_resume, Toast.LENGTH_LONG).show();
@@ -326,6 +370,8 @@ public class MainActivity extends AppCompatActivity
 		updatePkgViewAfterUploadOrRemoval( CURRENT_WORD_PKG_COUNT_RETURN );
 
 		Log.d( "upload", "onStart() called from MainActivity" );
+		Log.d( "resume", "mainActivity onStart() state: " + state );
+		
 	}
 
 	@Override
@@ -340,6 +386,9 @@ public class MainActivity extends AppCompatActivity
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent resumeSrc) {
 		if (resumeSrc != null) {
+			
+			Log.d( "resume", "resuming data..." );
+			
 			//if all necessary game preferences are written in memory, then unblock resume button
 			if (resumeSrc.hasExtra("wordArray") && resumeSrc.hasExtra("usrLangPref") && resumeSrc.hasExtra("SudokuArr") && resumeSrc.hasExtra("usrMode") && resumeSrc.hasExtra("language")) {
 				Log.i("TAG", "resumeSrc has all elements");
@@ -364,6 +413,41 @@ public class MainActivity extends AppCompatActivity
 				usrDiffPref = 0;
 				usrPuzzleTypePref[0] = 0;
 				removeBtnEnable[0] = false;
+			}
+			else if( requestCode == MINI_GAME_REQUEST_CODE )
+			{
+				if( resultCode == Activity.RESULT_OK )
+				{
+					Log.d( "resume", "resuming from mini game... (saving data)" );
+					
+					// TODO: save resumingMiniGame when rotating
+					// TODO: save all intent data when rotating
+					// TODO: add data to buttonResume + gameStop button
+					// TODO: test resume/stop btn if they are disabled properly
+					
+					//set flag to resume game
+					resumingMiniGame = (boolean) resumeSrc.getSerializableExtra( "resumeGame" );
+					
+					//save data for mini game
+					//CardView
+					viewInvisible = (int[]) resumeSrc.getSerializableExtra( "viewInvisible" );
+					//allowToSelect = (boolean) resumeSrc.getSerializableExtra( "allowToSelect" );
+					selectedLast = (int) resumeSrc.getSerializableExtra( "selectedLast" );
+					
+					//CardArray
+					cardArray = (String[]) resumeSrc.getSerializableExtra( "cardArray" );
+					cardKey = (int[]) resumeSrc.getSerializableExtra( "cardKey" );
+					gridRowCount = (int) resumeSrc.getSerializableExtra( "gridRowCount" );
+					gridColCount = (int) resumeSrc.getSerializableExtra( "gridColCount" );
+					size = (int) resumeSrc.getSerializableExtra( "size" );
+					
+					//block buttons
+					Button btnResume = (Button) findViewById( R.id.button_resume );
+					btnResume.setEnabled( true );
+					Button btnRemove = (Button) findViewById( R.id.btn_remove ); //block user from deleting pkg while playing game
+					btnRemove.setEnabled( false );
+					removeBtnEnable[0] = false;
+				}
 			}
 		}
 	}
@@ -703,9 +787,14 @@ public class MainActivity extends AppCompatActivity
 				}
 				else if( usrModePref == 3 )
 				{
-					//if in mini-game mode
-					gameSetup( gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB );
-					startActivityForResult( gameActivity,5 );
+					Log.d( "resume", "mini game mode called..." );
+					
+					// MINI GAME MODE
+					
+					//gameSetup( gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB );
+					gameActivity.putExtra( "wordArray", wordArray );
+					gameActivity.putExtra( "resumeGame", false ); //resume flag - new game
+					startActivityForResult( gameActivity, MINI_GAME_REQUEST_CODE );
 				}
 				else {
 					//standard start

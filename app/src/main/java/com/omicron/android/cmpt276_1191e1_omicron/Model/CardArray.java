@@ -1,5 +1,6 @@
 package com.omicron.android.cmpt276_1191e1_omicron.Model;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -169,7 +170,7 @@ public class CardArray implements Serializable
 	public void saveDataForRotation( Bundle state )
 	{
 		/*
-		 * This function adds all necessary data to intent to be saved
+		 * This function adds all necessary data to intent to be saved when rotating
 		 */
 		
 		state.putSerializable( "cardArray", cardArray );
@@ -177,6 +178,19 @@ public class CardArray implements Serializable
 		state.putInt( "gridRowCount", gridRowCount );
 		state.putInt( "gridColCount", gridColCount );
 		state.putInt( "size", size );
+	}
+	
+	public void saveDataForResume( Intent intent )
+	{
+		/*
+		 * This function adds all necessary data to intent to be saved for resume
+		 */
+		
+		intent.putExtra( "cardArray", cardArray );
+		intent.putExtra( "cardKey", cardKey );
+		intent.putExtra( "gridRowCount", gridRowCount );
+		intent.putExtra( "gridColCount", gridColCount );
+		intent.putExtra( "size", size );
 	}
 	
 	public void restoreFromRotation( Bundle state )
@@ -190,6 +204,19 @@ public class CardArray implements Serializable
 		gridRowCount = state.getInt( "gridRowCount" );
 		gridColCount = state.getInt( "gridColCount" );
 		size = state.getInt( "size" );
+	}
+	
+	public void restoreFromResume( Intent intent )
+	{
+		/*
+		 * This function restores data when resuming game
+		 */
+		
+		cardArray = (String[]) intent.getSerializableExtra( "cardArray" );
+		cardKey = (int[]) intent.getSerializableExtra( "cardKey" );
+		gridRowCount = (int) intent.getSerializableExtra( "gridRowCount" );
+		gridColCount = (int) intent.getSerializableExtra( "gridColCount" );
+		size = (int) intent.getSerializableExtra( "size" );
 	}
 }
 

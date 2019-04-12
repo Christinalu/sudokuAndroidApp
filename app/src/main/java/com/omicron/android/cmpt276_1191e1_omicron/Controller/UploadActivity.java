@@ -198,7 +198,6 @@ public class UploadActivity extends AppCompatActivity
 		//disable slide in animation
 		overridePendingTransition(0, 0);
 		Log.d( "TAG", "onStart( ) in GameActivity called with animation" );
-		
 	}
 	
 	
