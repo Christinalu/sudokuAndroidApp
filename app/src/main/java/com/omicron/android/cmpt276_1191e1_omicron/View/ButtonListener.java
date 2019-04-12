@@ -177,6 +177,8 @@ public class ButtonListener extends AppCompatActivity {
 				index = i;
 				btnArr[i].setOnTouchListener(new View.OnTouchListener() {
 						private GestureDetector gestureDetector = new GestureDetector(context , new GestureDetector.SimpleOnGestureListener() {
+
+							View view = View.inflate(context, R.layout.activity_game, null);
 							@Override
 							public boolean onDoubleTap(MotionEvent e) {
 								Log.d("TEST", "onDoubleTap");
@@ -265,10 +267,13 @@ public class ButtonListener extends AppCompatActivity {
 									// do not include "else if inserted wrong input, do not allow to be decreased" because user is likely to make mistakes
 									// SO FAR keep the idea that "if inserted correct word once without using HintClick, it implies the user is getting better with that word"
 
+
 									//have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
-									/*if (usrSudokuArr.canCheck()) {
-										usrSudokuArr.checkPuzzle(v, btnArr);
-									}*/
+
+									if (usrSudokuArr.canCheck()) {
+										usrSudokuArr.checkPuzzle(view, btnArr);
+									}
+
 
 
 									Log.d( "highlight", "marked rectArr (in ButtonListener) as selected at: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );
