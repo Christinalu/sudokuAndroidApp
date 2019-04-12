@@ -129,9 +129,13 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				int pkgSelectId = group.getCheckedRadioButtonId();
+                RadioButton radBtnSelected = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
+                String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
+                updateProgressBar(fileNameSelected);
 
-				switch(pkgSelectId)
+                switch(pkgSelectId)
 				{
+
 
 					//void
 				}
@@ -397,27 +401,36 @@ public class MainActivity extends AppCompatActivity
 //	}
 
     private void updateProgressBar(String fileNameSelected) {
+	    Log.d("updateProgressBar",fileNameSelected);
 
         int numFalseStatus = 0;
         int numTrueStatus = 0;
-        FileInputStream fileInStream = null; //open file from internal storage
+
+
         try {
-            fileInStream = this.openFileInput( fileNameSelected );
+            //Log.d("updateProgressBar","inside try");
+            FileInputStream fileInStream =openFileInput( fileNameSelected );
+            //Log.d("updateProgressBar","after open");
             // READ ALL CONTENT
             InputStreamReader inStreamRead = new InputStreamReader( fileInStream );
             BufferedReader buffRead = new BufferedReader( inStreamRead );
-            String[] strSplit = null;
-            String line;
 
+            //Log.d("updateProgressBar","after string allocation");
+            String line;
             while( (line = buffRead.readLine()) != null )
+
             {
-                boolean status = Boolean.parseBoolean(strSplit[3]);
-                if (status==false){ numFalseStatus++; }
-                else if (status==true) { numTrueStatus++;}
-            }
+                String[] strSplit = line.split(",");
+                if (strSplit.length==4){
+                    boolean status = Boolean.parseBoolean(strSplit[3]);
+                    Log.d("updateProgressBar:state", Boolean.toString(status));
+                    if (!status){ numFalseStatus++; Log.d("updateProgressBar:false", Integer.toString(numFalseStatus)); }
+                    else if (status) { numTrueStatus++; Log.d("updateProgressBar:true", Integer.toString(numTrueStatus));}
+            }}
 
             buffRead.close( );
             Progress.setProgress(numTrueStatus);
+
             Progress.setMax(numFalseStatus+numTrueStatus);
 
         } catch (FileNotFoundException e) {
@@ -425,6 +438,8 @@ public class MainActivity extends AppCompatActivity
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
 
     }
 
@@ -487,6 +502,7 @@ public class MainActivity extends AppCompatActivity
 
 		//automatically select first button
 		( (RadioButton) (pkgRadioGroup.getChildAt(0)) ).setChecked( true );
+		updateProgressBar(wordPackageFileIndexArr.getPackageFileAtIndex( 0 ).getInternalFileName());
 
 		return 0;
 	}

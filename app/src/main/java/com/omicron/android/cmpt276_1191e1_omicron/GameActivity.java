@@ -765,6 +765,7 @@ public class GameActivity extends AppCompatActivity
 				else //line found, update in file
 				{
 					strBuild.append( strSplit[0] + "," + strSplit[1] +  "," + newHintClick +  "," + newWordStatus);
+					Log.d("updatefile:state", Boolean.toString(newWordStatus));
 					Log.d("row",line);
 					strBuild.append(  "\n");
 				}
