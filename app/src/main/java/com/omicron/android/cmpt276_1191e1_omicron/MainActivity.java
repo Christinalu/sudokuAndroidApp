@@ -143,6 +143,7 @@ public class MainActivity extends AppCompatActivity
 		Progress=(ProgressBar)findViewById(R.id.progressBar) ;
 		//Progress.setProgress(10);
 
+
 		fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
 
 		pkgRadioGroup = findViewById( R.id.pkg_radio_group ); //stores all the radio buttons with file names
@@ -381,7 +382,10 @@ public class MainActivity extends AppCompatActivity
 	{
 		super.onStart( );
 
-			/** WHEN USER RETURNING FROM UPLOAD ACTIVITY, UPDATE WORD PKG LIST **/
+
+
+
+		/** WHEN USER RETURNING FROM UPLOAD ACTIVITY, UPDATE WORD PKG LIST **/
 
 		FileCSV fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
 		int CURRENT_WORD_PKG_COUNT_RETURN;
@@ -411,6 +415,9 @@ public class MainActivity extends AppCompatActivity
 		}
 
 		pkgRadioGroup = findViewById(R.id.pkg_radio_group);
+		RadioButton radBtnSelected1 = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
+		String fileNameSelected1 = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected1)).getInternalFileName(); //get pkg internal file name to find csv
+		updateProgressBar(fileNameSelected1);
 
 		//update scroll pkg view
 		updatePkgViewAfterUploadOrRemoval( CURRENT_WORD_PKG_COUNT_RETURN );

@@ -331,6 +331,25 @@ public class WordArray implements Parcelable
 		return wordArray[i].getWordState( );
 	}
 
+	public int setGameStateAtIndex( int i,boolean state )
+	{
+		//returns empty string on error
+		if( i < 0 || i >= wordCount )
+		{ return -1; } //invalid index
+
+		wordArray[i].setGameState(state);
+		return 0;
+	}
+
+	public boolean getGameStateAtIndex( int i )
+	{
+		//returns empty string on error
+		if( i < 0 || i >= wordCount )
+		{ return false; } //invalid index
+
+		return wordArray[i].getGameState( );
+	}
+
 
 
 
