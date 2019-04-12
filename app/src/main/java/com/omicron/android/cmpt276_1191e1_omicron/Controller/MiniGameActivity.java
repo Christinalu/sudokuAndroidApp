@@ -1,5 +1,6 @@
 package com.omicron.android.cmpt276_1191e1_omicron.Controller;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -29,7 +30,9 @@ public class MiniGameActivity extends AppCompatActivity
 	private int gridRowCount; //rows in card gridlayout based on word count
 	private CardArray cardStringArray; //stores the strings to be displayed for each card
 	private CardView cardView; //stores the card view array
+	
 	private boolean rotation = false; //flag if device rotated
+	private boolean resumeGame = false; //flag if game resumed
 	
 	
 	@Override
@@ -48,6 +51,9 @@ public class MiniGameActivity extends AppCompatActivity
 			rotation = true;
 		}
 		
+		//Intent resumeIntent = getIntent( );
+		
+		
 		// TODO: add resume option
 		// TODO: save data on 'back' btn press
 		// TODO: implement saveInstanceState for state saving when rotating
@@ -61,9 +67,17 @@ public class MiniGameActivity extends AppCompatActivity
 		// TODO: play mini game, go to main menu, rotate screen, then resume game
 		// TODO: test when rotating, while animating, before animation ends, if allowToSelect[] gets properly changed/saved
 		
+		// TODO: when resuming game, set all data
+		// TODO: bug? start app, start mini game, go back to main menu, click "start new game" btn, this
+		// TODO:	should start new REGULAR game, because its selected, but it starts mini game instead
+		// TODO: add the same app background as in main menu
+		
+		//detect if restoring a game
 		Intent intentSrc = getIntent( );
 		if( intentSrc == null )
 		{ return; }
+		
+		resumeGame = (boolean) intentSrc.getSerializableExtra( "resumeGame" );
 		
 		if( rotation == false ){
 			wordArray = (WordArray) intentSrc.getParcelableExtra("wordArray");
@@ -80,9 +94,14 @@ public class MiniGameActivity extends AppCompatActivity
 		
 		cardStringArray = new CardArray( gridRowCount, gridColCount );
 		
+		//restore data CardArray
 		if( rotation == true ){
 			cardStringArray.restoreFromRotation( savedInstanceState );
-		}else{
+		}
+		else if( resumeGame == true ){
+			cardStringArray.restoreFromResume( intentSrc );
+		}
+		else{ //new game, don't restore data
 			cardStringArray.initializeStringArray(wordArray);
 		}
 		
@@ -111,8 +130,12 @@ public class MiniGameActivity extends AppCompatActivity
 		cardView = new CardView( gridRowCount, gridColCount, relativeLayout, this,
 								 cardStringArray, screenW, screenH, edgeOffset, barH );
 		
+		//restore data CardView
 		if( rotation == true ){
 			cardView.reDrawOnRotation( savedInstanceState );
+		}
+		else if( resumeGame == true ){
+			cardView.reDrawOnResume( intentSrc );
 		}
 		
 		
@@ -148,6 +171,26 @@ public class MiniGameActivity extends AppCompatActivity
 		
 		cardStringArray.saveDataForRotation( savedInstanceState );
 		cardView.saveDataForRotation( savedInstanceState );
+	}
+	
+	
+	@Override
+	public void onBackPressed( )
+	{
+		
+		Log.d( "resume", "back btn pressed in mini game" );
+		
+		Intent returnIntern = new Intent( );
+		returnIntern.putExtra( "resumeGame", true ); //flag to resume game
+		cardView.saveDataForResume( returnIntern );
+		cardStringArray.saveDataForResume( returnIntern );
+		setResult( Activity.RESULT_OK, returnIntern );
+		
+		Log.d( "resume", "back btn pressed in mini game 2" );
+		
+		super.onBackPressed( );
+		
+		//finish( );
 	}
 }
 

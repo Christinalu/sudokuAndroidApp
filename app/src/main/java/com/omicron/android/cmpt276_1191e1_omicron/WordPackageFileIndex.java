@@ -31,6 +31,7 @@ public class WordPackageFileIndex
 		String nativeLang; //stores the native lang
 		String translateLang; //stores the lang name of translation
 		String[] linePart = new String[WORD_PKG_ATTR_NUM]; //array parsing all data in line in individual strings
+		int packageWordPairCount; //stores number of word pairs in package
 		
 		MAX_WORD_PKG = MAX_WORD_PKG2;
 		CURRENT_WORD_PKG_COUNT = CURRENT_WORD_PKG_COUNT2;
@@ -55,9 +56,10 @@ public class WordPackageFileIndex
 			fileName = linePart[1];
 			nativeLang = linePart[2];
 			translateLang = linePart[3];
+			packageWordPairCount = Integer.parseInt( linePart[4] );
 			
 			//add all data into a PackageFile object
-			packageFileArr[i] = new PackageFile( pkgName, fileName, nativeLang, translateLang );
+			packageFileArr[i] = new PackageFile( pkgName, fileName, nativeLang, translateLang, packageWordPairCount );
 		
 		}
 	}

@@ -2,13 +2,14 @@ This file describes how each file is represented:
 
  - word_pkg_name_and_file_name.csv
 
-line example: 0-30 Numbers,pkg_0.csv,English,French,1
+line example: 0-30 Numbers,pkg_0.csv,English,French,10,1
 
 attribute   1: user defined pkg name
 			2: internal file name of pkg
 			3: native language
 			4: translation language
-			5: 1 == this is a default protected file and user cannot delete
+			5: number of word pairs in package
+			6: 1 == this is a default protected file and user cannot delete
 
  - current_word_pkg_count.txt
 
