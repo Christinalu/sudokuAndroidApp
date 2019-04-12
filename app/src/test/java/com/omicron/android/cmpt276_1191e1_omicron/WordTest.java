@@ -112,6 +112,6 @@ public class WordTest {
         assertNotEquals(false, mWord2.getGameState());
         assertEquals(false, mWord3.getGameState());
         assertNotEquals(true, mWord3.getGameState());
-        
+
     }
 }
