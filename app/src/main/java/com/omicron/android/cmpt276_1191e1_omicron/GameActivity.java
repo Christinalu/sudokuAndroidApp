@@ -1129,7 +1129,7 @@ public class GameActivity extends AppCompatActivity
 			}
 			
 			drawR.setDrawParameters( touchX, touchY, lastRectColoured, currentRectColoured );
-			drawR.reDraw( currentRectColoured, usrLangPref, 0 );
+			drawR.reDraw( currentRectColoured, usrLangPref, currentSelectedIsCorrect );
 		}
 	}
 	
