@@ -105,7 +105,7 @@ public class WordArray implements Parcelable
 	}
 	
 	
-	public int setUpBasedOnUserTypePreference( )
+	private int setUpBasedOnUserTypePreference( )
 	{
 		// returns -1 if user preference not initialized
 		

@@ -1,11 +1,15 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
+import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -13,10 +17,12 @@ import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.omicron.android.cmpt276_1191e1_omicron.Controller.EventActivity;
 import com.omicron.android.cmpt276_1191e1_omicron.Model.Block;
@@ -32,6 +38,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
 
@@ -52,12 +60,18 @@ public class GameActivity extends AppCompatActivity
 	private int usrPuzzSize; //stores puzzle size
 	private int usrPuzzleTypePref; //stores puzzle size 4x4 ... 1 = 4x4, 2 = 6x6, 3 = 9x9, 4 = 12x12
 
+	//Text to Speech
 	private TextToSpeech mTTS;
 	private String theWord;
 	private String language;
-	private int row;
-	private int col;
-	private int val;
+	private String STTlanguage;
+	private String STTlang = "";
+
+	//Speech to Text
+	private TextView mVoiceInputTEXTVIEW;
+	private ImageButton mSpeakBtn;
+	private static final int REQ_CODE_SPEECH_INPUT = 100;
+	private String speechWord;
 
 	private Paint paint = new Paint( );
 	//private Bitmap bitMap;
@@ -76,7 +90,6 @@ public class GameActivity extends AppCompatActivity
 	private Pair lastRectColoured = new Pair( -1, -1 ); // stores the last coloured square coordinates
 	private Pair currentRectColoured = new Pair( -1, -1 ); // stores the current coloured square
 	private int currentSelectedIsCorrect = 0;
-	//TODO TESTING
 
 	private Paint paintblack = new Paint();
 	private TextMatrix textMatrix; //stores the TextView for drawing the text
@@ -173,7 +186,7 @@ public class GameActivity extends AppCompatActivity
 		//set intent to receive word array from Main Activity
 		if (savedInstanceState != null) {
 			//a state had been saved, load it
-			savetheInstanceState (0, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect);
+			savetheInstanceState (0, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, STTlanguage, numArray, orderArr, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect);
 			rotation[0] = 1;
 		}
 		else {
@@ -187,6 +200,7 @@ public class GameActivity extends AppCompatActivity
 					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPref");
 					usrModePref = (int) gameSrc.getSerializableExtra("usrMode");
 					language = (String) gameSrc.getSerializableExtra("language");
+					STTlanguage = (String) gameSrc.getSerializableExtra("STTlanguage");
 					HINT_CLICK_TO_MAX_PROB = (int) gameSrc.getSerializableExtra( "HINT_CLICK_TO_MAX_PROB" );
 					currentRectColoured = (Pair) gameSrc.getSerializableExtra("currentRectColoured");
 					currentSelectedIsCorrect = (int) gameSrc.getSerializableExtra("currentSelectedIsCorrect");
@@ -199,13 +213,14 @@ public class GameActivity extends AppCompatActivity
 				}
 				else {
 					//we are starting a new game
-					//state = 1; //set game available to resume
 					wordArray = (WordArray) gameSrc.getParcelableExtra("wordArray");
 					usrLangPref = (int) gameSrc.getSerializableExtra("usrLangPref");
 					usrModePref = (int) gameSrc.getSerializableExtra("usrMode");
 					HINT_CLICK_TO_MAX_PROB = (int) gameSrc.getSerializableExtra( "HINT_CLICK_TO_MAX_PROB" );
 					usrDiffPref = (int) gameSrc.getSerializableExtra("usrDiffPref");
 					usrPuzzSize = (int) gameSrc.getSerializableExtra("usrPuzzSize");
+					language = (String) gameSrc.getSerializableExtra("language");
+					STTlanguage = (String) gameSrc.getSerializableExtra("STTlanguage");
 					if (usrModePref == 1) {
 						//create separate array to draw from for this mode
 						WORD_COUNT = wordArray.getWordCount( );
@@ -224,7 +239,6 @@ public class GameActivity extends AppCompatActivity
 								wordArray.setWordNativeAtIndex( i, Integer.toString(i + 1) );
 							}
 						}
-						language = (String) gameSrc.getSerializableExtra("language");
 					}
 					usrSudokuArr = new SudokuGenerator(usrDiffPref, usrPuzzSize);
 				}
@@ -248,12 +262,12 @@ public class GameActivity extends AppCompatActivity
 						Locale locale = new Locale(language);
 						int result = mTTS.setLanguage(locale);
 						if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-							Log.e("mTTS", "ERROR: language initialization failed. Language = "+language);
+							Log.d("mTTS", "ERROR: language initialization failed. Language = "+language);
 						}
-						Log.e("mTTS", "SUCCESS: language initialization successful. Language = "+language);
+						Log.d("mTTS", "SUCCESS: language initialization successful. Language = "+language);
 					}
 					else {
-						Log.e("mTTS", "ERROR: TextToSpeech FAILED");
+						Log.d("mTTS", "ERROR: TextToSpeech FAILED");
 					}
 				}
 			});
@@ -391,11 +405,6 @@ public class GameActivity extends AppCompatActivity
                         drawR.reDraw(currentRectColoured, usrLangPref, cSiC);
 						textMatrix.chooseLangAndDraw( currentRectColoured.getRow(), currentRectColoured.getColumn(),
 								wordArray, usrSudokuArr, usrLangPref );
-
-						// TODO: see if necessary implement similar undoBtnPressed[] flag for 'reset' btn - ie after resetting, press a btn and see what happens
-
-                    } else {
-                        //Toast.makeText(v.getContext(), "There is nothing to undo!", Toast.LENGTH_LONG).show();
                     }
                 }
 			}
@@ -490,7 +499,6 @@ public class GameActivity extends AppCompatActivity
 			}
 		);
 		
-		
 			/* ZOOM OUT BUTTON */
 
 		ImageButton btnZoomOut = findViewById( R.id.button_zoom_out );
@@ -550,6 +558,36 @@ public class GameActivity extends AppCompatActivity
 					}
 		);
 
+			/* SPEECH BUTTON */
+
+		//mVoiceInputTEXTVIEW = (TextView) findViewById(R.id.voiceInput);
+		mSpeakBtn = (ImageButton) findViewById(R.id.button_speak);
+		mSpeakBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				//startVoiceInput();
+				Intent speakSrc = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+				speakSrc.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+				if (usrLangPref == 0) {
+					//keyboard will be in native, as should STT
+					STTlang = wordArray.getNativeLang();
+				}
+				else {
+					//keyboard will be in translation, as should STT
+					STTlang = wordArray.getTranslationLang();
+				}
+				speakSrc.putExtra(RecognizerIntent.EXTRA_LANGUAGE,STTlanguage);
+				if (STTlanguage.equalsIgnoreCase("nomatch")) {
+					speakSrc.putExtra(RecognizerIntent.EXTRA_PROMPT, "Sorry, but Speech to Text does not recognize: "+STTlang);
+				}
+				else {
+					speakSrc.putExtra(RecognizerIntent.EXTRA_PROMPT, "Hello, How can I help you?");
+				}
+				try {
+					startActivityForResult(speakSrc, REQ_CODE_SPEECH_INPUT);
+				} catch (ActivityNotFoundException a) {}
+			}
+		});
 
 			// Legend:
 			// dX : pixel drag on screen non-scaled
@@ -616,7 +654,7 @@ public class GameActivity extends AppCompatActivity
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
-		savetheInstanceState (1, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, numArray, orderArr, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect);
+		savetheInstanceState (1, savedInstanceState, state, wordArray, usrLangPref, usrSudokuArr, usrModePref, language, STTlanguage, numArray, orderArr, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect);
 	}
 
 	@Override
@@ -637,6 +675,7 @@ public class GameActivity extends AppCompatActivity
 		resumeSrc.putExtra("state", state);
 		resumeSrc.putExtra("usrMode", usrModePref);
 		resumeSrc.putExtra("language", language);
+		resumeSrc.putExtra("STTlanguage", STTlanguage);
 		resumeSrc.putExtra("currentRectColoured", currentRectColoured);
 		resumeSrc.putExtra("currentSelectedIsCorrect", currentSelectedIsCorrect);
 		if (usrModePref == 1) {
@@ -809,6 +848,114 @@ public class GameActivity extends AppCompatActivity
 		for( int i=0; i<WORD_COUNT; i++ )
 		{
 			wordArray.wordUpdateHintClickAtIndex( i, 0 );
+		}
+	}
+
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode,resultCode,data);
+		switch(requestCode) {
+			case REQ_CODE_SPEECH_INPUT: {
+				if (resultCode == RESULT_OK && null != data) {
+					ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+					speechWord = result.get(0);
+					//mVoiceInputTEXTVIEW.setText(speechWord);
+					Log.d("TESTI","Speech returned: "+result.get(0));
+					//Speech to Text is not capable of converting numbers
+					//Test to see if string is a number
+					int test;
+                    Context v = getApplicationContext();
+					try {
+						test = Integer.parseInt(speechWord);
+					} catch (NumberFormatException e){
+						test = -1;
+					}
+					if (test != -1 && STTlang.equalsIgnoreCase("English")) {
+						speechWord = ENGDigittoString(speechWord);
+						test = -1;
+					}
+					else if (test != -1 && STTlang.equalsIgnoreCase("French")) {
+						speechWord = FREDigittoString(speechWord);
+						test = -1;
+					}
+					if (test == -1) {
+						if (currentRectColoured.getRow() != -1 && usrSudokuArr.PuzzleOriginal[currentRectColoured.getRow()][currentRectColoured.getColumn()]==0) {
+							Button[] btnArr = listeners.getbtnArr();
+							if (usrModePref == 0) {
+								//playing a standard game
+								if (usrLangPref == 0) {
+									for (int i = 0; i < WORD_COUNT; i++) {
+										if (speechWord.equalsIgnoreCase(wordArray.getWordNativeAtIndex(i))) {
+											//Toast.makeText(getApplicationContext(), "match found with: " + speechWord, Toast.LENGTH_LONG).show();
+											test = 1;
+											btnArr[i].performClick();
+											break;
+										}
+									}
+								} else {
+									for (int i = 0; i < WORD_COUNT; i++) {
+										if (speechWord.equalsIgnoreCase(wordArray.getWordTranslationAtIndex(i))) {
+											//Toast.makeText(getApplicationContext(), "match found with: " + speechWord, Toast.LENGTH_LONG).show();
+											test = 1;
+											btnArr[i].performClick();
+											break;
+										}
+									}
+								}
+							}
+							else {
+								//playing a listening comprehension game
+								if (usrLangPref == 0) {
+									for (int i = 0; i < WORD_COUNT; i++) {
+										//if (speechWord.equalsIgnoreCase(numArray[i])) {
+										if (speechWord.equalsIgnoreCase(wordArray.getWordNativeAtIndex(i))) {
+											//Toast.makeText(getApplicationContext(), "match found with: " + speechWord, Toast.LENGTH_LONG).show();
+											test = 1;
+											for (int j=0; j<WORD_COUNT; j++) {
+												if (orderArr[j] == i) {
+													btnArr[j].performClick();
+													break;
+												}
+											}
+											break;
+										}
+									}
+								} else {
+									for (int i = 0; i < WORD_COUNT; i++) {
+										if (speechWord.equalsIgnoreCase(wordArray.getWordTranslationAtIndex(i))) {
+											//Toast.makeText(getApplicationContext(), "match found with: " + speechWord, Toast.LENGTH_LONG).show();
+											test = 1;
+											for (int j=0; j<WORD_COUNT; j++) {
+												if (orderArr[j] == i) {
+													btnArr[j].performClick();
+													break;
+												}
+											}
+											break;
+										}
+									}
+								}
+								/*
+								//DEBUG
+								Log.d("TESTI", "orderArray is: " + Arrays.toString(orderArr));
+								Log.d("TESTI", "numArray is: " + Arrays.toString(numArray));
+								Log.d("TESTI", "button text is: ");
+								for (int k = 0; k < WORD_COUNT; k++) {
+									Log.d("TESTI", btnArr[k].getText().toString());
+								}
+								*/
+							}
+							if (test == -1) {
+								Toast.makeText(getApplicationContext(), "Sorry! No match found with: " + speechWord, Toast.LENGTH_SHORT).show();
+							}
+						}
+					}
+					else {
+						Toast.makeText(getApplicationContext(),R.string.no_numbers, Toast.LENGTH_LONG).show();
+					}
+				}
+			}
 		}
 	}
 	
@@ -1066,11 +1213,11 @@ public class GameActivity extends AppCompatActivity
 
 		// TEXT TO SPEECH
 		if (usrModePref == 1) {
-			row = currentRectColoured.getRow();
-			col = currentRectColoured.getColumn();
-			
+			int row = currentRectColoured.getRow();
+			int col = currentRectColoured.getColumn();
+
 			if (row < WORD_COUNT && col < WORD_COUNT && row > -1 && col > -1) {
-				val = usrSudokuArr.PuzzleOriginal[row][col];
+				int val = usrSudokuArr.PuzzleOriginal[row][col];
 				if (val != 0) {
 					theWord = numArray[val-1];
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -1083,7 +1230,6 @@ public class GameActivity extends AppCompatActivity
 		}
 		
 	}
-	
 	
 	private void actionMove( )
 	{
@@ -1251,6 +1397,7 @@ public class GameActivity extends AppCompatActivity
 		touchXZ[0] = topX;
 		touchYZ[0] = topY;
 	}
+
 	private void randomizeOrder(int[] arr)
 	{
 		//bit map to see what order has been used
@@ -1272,7 +1419,94 @@ public class GameActivity extends AppCompatActivity
 			}
 		}
 	}
-	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP, Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect) {
+
+	private String ENGDigittoString(String digit) {
+		//ONLY SUPPORTS [0,99] CONVERSION TO ENGLISH
+		int len = digit.length();
+		int value = Integer.parseInt(digit);
+		int tempval;
+		if (len != 0 && len < 3) {
+			digit = "";
+			String[] oneDigit = new String[]{"Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"};
+			String[] twoDigit = new String[]{"Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"};
+			String[] tensDigit = new String[]{"","","Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"};
+			if (len == 2) {
+				//if two digit number
+				tempval = value-10;
+				if (tempval < 10) {
+					//digit is in the range [10,19]
+					digit = twoDigit[tempval];
+				}
+				else {
+					//digit is in the range [20,99]
+					digit = tensDigit[value/10];
+					if (value%10 != 0) {
+						digit += " "+oneDigit[value%10];
+					}
+				}
+			}
+			else if (len == 1) {
+				//digit is in the range [0,9]
+				digit = oneDigit[value];
+			}
+		}
+		return digit;
+	}
+
+	private String FREDigittoString(String digit) {
+		//ONLY SUPPORTS [0,99] CONVERSION TO FRENCH
+		int len = digit.length();
+		int value = Integer.parseInt(digit);
+		int tempval;
+		int tempval2;
+		if (len != 0 && len < 3) {
+			digit = "";
+			String[] oneDigit = new String[]{"Zero", "Un", "Deux", "Trois", "Quatre", "Cinq", "Six", "Sept", "Huit", "Neuf"};
+			String[] twoDigit = new String[]{"Dix", "Onze", "Douze", "Treize", "Quatorze", "Quinze", "Seize", "Dix-Sept", "Dix-Huit", "Dix-Neuf"};
+			String[] tensDigit = new String[]{"","","Vingt", "Trente", "Quarante", "Cinquante", "Soixante", "Soixante", "Quatre-Vingt", "Quatre-Vingt"};
+			if (len == 2) {
+				//if two digit number
+				tempval = value-10;
+				if (tempval < 10) {
+					//digit is in the range [10,19]
+					digit = twoDigit[tempval];
+				}
+				else {
+					//digit is in the range [20,99]
+					tempval2 = value/10;
+					digit = tensDigit[tempval2];
+					tempval = value%10;
+					if (tempval != 0) {
+						if (tempval2 < 7 || tempval2 == 8) {
+							//digit is in range [20,69] or [80,89]
+							if (tempval == 1) {
+								//second digit is a one
+								digit += "-et-" + oneDigit[tempval];
+							} else {
+								digit += "-" + oneDigit[tempval];
+							}
+						}
+						else {
+							//digit is in range [70,79] or [90,99]
+							if (tempval == 1) {
+								digit += "-et-" + twoDigit[tempval];
+							}
+							else {
+								digit += "-" + twoDigit[tempval];
+							}
+						}
+					}
+				}
+			}
+			else if (len == 1) {
+				//digit is in the range [0,9]
+				digit = oneDigit[value];
+			}
+		}
+		return digit;
+	}
+
+	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String sis_STTlanguage, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP, Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect) {
 		if (RorS == 0) {
 			//we are receiving
 			//a state had been saved, load it
@@ -1282,12 +1516,10 @@ public class GameActivity extends AppCompatActivity
 			usrSudokuArr = (SudokuGenerator) savedInstanceState.get("SudokuArr");
 			usrModePref = (int) savedInstanceState.getSerializable("usrMode");
 			language = (String) savedInstanceState.getSerializable("language");
+			STTlanguage = (String) savedInstanceState.getSerializable("STTlanguage");
 			HINT_CLICK_TO_MAX_PROB = savedInstanceState.getInt( "HINT_CLICK_TO_MAX_PROB" );
-			//touchX = (int[]) savedInstanceState.getIntArray("touchX");
-			//touchY = (int[]) savedInstanceState.getIntArray("touchY");
 			currentRectColoured = (Pair) savedInstanceState.getSerializable("currentRectColoured");
 			currentSelectedIsCorrect = (int) savedInstanceState.getSerializable("currentSelectedIsCorrect");
-			//rectArr = (Block[][]) savedInstanceState.getSerializable("rectArr");
 			if (usrModePref == 1) {
 				numArray = (String[]) savedInstanceState.getSerializable("numArray");
 				orderArr = (int[]) savedInstanceState.getIntArray("orderArr");
@@ -1305,12 +1537,10 @@ public class GameActivity extends AppCompatActivity
 			savedInstanceState.putSerializable("SudokuArr", sis_usrSudokuArr);
 			savedInstanceState.putInt("usrMode", sis_usrModePref);
 			savedInstanceState.putString("language", sis_language);
+			savedInstanceState.putString("STTlanguage", sis_STTlanguage);
 			savedInstanceState.putInt("HINT_CLICK_TO_MAX_PROB", sis_HCTMP);
-			//savedInstanceState.putIntArray("touchX", touchx);
-			//savedInstanceState.putIntArray("touchY", touchy);
 			savedInstanceState.putSerializable("currentRectColoured", sis_currentRectColoured);
 			savedInstanceState.putSerializable("currentSelectedIsCorrect", sis_currentSelectedIsCorrect);
-			//savedInstanceState.putSerializable("rectArr", sis_rectArr);
 			if (sis_usrModePref == 1) {
 				savedInstanceState.putStringArray("numArray", sis_numArray);
 				savedInstanceState.putIntArray("orderArr", sis_orderArr);
