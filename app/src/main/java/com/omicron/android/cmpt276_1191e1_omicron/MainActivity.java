@@ -259,7 +259,7 @@ public class MainActivity extends AppCompatActivity
                                              // Select Package from main activity
                                              RadioButton radBtnSelected = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
                                              String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
-                                             resumingMiniGame = false;
+                                             resumingMiniGame = true;
                                              startDialog(fileNameSelected);
                                          }
                                      });
