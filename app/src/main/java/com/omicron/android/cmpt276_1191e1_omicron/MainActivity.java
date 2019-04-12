@@ -53,7 +53,8 @@ public class MainActivity extends AppCompatActivity
 	private int usrLangPref = 0; // 0=eng_fr, 1=fr_eng; 0 == native(squares that cannot be modified); 1 == translation(the words that the user inserts)
 	private int usrDiffPref; //0=easy,1=medium,2=difficult
 	private int state = 0; //0=new start, 1=resume
-	private String language;
+	private String language = "nomatch";
+	private String STTlanguage = "nomatch";
 	private boolean canStart = true;
 	private int[] usrPuzzleTypePref = {-1}; //determines if it is a 4x4, 6x6, 9x9 or 12x12 sudoku puzzle
 	private RadioGroup pkgRadioGroup;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity
 	private SudokuGenerator usrSudokuArrResume;
 	int usrModePrefResume;
 	String languageResume;
+	String STTlanguageResume;
 	private Pair currentRectColoured = new Pair( -1, -1 ); // stores the current coloured square
 	private int currentSelectedIsCorrect=0;
 
@@ -134,10 +136,7 @@ public class MainActivity extends AppCompatActivity
 		super.onCreate( savedInstanceState );
 		setContentView( R.layout.activity_main );
 		if (savedInstanceState != null) {
-			savetheInstanceState(0, savedInstanceState, state, wordArrayResume, usrLangPrefResume,
-					usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume,
-					0, currentRectColoured, currentSelectedIsCorrect, resumingMiniGame, viewInvisible,
-					selectedLast, cardArray, cardKey, gridRowCount, gridColCount, size);
+			savetheInstanceState(0, savedInstanceState, state, wordArrayResume, usrLangPrefResume, usrSudokuArrResume, usrModePrefResume, languageResume, STTlanguageResume, numArrayResume, orderArrResume, 0, currentRectColoured, currentSelectedIsCorrect, resumingMiniGame, viewInvisible, selectedLast, cardArray, cardKey, gridRowCount, gridColCount, size);
 		}
 
 		Progress=(ProgressBar)findViewById(R.id.progressBar) ;
@@ -166,8 +165,6 @@ public class MainActivity extends AppCompatActivity
 
                 switch(pkgSelectId)
 				{
-
-
 					//void
 				}
 			}
@@ -227,10 +224,8 @@ public class MainActivity extends AppCompatActivity
 			public void onInit(int status) {
 				if (status == TextToSpeech.SUCCESS) {
 					thelocale = Locale.getAvailableLocales();
-					//For optional implementations
 					String TTSlanguage;
 					String TTScountry;
-					//int counter = 0;
 					for (Locale LO : thelocale) {
 						int res = lTTS.isLanguageAvailable(LO);
 						if (res == TextToSpeech.LANG_COUNTRY_AVAILABLE) {
@@ -238,15 +233,12 @@ public class MainActivity extends AppCompatActivity
 							localeList.add(LO);
 							//store all available language tag (String)
 							lTTSlangTags.add(LO.toLanguageTag());
-							//Log.e("lTTS", "LanguageTag is: "+lTTSlangTags.get(counter));
-							//For optional implementations
 							//store all available locales in language - country format (strings)
 							TTSlanguage = LO.getDisplayLanguage();
 							lTTSlanguage.add(TTSlanguage);
 							TTScountry = LO.getDisplayCountry();
 							lTTScountry.add(TTScountry);
-							//Log.e("lTTS", "Language and Country is: "+lTTSlanguage.get(counter)+" - "+lTTScountry.get(counter));
-							//counter++;
+							//Log.d("lTTS", "Language and Country is: "+lTTSlanguage.get(counter)+" - "+lTTScountry.get(counter));
 						}
 					}
 				}
@@ -341,6 +333,7 @@ public class MainActivity extends AppCompatActivity
 						resumeActivity.putExtra("orderArr", orderArrResume);
 					}
 					resumeActivity.putExtra("language", languageResume);
+					resumeActivity.putExtra("STTlanguage", STTlanguageResume);
 					resumeActivity.putExtra( "HINT_CLICK_TO_MAX_PROB", HINT_CLICK_TO_MAX_PROB );
 					resumeActivity.putExtra("currentRectColoured", currentRectColoured);
 					resumeActivity.putExtra("currentSelectedIsCorrect", currentSelectedIsCorrect);
@@ -448,6 +441,7 @@ public class MainActivity extends AppCompatActivity
 					orderArrResume = (int[]) resumeSrc.getIntArrayExtra("orderArr");
 				}
 				languageResume = (String) resumeSrc.getSerializableExtra("language");
+				STTlanguageResume = (String) resumeSrc.getSerializableExtra("STTlanguage");
 				currentRectColoured = (Pair) resumeSrc.getSerializableExtra("currentRectColoured");
 				currentSelectedIsCorrect = (int) resumeSrc.getSerializableExtra("currentSelectedIsCorrect");
 				Button btnResume = (Button) findViewById(R.id.button_resume);
@@ -501,11 +495,8 @@ public class MainActivity extends AppCompatActivity
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
-		savetheInstanceState(1, savedInstanceState, state, wordArrayResume, usrLangPrefResume,
-				usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume,
-				HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect,
-				resumingMiniGame, viewInvisible, selectedLast, cardArray, cardKey,
-				gridRowCount, gridColCount, size);
+		savetheInstanceState(1, savedInstanceState, state, wordArrayResume, usrLangPrefResume, usrSudokuArrResume, usrModePrefResume, languageResume, STTlanguageResume, numArrayResume, orderArrResume, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect, resumingMiniGame, viewInvisible, selectedLast, cardArray, cardKey,
+                gridRowCount, gridColCount, size);
 	}
 
 //	private int findUserPuzzleTypePreference( RadioGroup radGroup )
@@ -676,12 +667,9 @@ public class MainActivity extends AppCompatActivity
 			Log.d("upload", "USER DID NOT MODIFY A PKG");
 		}
 	}
-	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref,
-									  SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language,
-									  String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP,
-									  Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect, boolean sis_resumingMiniGame,
-									  int[] sis_viewInvisible, int sis_selectedLast, String[] sis_cardArray, int[] sis_cardKey,
-									  int sis_gridRowCount, int sis_gridColCount, int sis_size) {
+	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String sis_STTlanguage, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP, Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect, boolean sis_resumingMiniGame,
+                                      int[] sis_viewInvisible, int sis_selectedLast, String[] sis_cardArray, int[] sis_cardKey,
+                                      int sis_gridRowCount, int sis_gridColCount, int sis_size) {
 		if (RorS == 0) {
 			//we are receiving
 			state = (int) savedInstanceState.getSerializable("state");
@@ -693,6 +681,7 @@ public class MainActivity extends AppCompatActivity
 				usrSudokuArrResume = (SudokuGenerator) savedInstanceState.get("SudokuArr");
 				usrModePrefResume = (int) savedInstanceState.getSerializable("usrMode");
 				languageResume = (String) savedInstanceState.getSerializable("language");
+				STTlanguageResume = (String) savedInstanceState.getSerializable("STTlanguage");
 				HINT_CLICK_TO_MAX_PROB = (int) savedInstanceState.getSerializable("HINT_CLICK_TO_MAX_PROB");
 				currentRectColoured = (Pair) savedInstanceState.getSerializable("currentRectColoured");
 				currentSelectedIsCorrect = (int) savedInstanceState.getSerializable("currentSelectedIsCorrect");
@@ -724,6 +713,7 @@ public class MainActivity extends AppCompatActivity
 				savedInstanceState.putSerializable("SudokuArr", sis_usrSudokuArr);
 				savedInstanceState.putInt("usrMode", sis_usrModePref);
 				savedInstanceState.putString("language", sis_language);
+				savedInstanceState.putString("STTlanguage", sis_STTlanguage);
 				savedInstanceState.putInt( "HINT_CLICK_TO_MAX_PROB", sis_HCTMP );
 				savedInstanceState.putSerializable("currentRectColoured", sis_currentRectColoured);
 				savedInstanceState.putSerializable("currentSelectedIsCorrect", sis_currentSelectedIsCorrect);
@@ -745,18 +735,19 @@ public class MainActivity extends AppCompatActivity
 			}
 		}
 	}
-	public void gameSetup(Intent gA, int gs_state, WordArray gs_wordArray, int gs_usrLangPref, int gs_usrDiffPref, int gs_usrModePref, String gs_language, int gs_usrPuzzleTypePref, int HCTMP) {
+	public void gameSetup(Intent gA, int gs_state, WordArray gs_wordArray, int gs_usrLangPref, int gs_usrDiffPref, int gs_usrModePref, String gs_language, String gs_STTlanguage, int gs_usrPuzzleTypePref, int HCTMP) {
 		gA.putExtra("state", gs_state);
 		gA.putExtra( "wordArray", gs_wordArray );
 		gA.putExtra( "usrLangPref", gs_usrLangPref );
 		gA.putExtra("usrDiffPref",gs_usrDiffPref);
 		gA.putExtra("usrMode", gs_usrModePref);
 		gA.putExtra("language", gs_language);
+		gA.putExtra("STTlanguage", gs_STTlanguage);
 		gA.putExtra("usrPuzzSize", gs_usrPuzzleTypePref);
 		gA.putExtra( "HINT_CLICK_TO_MAX_PROB", HCTMP );
 	}
 
-	private  void startDialog(final String fileNameSelected){
+	private void startDialog(final String fileNameSelected){
 
 		final View view = getLayoutInflater().inflate(R.layout.activity_sub_menu, null);
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this,R.style.Theme_AppCompat_DayNight_Dialog_Alert);
@@ -870,7 +861,6 @@ public class MainActivity extends AppCompatActivity
 						Log.d("upload", "ERROR: initializeWordArray( ) returned an error");
 						Toast.makeText(MainActivity.this, "Please select one of the Puzzle Types to start", Toast.LENGTH_SHORT).show();
 						return; //error: could not initialize wordArray
-
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -884,36 +874,58 @@ public class MainActivity extends AppCompatActivity
 					gameActivity = new Intent(MainActivity.this, GameActivity.class);
 				}
 				//check to see for language format is correct and available
-				if (usrModePref == 1) {
+				if (usrModePref == 1 || usrModePref == 0) {
 					if (usrLangPref == 0) {
 						language = wordArray.getTranslationLang();
+                        STTlanguage = wordArray.getNativeLang();
 						Log.e("lTTSs", "language is: "+language);
 					}
 					else {
 						language = wordArray.getNativeLang();
+                        STTlanguage = wordArray.getTranslationLang();
 						Log.e("lTTSs", "language is: "+language);
 					}
 					canStart = false;
-					for (int i=0; i<lTTSlangTags.size(); i++) {
-						//Log.e("lTTS", "language is: "+language+" langTag is: "+langTags.get(i));
-						if (Objects.equals(language,lTTSlanguage.get(i))) {
-							language = lTTSlangTags.get(i);
-							canStart = true;
-							if (canStart) {
-								break;
-							}
-						}
-					}
-					if (canStart) {
-						//save wordArray for Game Activity
-						gameSetup(gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB);
-						startActivityForResult(gameActivity,0);
-					}
-					else {
-						Toast.makeText(view.getContext(),R.string.no_language, Toast.LENGTH_LONG).show();
-					}
+                    for (int i=0; i<lTTSlangTags.size(); i++) {
+                        //Log.d("lTTS", "language is: "+language+" langTag is: "+lTTSlangTags.get(i));
+                        if (language.equalsIgnoreCase(lTTSlanguage.get(i))) {
+                            language = lTTSlangTags.get(i);
+                            canStart = true;
+                            break;
+                        }
+                    }
+                    //get langtag for other language for STT
+                    boolean matchFound = false;
+                    for (int i=0; i<lTTSlangTags.size(); i++) {
+                        //Log.d("lTTS", "language is: "+language+" langTag is: "+lTTSlangTags.get(i));
+                        if (STTlanguage.equalsIgnoreCase(lTTSlanguage.get(i))) {
+                            STTlanguage = lTTSlangTags.get(i);
+                            matchFound = true;
+                            break;
+                        }
+                    }
+                    if (!matchFound) {
+                        STTlanguage = "nomatch";
+                    }
+                    if (usrModePref == 1) {
+                        if (canStart) {
+                            //save wordArray for Game Activity
+                            state = 0;
+                            gameSetup(gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, STTlanguage, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB);
+                            startActivityForResult(gameActivity, 0);
+                        }
+                        else {
+                            Toast.makeText(view.getContext(),R.string.no_language, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                    else {
+                        //standard start
+                        state = 0;
+                        gameSetup(gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, STTlanguage, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB);
+                        startActivityForResult(gameActivity,0);
+                    }
 				}
-				else if( usrModePref == 3 )
+                else //usrModPref == 3
 				{
 					Log.d( "resume", "mini game mode called..." );
 
@@ -923,11 +935,6 @@ public class MainActivity extends AppCompatActivity
 					gameActivity.putExtra( "wordArray", wordArray );
 					gameActivity.putExtra( "resumeGame", false ); //resume flag - new game
 					startActivityForResult( gameActivity, MINI_GAME_REQUEST_CODE );
-				}
-				else {
-					//standard start
-					gameSetup(gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB);
-					startActivityForResult(gameActivity,0);
 				}
 			}
 		});
