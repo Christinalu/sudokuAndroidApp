@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 
 public class PackageFileTest {
 
-    private PackageFile mPackageFile = new PackageFile("my name", "file name", "Chinese", "Japanese");
+    private PackageFile mPackageFile = new PackageFile("my name", "file name", "Chinese", "Japanese", 10);
 
     @Test
     public void getWordPackageName() throws Exception{
