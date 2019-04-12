@@ -267,10 +267,8 @@ public class MainActivity extends AppCompatActivity
                                              // Select Package from main activity
                                              RadioButton radBtnSelected = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
                                              String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
-                                             usrPuzzleTypePref[0] = -1;
-                                             state = 0;
                                              resumingMiniGame = false;
-                                             startDialog(fileNameSelected, state);
+                                             startDialog(fileNameSelected);
                                          }
                                      });
 
@@ -758,11 +756,14 @@ public class MainActivity extends AppCompatActivity
 		gA.putExtra( "HINT_CLICK_TO_MAX_PROB", HCTMP );
 	}
 
-	private  void startDialog(final String fileNameSelected, final int state){
+	private  void startDialog(final String fileNameSelected){
 
 		final View view = getLayoutInflater().inflate(R.layout.activity_sub_menu, null);
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this,R.style.Theme_AppCompat_DayNight_Dialog_Alert);
 		alertDialog.setView(view);
+
+		usrPuzzleTypePref[0] = -1;
+		usrModePref = 0;
 
 		// CHOOSE THE DIFFICULTY
 		Difficulty = view.findViewById(R.id.button_level);
@@ -858,15 +859,18 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 
+				state = 0;
 				wordArray = new WordArray( usrPuzzleTypePref[0], MAX_CSV_ROW, HINT_CLICK_TO_MAX_PROB, usrModePref );
 
 				try {
 					//based on pkg, initialize the wordArray (select 'n' words)
-					int res = wordArray.initializeWordArray( MainActivity.this, fileNameSelected );
-					if( res == 1 ){
-						Log.d( "upload", "ERROR: initializeWordArray( ) returned an error" );
+
+					int res = wordArray.initializeWordArray(MainActivity.this, fileNameSelected);
+					if (res == 1 && usrModePref != 3) {
+						Log.d("upload", "ERROR: initializeWordArray( ) returned an error");
 						Toast.makeText(MainActivity.this, "Please select one of the Puzzle Types to start", Toast.LENGTH_SHORT).show();
 						return; //error: could not initialize wordArray
+
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
