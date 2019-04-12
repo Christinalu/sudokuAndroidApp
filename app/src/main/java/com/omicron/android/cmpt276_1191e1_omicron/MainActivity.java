@@ -407,10 +407,6 @@ public class MainActivity extends AppCompatActivity
 			e.printStackTrace( );
 		}
 
-		pkgRadioGroup = findViewById(R.id.pkg_radio_group);
-		RadioButton radBtnSelected1 = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
-		String fileNameSelected1 = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected1)).getInternalFileName(); //get pkg internal file name to find csv
-		updateProgressBar(fileNameSelected1);
 
 		//update scroll pkg view
 		updatePkgViewAfterUploadOrRemoval( CURRENT_WORD_PKG_COUNT_RETURN );
@@ -504,6 +500,7 @@ public class MainActivity extends AppCompatActivity
 		super.onSaveInstanceState(savedInstanceState);
 		savetheInstanceState(1, savedInstanceState, state, wordArrayResume, usrLangPrefResume, usrSudokuArrResume, usrModePrefResume, languageResume, STTlanguageResume, numArrayResume, orderArrResume, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect, resumingMiniGame, viewInvisible, selectedLast, cardArray, cardKey,
                 gridRowCount, gridColCount, size);
+
 	}
 
 //	private int findUserPuzzleTypePreference( RadioGroup radGroup )
@@ -668,11 +665,16 @@ public class MainActivity extends AppCompatActivity
 			//reselect top radio btn
 			( (RadioButton) pkgRadioGroup.getChildAt(0)).setChecked( true );
 
+
 		}
 		else
 		{
 			Log.d("upload", "USER DID NOT MODIFY A PKG");
 		}
+		pkgRadioGroup = findViewById(R.id.pkg_radio_group);
+		RadioButton radBtnSelected1 = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
+		String fileNameSelected1 = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected1)).getInternalFileName(); //get pkg internal file name to find csv
+		updateProgressBar(fileNameSelected1);
 	}
 	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String sis_STTlanguage, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP, Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect, boolean sis_resumingMiniGame,
                                       int[] sis_viewInvisible, int sis_selectedLast, String[] sis_cardArray, int[] sis_cardKey,
