@@ -940,7 +940,7 @@ public class GameActivity extends AppCompatActivity
 								*/
 							}
 							if (test == -1) {
-								Toast.makeText(getApplicationContext(), "Sorry! Mo match found with: " + speechWord, Toast.LENGTH_SHORT).show();
+								Toast.makeText(getApplicationContext(), "Sorry! No match found with: " + speechWord, Toast.LENGTH_SHORT).show();
 							}
 						}
 					}
