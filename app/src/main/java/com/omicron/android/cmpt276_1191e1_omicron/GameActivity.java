@@ -625,7 +625,6 @@ public class GameActivity extends AppCompatActivity
 		onStopAlreadyCalled[0] = 1; //stop onStop() from being called again
 		Log.i("selectW", "back pressed");
 		Intent resumeSrc = new Intent( GameActivity.this, MainActivity.class );
-		Intent eventName = new Intent (GameActivity.this, EventActivity.class);
 		resumeSrc.putExtra( "wordArray", wordArray );
 		resumeSrc.putExtra( "usrLangPref", usrLangPref );
 		resumeSrc.putExtra("SudokuArr", usrSudokuArr);
@@ -635,7 +634,6 @@ public class GameActivity extends AppCompatActivity
 		else {
 			state = 1;
 		}
-        eventName.putExtra("ifFinished", state);
 		resumeSrc.putExtra("state", state);
 		resumeSrc.putExtra("usrMode", usrModePref);
 		resumeSrc.putExtra("language", language);

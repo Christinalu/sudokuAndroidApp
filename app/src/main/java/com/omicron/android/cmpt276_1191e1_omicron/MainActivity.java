@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
 	private WordArray wordArray;
 
-	public static String packageName;
+	private String packageName;
 	private ImageButton calendar_button;
 	private Calendar mCalendar;
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				int pkgSelectId = group.getCheckedRadioButtonId();
+				packageName =((RadioButton)findViewById(pkgSelectId)).getText().toString();
 				switch (pkgSelectId) {
 					//void
 				}
@@ -205,10 +206,6 @@ public class MainActivity extends AppCompatActivity {
 				usrPuzzleTypePref[0] = -1;
 				state = 0;
 				startDialog(fileNameSelected, state);
-
-				// Pass the package name user selected to Calendar event
-				Intent eventActivity = new Intent(MainActivity.this, EventActivity.class);
-				eventActivity.putExtra("PackageName", packageName);
 			}
 		});
 
@@ -222,6 +219,8 @@ public class MainActivity extends AppCompatActivity {
 				curDate = new Date();
 				Intent eventActivityIntent = new Intent(MainActivity.this, EventActivity.class);
 				eventActivityIntent.putExtra("ActivityDate", dateFormat.format(curDate));
+				eventActivityIntent.putExtra("PackageName", packageName);
+				eventActivityIntent.putExtra("ifFinished", state);
 				startActivity(eventActivityIntent);
 			}
 		});
@@ -366,17 +365,6 @@ public class MainActivity extends AppCompatActivity {
 		super.onSaveInstanceState(savedInstanceState);
 		savetheInstanceState(1, savedInstanceState, state, wordArrayResume, usrLangPrefResume, usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect);
 	}
-
-//	private int findUserPuzzleTypePreference( RadioGroup radGroup )
-//	{
-//		//find which puzzle type the user selected
-//		int usrPuzzleTypePref = -1;
-//		int btnID = radGroup.getCheckedRadioButtonId( );
-//		View radioBtn = radGroup.findViewById( btnID );
-//		usrPuzzleTypePref = radGroup.indexOfChild(radGroup);
-//		return usrPuzzleTypePref - 1; //-1 because first index is TextView
-//	}
-
 
 	private int checkIfJustInstalledAndSetUpPackagesAlreadyInstalled() {
 		//return 0 on success
@@ -687,41 +675,6 @@ public class MainActivity extends AppCompatActivity {
 		//dialog.getWindow().setBackgroundDrawable(R.drawable.background);
 
 	}
-
-//	public void showCalendar() {
-////		datePickerDialog = new DatePickerDialog(
-////				this, new DatePickerDialog.OnDateSetListener() {
-////			@Override
-////			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-////				eventView();
-////			}
-////		},
-////				mCalendar.get(Calendar.YEAR),
-////				mCalendar.get(Calendar.MONTH),
-////				mCalendar.get(Calendar.DAY_OF_MONTH));
-////		datePickerDialog.show();
-//		//v = getLayoutInflater().inflate(R.layout.activity_calendar, null);
-//
-//		AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this,R.style.Theme_AppCompat_DayNight_Dialog_Alert);
-//		alertDialog.setView(R.layout.activity_calendar);
-//
-//
-//		AlertDialog dialog = alertDialog.create();
-//		dialog.show();
-//	}
-
-//	public void eventView(){
-//		View event = getLayoutInflater().inflate(R.layout.calendar_event, null);
-//		AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this,R.style.Theme_AppCompat_DayNight_Dialog_Alert);
-//		alertDialog.setView(event);
-//
-//		TextView eventView = findViewById(R.id.event_view);
-//		eventView.setText("This is for testing");
-//		eventView.setTextColor(getResources().getColor(R.color.navy));
-//
-//		AlertDialog dialog = alertDialog.create();
-//		dialog.show();
-//	}
 
 }
 
