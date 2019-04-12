@@ -116,7 +116,10 @@ public class MainActivity extends AppCompatActivity
 		super.onCreate( savedInstanceState );
 		setContentView( R.layout.activity_main );
 		if (savedInstanceState != null) {
-			savetheInstanceState(0, savedInstanceState, state, wordArrayResume, usrLangPrefResume, usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume, 0, currentRectColoured, currentSelectedIsCorrect);
+			savetheInstanceState(0, savedInstanceState, state, wordArrayResume, usrLangPrefResume,
+					usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume,
+					0, currentRectColoured, currentSelectedIsCorrect, resumingMiniGame, viewInvisible,
+					selectedLast, cardArray, cardKey, gridRowCount, gridColCount, size);
 		}
 
 		fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
@@ -455,7 +458,11 @@ public class MainActivity extends AppCompatActivity
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
-		savetheInstanceState(1, savedInstanceState, state, wordArrayResume, usrLangPrefResume, usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect);
+		savetheInstanceState(1, savedInstanceState, state, wordArrayResume, usrLangPrefResume,
+				usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume,
+				HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect,
+				resumingMiniGame, viewInvisible, selectedLast, cardArray, cardKey,
+				gridRowCount, gridColCount, size);
 	}
 
 //	private int findUserPuzzleTypePreference( RadioGroup radGroup )
@@ -583,10 +590,17 @@ public class MainActivity extends AppCompatActivity
 			Log.d("upload", "USER DID NOT MODIFY A PKG");
 		}
 	}
-	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP, Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect) {
+	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref,
+									  SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language,
+									  String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP,
+									  Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect, boolean sis_resumingMiniGame,
+									  int[] sis_viewInvisible, int sis_selectedLast, String[] sis_cardArray, int[] sis_cardKey,
+									  int sis_gridRowCount, int sis_gridColCount, int sis_size) {
 		if (RorS == 0) {
 			//we are receiving
 			state = (int) savedInstanceState.getSerializable("state");
+			resumingMiniGame = (boolean) savedInstanceState.getSerializable( "resumeGame" ); //get 'resume mini game' flag
+			
 			if (state > 0) {
 				wordArrayResume = (WordArray) savedInstanceState.getParcelable("wordArray");
 				usrLangPrefResume = savedInstanceState.getInt("usrLangPref");
@@ -601,10 +615,22 @@ public class MainActivity extends AppCompatActivity
 					orderArrResume = (int[]) savedInstanceState.getSerializable("orderArr");
 				}
 			}
+			else if( resumingMiniGame == true ) //restore data from mini game when rotating
+			{
+				viewInvisible = (int[]) savedInstanceState.getSerializable( "viewInvisible" );
+				selectedLast = (int) savedInstanceState.getSerializable( "selectedLast" );
+				cardArray = (String[]) savedInstanceState.getSerializable( "cardArray" );
+				cardKey = (int[]) savedInstanceState.getSerializable( "cardKey" );
+				gridRowCount = (int) savedInstanceState.getSerializable( "gridRowCount" );
+				gridColCount = (int) savedInstanceState.getSerializable( "gridColCount" );
+				size = (int) savedInstanceState.getSerializable( "size" );
+			}
 		}
 		else {
 			//we are sending
 			savedInstanceState.putInt("state", sis_state);
+			savedInstanceState.putSerializable( "resumeGame", sis_resumingMiniGame ); //save 'resume mini game' flag
+			
 			if (sis_state > 0) {
 				//if there was a previous game, load it's contents
 				savedInstanceState.putParcelable("wordArray", sis_wordArray);
@@ -620,6 +646,16 @@ public class MainActivity extends AppCompatActivity
 					savedInstanceState.putStringArray("numArray", sis_numArray);
 					savedInstanceState.putIntArray("orderArr", sis_orderArr);
 				}
+			}
+			else if( sis_resumingMiniGame == true ) //save data for mini game when rotating
+			{
+				savedInstanceState.putSerializable( "viewInvisible", sis_viewInvisible );
+				savedInstanceState.putSerializable( "selectedLast", sis_selectedLast );
+				savedInstanceState.putSerializable( "cardArray", sis_cardArray );
+				savedInstanceState.putSerializable( "cardKey", sis_cardKey );
+				savedInstanceState.putSerializable( "gridRowCount", sis_gridRowCount );
+				savedInstanceState.putSerializable( "gridColCount", sis_gridColCount );
+				savedInstanceState.putSerializable( "size", sis_size );
 			}
 		}
 	}
