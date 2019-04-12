@@ -17,6 +17,7 @@
             android:name=".Controller.RemoveActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".Controller.UploadActivity" /> <!-- MENU -->
+        <activity android:name=".Controller.EventActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

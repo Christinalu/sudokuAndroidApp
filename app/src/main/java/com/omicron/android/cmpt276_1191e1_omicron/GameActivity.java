@@ -18,6 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import com.omicron.android.cmpt276_1191e1_omicron.Controller.EventActivity;
 import com.omicron.android.cmpt276_1191e1_omicron.Model.Block;
 import com.omicron.android.cmpt276_1191e1_omicron.Model.Entry;
 import com.omicron.android.cmpt276_1191e1_omicron.Model.Pair;
