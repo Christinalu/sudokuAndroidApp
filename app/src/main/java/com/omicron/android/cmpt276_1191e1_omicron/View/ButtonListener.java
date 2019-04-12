@@ -173,6 +173,8 @@ public class ButtonListener extends AppCompatActivity
 													 public boolean onLongClick(View v) {
 														 Log.d("selectW", "long button press");
 														 Hint.setBackgroundColor(R.drawable.buttons);
+
+                                                         Log.d("Hint","Hint number"+(wordArray.getWordStateAtIndex(index)));
 														 if (usrLangPref == 0) {
 															 if (usrModePref == 1) {
 																 Hint.setText(wordArray.getWordNativeAtIndex(index) + " : " + numArray[index]);

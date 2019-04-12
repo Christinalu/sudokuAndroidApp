@@ -699,6 +699,7 @@ public class GameActivity extends AppCompatActivity
 			long newHintClick = 0;
 			int i = 0; // line index to keep track of row index in file
 			boolean lineFound;
+			boolean newWordStatus=false;
 			
 			
 				/* READ FILE AND UPDATE HintClick */
@@ -716,12 +717,13 @@ public class GameActivity extends AppCompatActivity
 				{
 					if( i == wordArray.getWordInFileLineNumAtIndex( k ) ) //if updating line with word that was used in wordArray
 					{
+
 						strSplit = line.split(","); //get all attribute
 						long hintClickSoFar = Long.parseLong(strSplit[2]); //get original click count from file
 						
 						//to what hintClickSoFar was so far originally in the file, add wordArray.getHintClick() from the current game
 						//newHintClick = hintClickSoFar + wordArray[k].getHintClick()*STATISTIC_MULTIPLE;
-						
+						newWordStatus=wordArray.getWordStateAtIndex(k);
 						if( wordArray.getWordHintClickAtIndex( k ) == 0 ) //if no HintClicks for this word, it means user has less difficulty so decrease HintClick to decrease probability
 						{
 							if( wordArray.getWordAllowToDecreaseDifficultyAtIndex( k ) ) //if user inserted correct word (ONLY ONCE)
@@ -763,7 +765,9 @@ public class GameActivity extends AppCompatActivity
 				}
 				else //line found, update in file
 				{
-					strBuild.append( strSplit[0] + "," + strSplit[1] +  "," + newHintClick );
+					strBuild.append( strSplit[0] + "," + strSplit[1] +  "," + newHintClick +  "," + newWordStatus);
+					Log.d("updatefile:state", Boolean.toString(newWordStatus));
+					Log.d("row",line);
 					strBuild.append(  "\n");
 				}
 				

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -22,9 +23,13 @@ import com.omicron.android.cmpt276_1191e1_omicron.Controller.RemoveActivity;
 import com.omicron.android.cmpt276_1191e1_omicron.Controller.UploadActivity;
 import com.omicron.android.cmpt276_1191e1_omicron.Model.Pair;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -43,7 +48,8 @@ public class MainActivity extends AppCompatActivity
 	RadioGroup Language;
 	RadioGroup Mode;
 	RadioGroup Size;
-	private int usrModePref = 0; // 0=standard, 1=speech, 3=mini game
+	private ProgressBar Progress;
+	private int usrModePref = 0; // 0=standard, 1=speech
 	private int usrLangPref = 0; // 0=eng_fr, 1=fr_eng; 0 == native(squares that cannot be modified); 1 == translation(the words that the user inserts)
 	private int usrDiffPref; //0=easy,1=medium,2=difficult
 	private int state = 0; //0=new start, 1=resume
@@ -95,6 +101,20 @@ public class MainActivity extends AppCompatActivity
 	private int size;
 
 	private WordArray wordArray;
+	/*private Word[] wordArray =new Word[]
+			{
+					new Word( "Un", "Un", 1, 1 ),
+					new Word( "Two", "Deux", 2, 1 ),
+					new Word( "Three", "Trois", 3, 1 ),
+					new Word( "Four", "Quatre", 4, 1 ),
+					new Word( "Five", "Cinq", 5, 1 ),
+					new Word( "Six", "Six", 6, 1 ),
+					new Word( "Seven", "Sept", 7, 1 ),
+					new Word( "Eight", "Huit", 8, 1 ),
+					new Word( "Nine", "Neuf", 9, 1 ),
+					new Word( "en-US", "fr-FR", -1, -1 ), //lang
+					new Word( "pkg_n.csv", "", -1, -1 ) //pkg name
+			};*/
 
 	//data for Calendar event
 	private String packageName;
@@ -120,6 +140,9 @@ public class MainActivity extends AppCompatActivity
 					selectedLast, cardArray, cardKey, gridRowCount, gridColCount, size);
 		}
 
+		Progress=(ProgressBar)findViewById(R.id.progressBar) ;
+		//Progress.setProgress(10);
+
 		fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
 
 		pkgRadioGroup = findViewById( R.id.pkg_radio_group ); //stores all the radio buttons with file names
@@ -136,8 +159,15 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				int pkgSelectId = group.getCheckedRadioButtonId();
-				packageName =((RadioButton)findViewById(checkedId)).getText().toString();
-				switch (pkgSelectId) {
+                packageName =((RadioButton)findViewById(pkgSelectId)).getText().toString();
+				RadioButton radBtnSelected = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
+                String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
+                updateProgressBar(fileNameSelected);
+
+                switch(pkgSelectId)
+				{
+
+
 					//void
 				}
 			}
@@ -488,6 +518,48 @@ public class MainActivity extends AppCompatActivity
 //		return usrPuzzleTypePref - 1; //-1 because first index is TextView
 //	}
 
+    private void updateProgressBar(String fileNameSelected) {
+	    Log.d("updateProgressBar",fileNameSelected);
+
+        int numFalseStatus = 0;
+        int numTrueStatus = 0;
+
+
+        try {
+            //Log.d("updateProgressBar","inside try");
+            FileInputStream fileInStream =openFileInput( fileNameSelected );
+            //Log.d("updateProgressBar","after open");
+            // READ ALL CONTENT
+            InputStreamReader inStreamRead = new InputStreamReader( fileInStream );
+            BufferedReader buffRead = new BufferedReader( inStreamRead );
+
+            //Log.d("updateProgressBar","after string allocation");
+            String line;
+            while( (line = buffRead.readLine()) != null )
+
+            {
+                String[] strSplit = line.split(",");
+                if (strSplit.length==4){
+                    boolean status = Boolean.parseBoolean(strSplit[3]);
+                    Log.d("updateProgressBar:state", Boolean.toString(status));
+                    if (!status){ numFalseStatus++; Log.d("updateProgressBar:false", Integer.toString(numFalseStatus)); }
+                    else if (status) { numTrueStatus++; Log.d("updateProgressBar:true", Integer.toString(numTrueStatus));}
+            }}
+
+            buffRead.close( );
+            Progress.setProgress(numTrueStatus);
+
+            Progress.setMax(numFalseStatus+numTrueStatus);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+    }
 
 	private int checkIfJustInstalledAndSetUpPackagesAlreadyInstalled( )
 	{
@@ -551,6 +623,7 @@ public class MainActivity extends AppCompatActivity
 
 		//automatically select first button
 		( (RadioButton) (pkgRadioGroup.getChildAt(0)) ).setChecked( true );
+		updateProgressBar(wordPackageFileIndexArr.getPackageFileAtIndex( 0 ).getInternalFileName());
 
 		return 0;
 	}
