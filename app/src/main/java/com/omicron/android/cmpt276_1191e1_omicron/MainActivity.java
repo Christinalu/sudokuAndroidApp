@@ -129,11 +129,8 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				int pkgSelectId = group.getCheckedRadioButtonId();
-                RadioButton radBtnSelected1 = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
-                String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected1)).getInternalFileName(); //get pkg internal file name to find csv
 
-
-				switch(fileNameSelected)
+				switch(pkgSelectId)
 				{
 
 					//void
