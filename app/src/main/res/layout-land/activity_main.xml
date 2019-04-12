@@ -145,7 +145,6 @@
 				android:fontFamily="casual"
 				android:text="@string/available_package"/>
 
-
 			<LinearLayout
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
@@ -199,15 +198,19 @@
 							android:layout_width="wrap_content"
 							android:layout_height="match_parent"
 							android:indeterminate="false"
-							android:progressDrawable="@drawable/circular_progress_bar"
-							android:background="@drawable/circle_shape"
-							style="?android:attr/progressBarStyleHorizontal"/>
+							android:progressDrawable="@drawable/circular"
+							style="?android:attr/progressBarStyleHorizontal"
+							android:secondaryProgress="100"/>
 						<TextView
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content" />
 					</LinearLayout>
+
+
 				</LinearLayout>
-				</LinearLayout>
+
+			</LinearLayout>
+
 			</LinearLayout>
 	</LinearLayout>
 

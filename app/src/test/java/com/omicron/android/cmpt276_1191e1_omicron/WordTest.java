@@ -10,6 +10,7 @@ public class WordTest {
 
     private Word mWord = new Word("English", "French", 12, 5);
     private Word mWord2 = new Word("Chinese","Japanese", 30, 8);
+    private Word mWord3 = new Word("Farsi","English", 30, 2);
 
     @Test
     public void getNative() {
@@ -54,15 +55,20 @@ public class WordTest {
         assertEquals(8, mWord2.getHintClick());
         assertNotEquals(22, mWord2.getHintClick());
     }
-
+// need to change
     @Test
     public void incrementHintClick() {
         mWord.incrementHintClick();
         assertEquals(6, mWord.getHintClick());
+        assertEquals(false, mWord.getWordState());
         assertNotEquals(5, mWord.getHintClick());
+        assertNotEquals(true, mWord.getWordState());
+
         mWord2.incrementHintClick();
         assertEquals(9, mWord2.getHintClick());
+        assertEquals(false, mWord2.getWordState());
         assertNotEquals(8, mWord2.getHintClick());
+        assertNotEquals(true, mWord2.getWordState());
     }
 
     @Test
@@ -75,4 +81,37 @@ public class WordTest {
         assertNotEquals(8, mWord2.getHintClick());
     }
 
+    @Test
+    public void getWordState() {
+
+        assertEquals(false, mWord.getWordState());
+        assertNotEquals(true, mWord.getWordState());
+        assertEquals(false, mWord2.getWordState());
+        assertNotEquals(true, mWord2.getWordState());
+        assertEquals(true, mWord3.getWordState());
+        assertNotEquals(false, mWord3.getWordState());
+
+    }
+
+    @Test
+    public void setGameState() {
+        mWord.setGameState(false);
+        assertEquals(false, mWord.getGameState());
+        assertNotEquals(true, mWord.getGameState());
+        mWord2.setGameState(true);
+        assertEquals(true, mWord2.getGameState());
+        assertNotEquals(false, mWord2.getGameState());
+    }
+
+    @Test
+    public void getGameState() {
+
+        assertEquals(false, mWord.getGameState());
+        assertNotEquals(true, mWord.getGameState());
+        assertEquals(true, mWord2.getGameState());
+        assertNotEquals(false, mWord2.getGameState());
+        assertEquals(false, mWord3.getGameState());
+        assertNotEquals(true, mWord3.getGameState());
+
+    }
 }
