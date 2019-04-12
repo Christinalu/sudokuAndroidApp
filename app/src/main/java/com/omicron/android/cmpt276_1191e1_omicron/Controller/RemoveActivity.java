@@ -88,7 +88,7 @@ public class RemoveActivity extends AppCompatActivity
 				if( i == indexOfRadBtnToRemove ) //if on line that the user wants to delete
 				{
 					strSplit = line.split(","); //get all attribute
-					if (strSplit[4].contentEquals("0")) //if removing allowed (usr installed) pkg
+					if (strSplit[5].contentEquals("0")) //if removing allowed (usr installed) pkg
 					{
 						//do not add this line (remove it)
 					} else { //cannot remove default pkg

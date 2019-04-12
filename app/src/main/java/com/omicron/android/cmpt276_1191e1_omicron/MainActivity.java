@@ -1,5 +1,6 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -10,12 +11,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.omicron.android.cmpt276_1191e1_omicron.Controller.MiniGameActivity;
+import com.omicron.android.cmpt276_1191e1_omicron.Controller.EventActivity;
 import com.omicron.android.cmpt276_1191e1_omicron.Controller.RemoveActivity;
 import com.omicron.android.cmpt276_1191e1_omicron.Controller.UploadActivity;
 import com.omicron.android.cmpt276_1191e1_omicron.Model.Pair;
@@ -24,8 +27,12 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -80,6 +87,19 @@ public class MainActivity extends AppCompatActivity
 	private int[] indexOfRadBtnToRemove = { -1 }; //which radio btn to remove
 	private boolean[] removeBtnEnable = { true }; //when false, do not allow "REMOVE PKG" button (required because GameActivity may be using that file to save "Hint Click")
 
+	private static final int MINI_GAME_REQUEST_CODE = 5;
+	private boolean resumingMiniGame = false; //flag when returning from MiniGameActivity to resume game
+
+	//data saved for mini game resume
+	private int[] viewInvisible;
+	//private boolean allowToSelect;
+	private int selectedLast;
+	private String[] cardArray;
+	private int[] cardKey;
+	private int gridRowCount;
+	private int gridColCount;
+	private int size;
+
 	private WordArray wordArray;
 	/*private Word[] wordArray =new Word[]
 			{
@@ -96,9 +116,17 @@ public class MainActivity extends AppCompatActivity
 					new Word( "pkg_n.csv", "", -1, -1 ) //pkg name
 			};*/
 
+	//data for Calendar event
+	private String packageName;
+	private ImageButton calendar_button;
+	private Calendar mCalendar;
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+	private Date curDate;
 
 	// TODO: separate all of Intent activity.putExtra( ) outside of MainActivity in different functions
 
+	// TODO: fix bug where when starting Sudoky game, then going to main menu, press 'start new game' but
+	// TODO:	then press cancel... it does not resume the game
 
 	@Override
 	protected void onCreate( Bundle savedInstanceState )
@@ -106,7 +134,10 @@ public class MainActivity extends AppCompatActivity
 		super.onCreate( savedInstanceState );
 		setContentView( R.layout.activity_main );
 		if (savedInstanceState != null) {
-			savetheInstanceState(0, savedInstanceState, state, wordArrayResume, usrLangPrefResume, usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume, 0, currentRectColoured, currentSelectedIsCorrect);
+			savetheInstanceState(0, savedInstanceState, state, wordArrayResume, usrLangPrefResume,
+					usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume,
+					0, currentRectColoured, currentSelectedIsCorrect, resumingMiniGame, viewInvisible,
+					selectedLast, cardArray, cardKey, gridRowCount, gridColCount, size);
 		}
 
 		Progress=(ProgressBar)findViewById(R.id.progressBar) ;
@@ -124,13 +155,12 @@ public class MainActivity extends AppCompatActivity
 
 		// SET LISTENERS TO WHICH PKG IS SELECTED //
 
-
-
 		pkgRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				int pkgSelectId = group.getCheckedRadioButtonId();
-                RadioButton radBtnSelected = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
+                packageName =((RadioButton)findViewById(pkgSelectId)).getText().toString();
+				RadioButton radBtnSelected = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
                 String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
                 updateProgressBar(fileNameSelected);
 
@@ -142,6 +172,9 @@ public class MainActivity extends AppCompatActivity
 				}
 			}
 		});
+
+
+		Log.d( "resume", "state: " + state );
 
 
 		//create button which will start new UploadActivity to upload and process .csv file
@@ -229,17 +262,35 @@ public class MainActivity extends AppCompatActivity
 		// used to switch to gameActivity
 		Button btnStart = findViewById( R.id.button_start );
 		btnStart.setOnClickListener( new View.OnClickListener(  ) {
-			 @Override
-			 public void onClick(View v) {
-				 // Select Package from main activity
-				 RadioButton radBtnSelected = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
-				 String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
-				 usrPuzzleTypePref[0] = -1;
-				 state = 0;
-				 startDialog(fileNameSelected, state);
+                                         @Override
+                                         public void onClick(View v) {
+                                             // Select Package from main activity
+                                             RadioButton radBtnSelected = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
+                                             String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
+                                             usrPuzzleTypePref[0] = -1;
+                                             state = 0;
+                                             resumingMiniGame = false;
+                                             startDialog(fileNameSelected, state);
+                                         }
+                                     });
 
-			 }
-		 });
+
+		// SET UP CALENDAR DIALOG
+
+		calendar_button = findViewById(R.id.calendar_button);
+		calendar_button.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				curDate = new Date();
+				Intent eventActivityIntent = new Intent(MainActivity.this, EventActivity.class);
+				eventActivityIntent.putExtra("ActivityDate", dateFormat.format(curDate));
+				eventActivityIntent.putExtra("PackageName", packageName);
+				eventActivityIntent.putExtra("ifFinished", state);
+				eventActivityIntent.putExtra("modeSelect", usrModePref);
+				startActivity(eventActivityIntent);
+			}
+		});
+
 
 
 		//implement STOP btn
@@ -250,6 +301,7 @@ public class MainActivity extends AppCompatActivity
 										public void onClick( View v )
 										{
 											state = 0;
+											resumingMiniGame = false;
 											btn_remove.setEnabled( true ); //allow user to remove pkg
 											removeBtnEnable[0] = true;
 											Button btnResume = findViewById( R.id.button_resume );
@@ -260,7 +312,7 @@ public class MainActivity extends AppCompatActivity
 
 
 		Button btnResume = (Button) findViewById(R.id.button_resume);
-		if (state == 0) {
+		if (state == 0 && resumingMiniGame == false ) {
 			btnResume.setEnabled(false); //block Resume button unless a previous game is saved
 			//DISABLE "REMOVE PKG" button when game is started
 			removeBtnEnable[0] = true;
@@ -275,6 +327,9 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(View v) {
 				if (state > 0) {
+
+					Log.d( "resume", "resuming sudoku game..." );
+
 					//load previous game preferences to prepare for export to new Game Activity
 					Intent resumeActivity = new Intent(MainActivity.this, GameActivity.class);
 					//save preferences for Game Activity to read
@@ -293,6 +348,28 @@ public class MainActivity extends AppCompatActivity
 					resumeActivity.putExtra("currentSelectedIsCorrect", currentSelectedIsCorrect);
 					startActivityForResult(resumeActivity, 0);
 				}
+				else if( resumingMiniGame == true )
+				{
+					Log.d( "resume", "resuming mini game..." );
+
+					// RESUME MINI GAME
+					Intent resumeIntent = new Intent( MainActivity.this, MiniGameActivity.class );
+
+					//CardView data
+					resumeIntent.putExtra( "viewInvisible", viewInvisible );
+					//resumeIntent.putExtra( "allowToSelect", allowToSelect );
+					resumeIntent.putExtra( "selectedLast", selectedLast );
+
+					//CardArray data
+					resumeIntent.putExtra( "resumeGame", true ); //resume existing game flag
+					resumeIntent.putExtra( "cardArray", cardArray );
+					resumeIntent.putExtra( "cardKey", cardKey );
+					resumeIntent.putExtra( "gridRowCount", gridRowCount );
+					resumeIntent.putExtra( "gridColCount", gridColCount );
+					resumeIntent.putExtra( "size", size );
+
+					startActivityForResult( resumeIntent,  MINI_GAME_REQUEST_CODE );
+				}
 				else {
 					Toast.makeText(v.getContext(),R.string.no_resume, Toast.LENGTH_LONG).show();
 				}
@@ -307,8 +384,6 @@ public class MainActivity extends AppCompatActivity
 		super.onStart( );
 
 			/** WHEN USER RETURNING FROM UPLOAD ACTIVITY, UPDATE WORD PKG LIST **/
-
-		/** WHEN USER RETURNING FROM UPLOAD ACTIVITY, UPDATE WORD PKG LIST **/
 
 		FileCSV fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
 		int CURRENT_WORD_PKG_COUNT_RETURN;
@@ -343,6 +418,8 @@ public class MainActivity extends AppCompatActivity
 		updatePkgViewAfterUploadOrRemoval( CURRENT_WORD_PKG_COUNT_RETURN );
 
 		Log.d( "upload", "onStart() called from MainActivity" );
+		Log.d( "resume", "mainActivity onStart() state: " + state );
+
 	}
 
 	@Override
@@ -357,6 +434,9 @@ public class MainActivity extends AppCompatActivity
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent resumeSrc) {
 		if (resumeSrc != null) {
+
+			Log.d( "resume", "resuming data..." );
+
 			//if all necessary game preferences are written in memory, then unblock resume button
 			if (resumeSrc.hasExtra("wordArray") && resumeSrc.hasExtra("usrLangPref") && resumeSrc.hasExtra("SudokuArr") && resumeSrc.hasExtra("usrMode") && resumeSrc.hasExtra("language")) {
 				Log.i("TAG", "resumeSrc has all elements");
@@ -382,13 +462,52 @@ public class MainActivity extends AppCompatActivity
 				usrPuzzleTypePref[0] = 0;
 				removeBtnEnable[0] = false;
 			}
+			else if( requestCode == MINI_GAME_REQUEST_CODE )
+			{
+				if( resultCode == Activity.RESULT_OK )
+				{
+					Log.d( "resume", "resuming from mini game... (saving data)" );
+
+					// TODO: save resumingMiniGame when rotating
+					// TODO: save all intent data when rotating
+					// TODO: add data to buttonResume + gameStop button
+					// TODO: test resume/stop btn if they are disabled properly
+
+					//set flag to resume game
+					resumingMiniGame = (boolean) resumeSrc.getSerializableExtra( "resumeGame" );
+
+					//save data for mini game
+					//CardView
+					viewInvisible = (int[]) resumeSrc.getSerializableExtra( "viewInvisible" );
+					//allowToSelect = (boolean) resumeSrc.getSerializableExtra( "allowToSelect" );
+					selectedLast = (int) resumeSrc.getSerializableExtra( "selectedLast" );
+
+					//CardArray
+					cardArray = (String[]) resumeSrc.getSerializableExtra( "cardArray" );
+					cardKey = (int[]) resumeSrc.getSerializableExtra( "cardKey" );
+					gridRowCount = (int) resumeSrc.getSerializableExtra( "gridRowCount" );
+					gridColCount = (int) resumeSrc.getSerializableExtra( "gridColCount" );
+					size = (int) resumeSrc.getSerializableExtra( "size" );
+
+					//block buttons
+					Button btnResume = (Button) findViewById( R.id.button_resume );
+					btnResume.setEnabled( true );
+					Button btnRemove = (Button) findViewById( R.id.btn_remove ); //block user from deleting pkg while playing game
+					btnRemove.setEnabled( false );
+					removeBtnEnable[0] = false;
+				}
+			}
 		}
 	}
 
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
-		savetheInstanceState(1, savedInstanceState, state, wordArrayResume, usrLangPrefResume, usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume, HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect);
+		savetheInstanceState(1, savedInstanceState, state, wordArrayResume, usrLangPrefResume,
+				usrSudokuArrResume, usrModePrefResume, languageResume, numArrayResume, orderArrResume,
+				HINT_CLICK_TO_MAX_PROB, currentRectColoured, currentSelectedIsCorrect,
+				resumingMiniGame, viewInvisible, selectedLast, cardArray, cardKey,
+				gridRowCount, gridColCount, size);
 	}
 
 //	private int findUserPuzzleTypePreference( RadioGroup radGroup )
@@ -472,7 +591,7 @@ public class MainActivity extends AppCompatActivity
 			}
 		}
 
-		// read all packages the user has uploaded so far, and get an array with name and file
+		// READ ALL PACKAGES THE USER HAS UPLOADED SO FAR, and get an array with name and file
 		try {
 			wordPackageFileIndexArr = new WordPackageFileIndex( this, MAX_WORD_PKG, CURRENT_WORD_PKG_COUNT ); //allow a maximum of X packages
 		} catch( IOException e ){
@@ -497,6 +616,9 @@ public class MainActivity extends AppCompatActivity
 
 			radBtn.setText( wordPackageFileIndexArr.getPackageFileAtIndex( i ).getWordPackageName( ) );
 			radBtn.setButtonTintList(colorStateList);
+
+			Log.d( "fileCSV", wordPackageFileIndexArr.getPackageFileAtIndex( i ).getWordPackageName( )
+					+ " word pair count: " + wordPackageFileIndexArr.getPackageFileAtIndex( i ).getPackageWordPairCount() );
 
 			pkgRadioGroup.addView(radBtn);
 		}
@@ -556,10 +678,17 @@ public class MainActivity extends AppCompatActivity
 			Log.d("upload", "USER DID NOT MODIFY A PKG");
 		}
 	}
-	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP, Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect) {
+	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref,
+									  SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language,
+									  String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP,
+									  Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect, boolean sis_resumingMiniGame,
+									  int[] sis_viewInvisible, int sis_selectedLast, String[] sis_cardArray, int[] sis_cardKey,
+									  int sis_gridRowCount, int sis_gridColCount, int sis_size) {
 		if (RorS == 0) {
 			//we are receiving
 			state = (int) savedInstanceState.getSerializable("state");
+			resumingMiniGame = (boolean) savedInstanceState.getSerializable( "resumeGame" ); //get 'resume mini game' flag
+
 			if (state > 0) {
 				wordArrayResume = (WordArray) savedInstanceState.getParcelable("wordArray");
 				usrLangPrefResume = savedInstanceState.getInt("usrLangPref");
@@ -574,10 +703,22 @@ public class MainActivity extends AppCompatActivity
 					orderArrResume = (int[]) savedInstanceState.getSerializable("orderArr");
 				}
 			}
+			else if( resumingMiniGame == true ) //restore data from mini game when rotating
+			{
+				viewInvisible = (int[]) savedInstanceState.getSerializable( "viewInvisible" );
+				selectedLast = (int) savedInstanceState.getSerializable( "selectedLast" );
+				cardArray = (String[]) savedInstanceState.getSerializable( "cardArray" );
+				cardKey = (int[]) savedInstanceState.getSerializable( "cardKey" );
+				gridRowCount = (int) savedInstanceState.getSerializable( "gridRowCount" );
+				gridColCount = (int) savedInstanceState.getSerializable( "gridColCount" );
+				size = (int) savedInstanceState.getSerializable( "size" );
+			}
 		}
 		else {
 			//we are sending
 			savedInstanceState.putInt("state", sis_state);
+			savedInstanceState.putSerializable( "resumeGame", sis_resumingMiniGame ); //save 'resume mini game' flag
+
 			if (sis_state > 0) {
 				//if there was a previous game, load it's contents
 				savedInstanceState.putParcelable("wordArray", sis_wordArray);
@@ -593,6 +734,16 @@ public class MainActivity extends AppCompatActivity
 					savedInstanceState.putStringArray("numArray", sis_numArray);
 					savedInstanceState.putIntArray("orderArr", sis_orderArr);
 				}
+			}
+			else if( sis_resumingMiniGame == true ) //save data for mini game when rotating
+			{
+				savedInstanceState.putSerializable( "viewInvisible", sis_viewInvisible );
+				savedInstanceState.putSerializable( "selectedLast", sis_selectedLast );
+				savedInstanceState.putSerializable( "cardArray", sis_cardArray );
+				savedInstanceState.putSerializable( "cardKey", sis_cardKey );
+				savedInstanceState.putSerializable( "gridRowCount", sis_gridRowCount );
+				savedInstanceState.putSerializable( "gridColCount", sis_gridColCount );
+				savedInstanceState.putSerializable( "size", sis_size );
 			}
 		}
 	}
@@ -760,9 +911,14 @@ public class MainActivity extends AppCompatActivity
 				}
 				else if( usrModePref == 3 )
 				{
-					//if in mini-game mode
-					gameSetup( gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB );
-					startActivityForResult( gameActivity,5 );
+					Log.d( "resume", "mini game mode called..." );
+
+					// MINI GAME MODE
+
+					//gameSetup( gameActivity, state, wordArray, usrLangPref, usrDiffPref, usrModePref, language, usrPuzzleTypePref[0], HINT_CLICK_TO_MAX_PROB );
+					gameActivity.putExtra( "wordArray", wordArray );
+					gameActivity.putExtra( "resumeGame", false ); //resume flag - new game
+					startActivityForResult( gameActivity, MINI_GAME_REQUEST_CODE );
 				}
 				else {
 					//standard start

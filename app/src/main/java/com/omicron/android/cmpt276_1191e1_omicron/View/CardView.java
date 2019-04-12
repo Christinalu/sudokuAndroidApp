@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.AppComponentFactory;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -196,11 +197,12 @@ public class CardView extends Activity
 		
 			// NOTE: TableLayout is a 2D grid, however the String and Card data are 1D
 		
-		if( viewInvisible[row*colCount+col] == 0 && allowToSelect[0] == true ) //if card touched not previously selected; only allow to select after animation
+		//if card touched not previously selected; only allow to select after animation
+		if( viewInvisible[row*colCount+col] == 0 && allowToSelect[0] == true )
 		{
 			Log.d( "cardArray", "selected card: ( " + row + ", " + col + " )" );
 			
-			viewInvisible[row*colCount+col] = 1; //mark as invisible - selected
+			viewInvisible[row*colCount+col] = 1; //mark as invisible - selected, show text
 			
 			if( selectedLast[0] != -1 ) //if another card previously selected (other than this), check for match
 			{
@@ -239,6 +241,7 @@ public class CardView extends Activity
 											.getChildAt( col ))).getChildAt(1).setVisibility( View.INVISIBLE );
 									((RelativeLayout) (((TableRow) (tableLayout.getChildAt( rowLast )))
 											.getChildAt( colLast ))).getChildAt(1).setVisibility( View.INVISIBLE );
+									
 									allowToSelect[0] = true; //once animation finished allow to select next pair
 								}
 							});
@@ -265,6 +268,7 @@ public class CardView extends Activity
 					
 					//add fade out/in animation to show text
 					allowToSelect[0] = false; //do not allow to select while animating
+					
 					((RelativeLayout) (((TableRow) (tableLayout.getChildAt( row ))).getChildAt( col )))
 							.getChildAt(1).animate().alpha(0f)
 							.setDuration(shortAnimationDuration).setStartDelay( 0 )
@@ -339,14 +343,23 @@ public class CardView extends Activity
 	public void saveDataForRotation( Bundle state )
 	{
 		/*
-		 * This function adds all necessary data to intent to be saved
+		 * This function adds all necessary data to intent to be saved for rotation
 		 */
 		
 		state.putSerializable( "viewInvisible", viewInvisible );
-		state.putBoolean( "allowToSelect", allowToSelect[0] );
+		//state.putBoolean( "allowToSelect", allowToSelect[0] );
 		state.putSerializable( "selectedLast", selectedLast[0] );
-
-		// TODO: also save String[][] from cardArray
+	}
+	
+	public void saveDataForResume( Intent intent )
+	{
+		/*
+		 * This function adds all necessary data to intent to be saved for resume
+		 */
+		
+		intent.putExtra( "viewInvisible", viewInvisible );
+		//intent.putExtra( "allowToSelect", allowToSelect[0] );
+		intent.putExtra( "selectedLast", selectedLast[0] );
 	}
 	
 	
@@ -358,8 +371,23 @@ public class CardView extends Activity
 		 */
 		
 		viewInvisible = (int[]) state.getSerializable( "viewInvisible" );
-		allowToSelect[0] = state.getBoolean( "allowToSelect" );
+		//allowToSelect[0] = state.getBoolean( "allowToSelect" );
 		selectedLast[0] = (int) state.getSerializable( "selectedLast" );
+		
+		reDrawCard( );
+	}
+	
+	
+	public void reDrawOnResume( Intent intent )
+	{
+		/*
+		 * This function re draws the cards when resuming previous game
+		 * and restores View data
+		 */
+		
+		viewInvisible = (int[]) intent.getSerializableExtra( "viewInvisible" );
+		//allowToSelect[0] = (boolean) intent.getSerializableExtra( "allowToSelect" );
+		selectedLast[0] = (int) intent.getSerializableExtra( "selectedLast" );
 		
 		reDrawCard( );
 	}

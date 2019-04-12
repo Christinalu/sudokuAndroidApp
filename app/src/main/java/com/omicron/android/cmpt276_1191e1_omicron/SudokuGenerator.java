@@ -651,4 +651,7 @@ public class SudokuGenerator implements Serializable {
         //only used for SudokuGeneratorTest
         PuzzleSol = arr;
     }
+    public boolean getIsCorrect() {
+        return isCorrect;
+    }
 }
