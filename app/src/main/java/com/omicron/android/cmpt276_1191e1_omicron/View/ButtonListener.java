@@ -291,6 +291,10 @@ public class ButtonListener extends AppCompatActivity
 														 //have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
 														 if (usrSudokuArr.canCheck()) {
 															 usrSudokuArr.checkPuzzle(v, btnArr);
+															 for (int k=0; k<WORD_COUNT;k++){
+																 wordArray.setGameStateAtIndex(k,true);
+															 }
+
 														 }
 
 														 Log.d( "highlight", "marked rectArr (in ButtonListener) as selected at: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );

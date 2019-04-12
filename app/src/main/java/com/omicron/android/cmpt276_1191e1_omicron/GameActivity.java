@@ -762,7 +762,14 @@ public class GameActivity extends AppCompatActivity
 						
 						//to what hintClickSoFar was so far originally in the file, add wordArray.getHintClick() from the current game
 						//newHintClick = hintClickSoFar + wordArray[k].getHintClick()*STATISTIC_MULTIPLE;
-						newWordStatus=wordArray.getWordStateAtIndex(k);
+						if( wordArray.getGameStateAtIndex(k)){
+							newWordStatus=wordArray.getWordStateAtIndex(k);
+						}
+						else{
+							if(!wordArray.getWordStateAtIndex(k)){newWordStatus=false;}
+							else{ newWordStatus=Boolean.parseBoolean(strSplit[3]);}
+						}
+
 						if( wordArray.getWordHintClickAtIndex( k ) == 0 ) //if no HintClicks for this word, it means user has less difficulty so decrease HintClick to decrease probability
 						{
 							if( wordArray.getWordAllowToDecreaseDifficultyAtIndex( k ) ) //if user inserted correct word (ONLY ONCE)
