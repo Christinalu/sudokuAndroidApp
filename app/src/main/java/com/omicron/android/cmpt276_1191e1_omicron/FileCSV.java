@@ -141,7 +141,8 @@ public class FileCSV
 		while( ( str = buffRead.readLine( ) ) != null ) //read lines from buffer until EOF
 		{
 			strBuild.append( str ); //append all lines to builder
-			strBuild.append( ",1\n" ); //"new line" char important to separate rows (because it is discarded when reading line by line
+			strBuild.append( ",1" ); //"new line" char important to separate rows (because it is discarded when reading line by line
+			strBuild.append(",false\n");
 		}
 		
 		String content = strBuild.toString( ); //get all content from file so far in a string
@@ -465,7 +466,8 @@ public class FileCSV
 			{
 				strBuild.append(strLine); //append all lines to builder
 				strBuild.append( ",1" ); //add a third "hint click" attribute to represent how many times a user has clicked in Dictionary to reveal translation (used to find which words the user is having difficulty with); "1" must be default, NOT "0" because later in code "1" is needed
-				strBuild.append("\n"); //"new line" char important to separate rows (because it is discarded when reading line by line
+				strBuild.append(",false"); // add a forth "status" attribute to represent if user has fully learned the word or not
+                strBuild.append("\n"); //"new line" char important to separate rows (because it is discarded when reading line by line
 				totalLineCnt++; //increase count of valid word pair
 			}
 			else

@@ -19,7 +19,11 @@ import com.omicron.android.cmpt276_1191e1_omicron.Controller.RemoveActivity;
 import com.omicron.android.cmpt276_1191e1_omicron.Controller.UploadActivity;
 import com.omicron.android.cmpt276_1191e1_omicron.Model.Pair;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -127,16 +131,19 @@ public class MainActivity extends AppCompatActivity
 				int pkgSelectId = group.getCheckedRadioButtonId();
                 RadioButton radBtnSelected1 = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
                 String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected1)).getInternalFileName(); //get pkg internal file name to find csv
-                //int pkglength=wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected1)).getWordPackageName();
-				switch(pkgSelectId)
+
+
+				switch(fileNameSelected)
 				{
+
 					//void
 				}
-			}
-		});
+
+		}
+                                                 });
 
 
-		//create button which will start new UploadActivity to upload and process .csv file
+            //create button which will start new UploadActivity to upload and process .csv file
 		Button btn_upload = findViewById( R.id.btn_upload );
 		btn_upload.setOnClickListener(new View.OnClickListener( )
 									  {
@@ -290,13 +297,17 @@ public class MainActivity extends AppCompatActivity
 				}
 			}
 		});
+
 	}
 
 
-	@Override
+
+
+    @Override
 	public void onStart( )
 	{
 		super.onStart( );
+
 
 		/** WHEN USER RETURNING FROM UPLOAD ACTIVITY, UPDATE WORD PKG LIST **/
 
@@ -388,6 +399,37 @@ public class MainActivity extends AppCompatActivity
 //		return usrPuzzleTypePref - 1; //-1 because first index is TextView
 //	}
 
+    private void updateProgressBar(String fileNameSelected) {
+
+        int numFalseStatus = 0;
+        int numTrueStatus = 0;
+        FileInputStream fileInStream = null; //open file from internal storage
+        try {
+            fileInStream = this.openFileInput( fileNameSelected );
+            // READ ALL CONTENT
+            InputStreamReader inStreamRead = new InputStreamReader( fileInStream );
+            BufferedReader buffRead = new BufferedReader( inStreamRead );
+            String[] strSplit = null;
+            String line;
+
+            while( (line = buffRead.readLine()) != null )
+            {
+                boolean status = Boolean.parseBoolean(strSplit[3]);
+                if (status==false){ numFalseStatus++; }
+                else if (status==true) { numTrueStatus++;}
+            }
+
+            buffRead.close( );
+            Progress.setProgress(numTrueStatus);
+            Progress.setMax(numFalseStatus+numTrueStatus);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
 	private int checkIfJustInstalledAndSetUpPackagesAlreadyInstalled( )
 	{
