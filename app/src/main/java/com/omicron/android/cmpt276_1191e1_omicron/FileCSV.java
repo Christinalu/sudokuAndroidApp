@@ -104,7 +104,7 @@ public class FileCSV
 		try
 		{
 			outStream = context.openFileOutput( fileName, context.MODE_PRIVATE ); //open private output stream
-			outStream.write( ("0-30 Numbers,pkg_0.csv,English,French,1\n").getBytes( ) ); //convert string to bytes and write to file DEFAULT 1
+			outStream.write( ("0-30 Numbers,pkg_0.csv,English,French,31,1\n").getBytes( ) ); //convert string to bytes and write to file DEFAULT 1
 			outStream.close( ); //close and save file
 		}
 		catch( Exception e ) //in case of error

@@ -25,6 +25,8 @@ public class CardArray implements Serializable
 	private int gridColCount;
 	private int size;
 	
+	private int[] wordArrayMask; //only used as local variable and for testing
+	
 	
 	public CardArray( int gridRowCount2 , int gridColCount2 )
 	{
@@ -52,7 +54,7 @@ public class CardArray implements Serializable
 		int temp;
 		int indexLastMaskKey = 0; //stores int index from wordArrayMask of where current translation has correct key index (in wordArrayMask)
 		int indexCurrentMaskKey = 0;
-		int[] wordArrayMask = new int[size];
+		wordArrayMask = new int[size]; //see next for() loop for explanation
 		
 		for( int i=0; i<size; i++ ){ //fill mask with numbers where each number will represent a string word from word array
 			wordArrayMask[i] = i;	 //ie i==2 means 2nd word native; i==1 first word translation
@@ -165,6 +167,16 @@ public class CardArray implements Serializable
 		 * from 1D array extract using 2D coordinate
 		 */
 		return  cardArray[i*colCount+j];
+	}
+	
+	public int getCardKeyAtIndex( int i )
+	{
+		return cardKey[i];
+	}
+	
+	public int getWordArrayMaskAtIndex( int i )
+	{
+		return wordArrayMask[i];
 	}
 	
 	public void saveDataForRotation( Bundle state )
