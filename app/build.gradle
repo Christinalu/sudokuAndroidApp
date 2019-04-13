@@ -6,6 +6,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     compileSdkVersion 28
+    useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "com.omicron.android.cmpt276_1191e1_omicron"
         minSdkVersion 21

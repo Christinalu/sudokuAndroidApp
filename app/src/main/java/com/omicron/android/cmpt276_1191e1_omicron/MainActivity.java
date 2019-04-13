@@ -27,7 +27,6 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -35,7 +34,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 
 public class MainActivity extends AppCompatActivity
@@ -119,16 +117,15 @@ public class MainActivity extends AppCompatActivity
 			};*/
 
 	//data for Calendar event
-	private String packageName;
+	public String modeName = "Standard";
+	private String packageName = "0-30 Numbers";
 	private ImageButton calendar_button;
 	private Calendar mCalendar;
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 	private Date curDate;
+	private Double progress_percentage;
 
 	// TODO: separate all of Intent activity.putExtra( ) outside of MainActivity in different functions
-
-	// TODO: fix bug where when starting Sudoky game, then going to main menu, press 'start new game' but
-	// TODO:	then press cancel... it does not resume the game
 
 	@Override
 	protected void onCreate( Bundle savedInstanceState )
@@ -146,7 +143,6 @@ public class MainActivity extends AppCompatActivity
 		fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
 
 		pkgRadioGroup = findViewById( R.id.pkg_radio_group ); //stores all the radio buttons with file names
-
 		int res = checkIfJustInstalledAndSetUpPackagesAlreadyInstalled( );
 
 		if( res != 0 ) //some exception occurred
@@ -159,9 +155,9 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				int pkgSelectId = group.getCheckedRadioButtonId();
-                packageName =((RadioButton)findViewById(pkgSelectId)).getText().toString();
 				RadioButton radBtnSelected = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
-                String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
+                packageName = ((RadioButton)findViewById(checkedId)).getText().toString();
+				String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
                 updateProgressBar(fileNameSelected);
 
                 switch(pkgSelectId)
@@ -277,7 +273,8 @@ public class MainActivity extends AppCompatActivity
 				eventActivityIntent.putExtra("ActivityDate", dateFormat.format(curDate));
 				eventActivityIntent.putExtra("PackageName", packageName);
 				eventActivityIntent.putExtra("ifFinished", state);
-				eventActivityIntent.putExtra("modeSelect", usrModePref);
+				eventActivityIntent.putExtra("modeSelect", modeName);
+				eventActivityIntent.putExtra("Progress", progress_percentage);
 				startActivity(eventActivityIntent);
 			}
 		});
@@ -375,9 +372,6 @@ public class MainActivity extends AppCompatActivity
 	{
 		super.onStart( );
 
-
-
-
 		/** WHEN USER RETURNING FROM UPLOAD ACTIVITY, UPDATE WORD PKG LIST **/
 
 		FileCSV fileCSV = new FileCSV( MAX_WORD_PKG, MAX_CSV_ROW, MIN_CSV_ROW );
@@ -467,7 +461,6 @@ public class MainActivity extends AppCompatActivity
 				{
 					Log.d( "resume", "resuming from mini game... (saving data)" );
 
-					// TODO: save resumingMiniGame when rotating
 					// TODO: save all intent data when rotating
 					// TODO: add data to buttonResume + gameStop button
 					// TODO: test resume/stop btn if they are disabled properly
@@ -506,15 +499,6 @@ public class MainActivity extends AppCompatActivity
                 gridRowCount, gridColCount, size);
 	}
 
-//	private int findUserPuzzleTypePreference( RadioGroup radGroup )
-//	{
-//		//find which puzzle type the user selected
-//		int usrPuzzleTypePref = -1;
-//		int btnID = radGroup.getCheckedRadioButtonId( );
-//		View radioBtn = radGroup.findViewById( btnID );
-//		usrPuzzleTypePref = radGroup.indexOfChild(radGroup);
-//		return usrPuzzleTypePref - 1; //-1 because first index is TextView
-//	}
 
     private void updateProgressBar(String fileNameSelected) {
 	    Log.d("updateProgressBar",fileNameSelected);
@@ -525,7 +509,7 @@ public class MainActivity extends AppCompatActivity
 
         try {
             //Log.d("updateProgressBar","inside try");
-            FileInputStream fileInStream =openFileInput( fileNameSelected );
+            FileInputStream fileInStream = openFileInput( fileNameSelected );
             //Log.d("updateProgressBar","after open");
             // READ ALL CONTENT
             InputStreamReader inStreamRead = new InputStreamReader( fileInStream );
@@ -546,8 +530,8 @@ public class MainActivity extends AppCompatActivity
 
             buffRead.close( );
             Progress.setProgress(numTrueStatus);
-
             Progress.setMax(numFalseStatus+numTrueStatus);
+			progress_percentage = (double)numTrueStatus/(numFalseStatus+numTrueStatus);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -812,6 +796,7 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				int ModeId = group.getCheckedRadioButtonId();
+				modeName = ((RadioButton)findViewById(checkedId)).getText().toString();
 				switch (ModeId)
 				{
 					case R.id.button_mStandard:
