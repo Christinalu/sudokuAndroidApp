@@ -1,6 +1,7 @@
 package com.omicron.android.cmpt276_1191e1_omicron;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
@@ -103,7 +104,7 @@ public class FileCSV
 		try
 		{
 			outStream = context.openFileOutput( fileName, context.MODE_PRIVATE ); //open private output stream
-			outStream.write( ("0-30 Numbers,pkg_0.csv,English,French,1\n").getBytes( ) ); //convert string to bytes and write to file DEFAULT 1
+			outStream.write( ("0-30 Numbers,pkg_0.csv,English,French,31,1\n").getBytes( ) ); //convert string to bytes and write to file DEFAULT 1
 			outStream.close( ); //close and save file
 		}
 		catch( Exception e ) //in case of error
@@ -141,7 +142,10 @@ public class FileCSV
 		while( ( str = buffRead.readLine( ) ) != null ) //read lines from buffer until EOF
 		{
 			strBuild.append( str ); //append all lines to builder
-			strBuild.append( ",1\n" ); //"new line" char important to separate rows (because it is discarded when reading line by line
+			strBuild.append( ",1" ); //"new line" char important to separate rows
+									   // (because it is discarded when reading line by line from InputStream)
+									   // 1 represents hint click count
+			strBuild.append(",false\n");
 		}
 		
 		String content = strBuild.toString( ); //get all content from file so far in a string
@@ -231,7 +235,8 @@ public class FileCSV
 			
 			// re-write content
 			outStream = context.openFileOutput( "word_pkg_name_and_file_name.csv", context.MODE_PRIVATE ); //open private output stream for re-write
-			outStream.write( (strBuild.toString() + pkgName + "," + fileNameFinal + "," + strContent[1].replace( "\n", "") + ",0\n" ).getBytes( ) ); //convert string to bytes and write to file
+			outStream.write( (strBuild.toString() + pkgName + "," + fileNameFinal + ","
+					+ strContent[1].replace( "\n", "") +","+ strContent[2] + ",0\n" ).getBytes( ) ); //convert string to bytes and write to file
 			outStream.close( ); //close and save file
 			
 			
@@ -327,7 +332,9 @@ public class FileCSV
 		
 		/*
 		 * This class takes a File[] which stores all files names, and returns a int 'n' for
-		 * 		which file name is available for format pkg_n.csv
+		 * 		which file name is available for format pkg_n.csv, that is, it finds which
+		 * 		pkg_n.csv name is available;
+		 * 		if had pkg_0.csv, pkg_2.csv, pkg_3.csv already, then 'n' would be 1
 		 * Returns -1 on failure
 		 */
 		
@@ -411,8 +418,9 @@ public class FileCSV
 										int MAX_WORD_LEN, int MIN_CSV_ROW ) throws IOException
 	{
 		/*
-		 * Returns a string[] containing the [0] .csv data and [1] line with language
-		 * Returns empty string in [0] if file does not have proper formatting
+		 * Returns a string[] containing the string[0]=='.csv data', string[1]=='line with language',
+		 * string[2]=='word pair count in package'
+		 * Returns empty string in string[0] if file does not have proper formatting
 		 */
 		
 		String strLine; //store each line from .csv file
@@ -420,7 +428,7 @@ public class FileCSV
 		
 		String[] splitLine; //array to store the strings parsed from line by comma
 		String lang;
-		String[] res = { "", "" };
+		String[] res = { "", "", "" };
 		
 		try {
 			strLine = buffRead.readLine(); //required if file empty to prevent crash on accessing .split() on null pointer
@@ -449,7 +457,7 @@ public class FileCSV
 		{ return res; }
 		
 		
-		// TEST FORMAT
+		// TEST FORMAT (for word pair)
 		
 		int totalLineCnt = 0; //stores the number of word pairs in the file
 		
@@ -465,7 +473,8 @@ public class FileCSV
 			{
 				strBuild.append(strLine); //append all lines to builder
 				strBuild.append( ",1" ); //add a third "hint click" attribute to represent how many times a user has clicked in Dictionary to reveal translation (used to find which words the user is having difficulty with); "1" must be default, NOT "0" because later in code "1" is needed
-				strBuild.append("\n"); //"new line" char important to separate rows (because it is discarded when reading line by line
+				strBuild.append(",false"); // add a forth "status" attribute to represent if user has fully learned the word or not
+                strBuild.append("\n"); //"new line" char important to separate rows (because it is discarded when reading line by line
 				totalLineCnt++; //increase count of valid word pair
 			}
 			else
@@ -483,7 +492,8 @@ public class FileCSV
 		//return valid String[]
 		res[0] = strBuild.toString( );
 		res[1] = lang;
-		
+		res[2] = Integer.toString( totalLineCnt );
+
 		return res;
 	}
 	

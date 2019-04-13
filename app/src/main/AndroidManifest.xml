@@ -12,10 +12,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".Controller.RemoveActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+        <activity android:name=".Controller.MiniGameActivity"></activity>
+        <activity
+            android:name=".Controller.RemoveActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".Controller.UploadActivity" /> <!-- MENU -->
+        <activity android:name=".Controller.EventActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,7 +28,7 @@
         <activity
             android:name=".GameActivity"
             android:label="@string/title_activity_game"
-            android:theme="@style/AppTheme.NoActionBar" /> <!-- DICTIONARY -->
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

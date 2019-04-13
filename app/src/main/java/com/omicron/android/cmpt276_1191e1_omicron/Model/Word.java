@@ -15,7 +15,9 @@ public class Word implements Serializable
 	private long mHintClick; //stores the number of times the user had difficulty with a word
 	private boolean alreadyUsedInGame; //stores if the word was already used in game once
 	private boolean allowToDecreaseDifficulty = false; //when true, can decrease difficulty of word; default must be false so difficulty decreased only when word inserted correctly
-	
+	private boolean WordStatus; // when True , has been played and not using Hint function
+	private boolean GameStatus; // it is true when the game is completed
+
 	
 	public Word( String wordNative, String wordTranslation, int inFileLineNum, long hintClick )
 	{
@@ -24,6 +26,10 @@ public class Word implements Serializable
 		mInFileLineNum = inFileLineNum;
 		mHintClick = hintClick;
 		alreadyUsedInGame = false;
+
+		WordStatus=true;
+		GameStatus=false;
+
 	}
 	
 	//get native word
@@ -48,7 +54,7 @@ public class Word implements Serializable
 	
 	public void updateHintClick( int newHintClick ){ mHintClick = newHintClick; }
 	
-	public void incrementHintClick( ){ mHintClick++; }
+	public void incrementHintClick( ){ mHintClick++; WordStatus=false; }
 	
 	public long getHintClick(  ){ return mHintClick; }
 	
@@ -64,5 +70,14 @@ public class Word implements Serializable
 	
 	public void setDoNotAllowToDecreaseDifficulty( )
 	{ allowToDecreaseDifficulty = false; }
+
+	public boolean getWordState( )
+	{ return WordStatus; }
+
+	public void setGameState( boolean NewState )
+	{ GameStatus=NewState; }
+
+	public boolean getGameState( )
+	{ return GameStatus; }
 	
 }

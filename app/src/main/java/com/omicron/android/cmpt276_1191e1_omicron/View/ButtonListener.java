@@ -36,12 +36,13 @@ public class ButtonListener extends AppCompatActivity {
 	private boolean flag_tap; //
 
 
-	public ButtonListener(final Pair currentRectColoured, final SudokuGenerator usrSudokuArr, final drw drawR,
-						  final int[] touchX, final int[] touchY, final Pair lastRectColoured,
-						  final int usrLangPref, final int[] btnClicked, final TextView Hint, final WordArray wordArray,
-						  final int usrModePref, final String[] numArray, int WORD_COUNT, int COL_PER_BLOCK,
-						  int ROW_PER_BLOCK, final Context context, TableLayout tableLayout, int orientation, int state,
-						  int[] orderArr, final int[] rotation, final int[] undoBtnPressed) {
+	@SuppressLint("ClickableViewAccessibility")
+    public ButtonListener(final Pair currentRectColoured, final SudokuGenerator usrSudokuArr, final drw drawR,
+                          final int[] touchX, final int[] touchY, final Pair lastRectColoured,
+                          final int usrLangPref, final int[] btnClicked, final TextView Hint, final WordArray wordArray,
+                          final int usrModePref, final String[] numArray, int WORD_COUNT, int COL_PER_BLOCK,
+                          int ROW_PER_BLOCK, final Context context, TableLayout tableLayout, int orientation, int state,
+                          final int[] orderArr, final int[] rotation, final int[] undoBtnPressed) {
 		// pulled out of button listeners
 		final Handler handler = new Handler();
 		int rowCount;
@@ -99,7 +100,6 @@ public class ButtonListener extends AppCompatActivity {
 							button.setText(wordArray.getWordNativeAtIndex(indexArr));
 						} else {
 							button.setText(wordArray.getWordTranslationAtIndex(indexArr));
-							;
 						}
 					} else {
 						//user is doing listening comprehension
@@ -135,7 +135,6 @@ public class ButtonListener extends AppCompatActivity {
 						button.setText(wordArray.getWordNativeAtIndex(indexArr));
 					} else {
 						button.setText(wordArray.getWordTranslationAtIndex(indexArr));
-						;
 					}
 				} else {
 					//user is doing listening comprehension
@@ -267,14 +266,14 @@ public class ButtonListener extends AppCompatActivity {
 									// do not include "else if inserted wrong input, do not allow to be decreased" because user is likely to make mistakes
 									// SO FAR keep the idea that "if inserted correct word once without using HintClick, it implies the user is getting better with that word"
 
+														 //have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
+														 if (usrSudokuArr.canCheck()) {
+															 usrSudokuArr.checkPuzzle(view, btnArr);
+															 for (int k=0; k<WORD_COUNT;k++){
+																 wordArray.setGameStateAtIndex(k,true);
+															 }
 
-									//have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
-
-									if (usrSudokuArr.canCheck()) {
-										usrSudokuArr.checkPuzzle(view, btnArr);
-									}
-
-
+														 }
 
 									Log.d( "highlight", "marked rectArr (in ButtonListener) as selected at: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );
 
@@ -324,4 +323,5 @@ public class ButtonListener extends AppCompatActivity {
 			}
 		}
 	}
+	public Button[] getbtnArr () {return btnArr;}
 }
