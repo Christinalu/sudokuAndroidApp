@@ -6,9 +6,7 @@ import android.graphics.Color;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -20,22 +18,23 @@ import android.widget.TextView;
 import com.omicron.android.cmpt276_1191e1_omicron.Model.Pair;
 import com.omicron.android.cmpt276_1191e1_omicron.R;
 import com.omicron.android.cmpt276_1191e1_omicron.SudokuGenerator;
+import com.omicron.android.cmpt276_1191e1_omicron.View.drw;
 import com.omicron.android.cmpt276_1191e1_omicron.WordArray;
 
 
-public class ButtonListener extends AppCompatActivity {
-	/*
-	 *	This class is used to set up keypad buttons for GameActivity
-	 *	This also contains code that will let buttons respond
-	 *	by updating Puzzle
-	 */
+public class ButtonListener extends AppCompatActivity
+{
+    /*
+     *	This class is used to set up keypad buttons for GameActivity
+     *	This also contains code that will let buttons respond
+     *	by updating Puzzle
+     */
 
-	private int i;
-	private Button[] btnArr;
-	private boolean flag_tap; //
+    private int i;
+    private Button [] btnArr;
 
 
-	@SuppressLint("ClickableViewAccessibility")
+
     public ButtonListener(final Pair currentRectColoured, final SudokuGenerator usrSudokuArr, final drw drawR,
                           final int[] touchX, final int[] touchY, final Pair lastRectColoured,
                           final int usrLangPref, final int[] btnClicked, final TextView Hint, final WordArray wordArray,
@@ -168,161 +167,148 @@ public class ButtonListener extends AppCompatActivity {
                 }
                 final int index;
                 index = i;
+                btnArr[i].setOnLongClickListener(new View.OnLongClickListener() {
+                                                     @SuppressLint("SetTextI18n")
+                                                     @Override
+                                                     public boolean onLongClick(View v) {
+                                                         Log.d("selectW", "long button press");
+                                                         Hint.setBackgroundColor(R.drawable.buttons);
 
-				btnArr[i].setOnTouchListener(new View.OnTouchListener() {
-						private GestureDetector gestureDetector = new GestureDetector(context , new GestureDetector.SimpleOnGestureListener() {
+                                                         Log.d("Hint","Hint number"+(wordArray.getWordStateAtIndex(index)));
+                                                         if (usrLangPref == 0) {
+                                                             if (usrModePref == 1) {
+                                                                 //listening comprehension mode
+                                                                 Hint.setText(wordArray.getWordNativeAtIndex(orderArr[index]) + " : " + numArray[orderArr[index]]);
+                                                             } else {
+                                                                 //standard mode
+                                                                 Hint.setText(wordArray.getWordNativeAtIndex(index) + " : " + wordArray.getWordTranslationAtIndex(index));
+                                                             }
+                                                         } else {
+                                                             if (usrModePref == 1) {
+                                                                 //listening comprehension mode
+                                                                 Hint.setText(wordArray.getWordTranslationAtIndex(orderArr[index]) + " : " + numArray[orderArr[index]]);
+                                                             } else {
+                                                                 //standard mode
+                                                                 Hint.setText(wordArray.getWordTranslationAtIndex(index) + " : " + wordArray.getWordNativeAtIndex(index));
+                                                             }
+                                                         }
+                                                         wordArray.wordIncrementHintClickAtIndex(index);
 
-							View view = View.inflate(context, R.layout.activity_game, null);
+                                                         wordArray.setWordUsedInGameAtIndex(index); //mark as used
+                                                         wordArray.setWordDoNotAllowToDecreaseDifficultyAtIndex(index); //allow for difficulty to be decreased
 
-							@Override
-							public boolean onDown(MotionEvent event) {
-								Log.d("TAG","onDown: ");
+                                                         handler.postDelayed(new Runnable() {
+                                                             @Override
+                                                             public void run() {
+                                                                 // Do something after 5s = 5000ms
+                                                                 Hint.setBackgroundColor(Color.TRANSPARENT);
+                                                                 Hint.setText("");
 
-								// don't return false here or else none of the other
-								// gestures will work
-
-
-								return super.onDown(event);
-							}
-
-							@Override
-							public boolean onSingleTapConfirmed(MotionEvent e) {
-								Log.i("TAG", "onSingleTapConfirmed: ");
-
-                                int row = currentRectColoured.getRow();
-                                int col = currentRectColoured.getColumn();
-
-                                Log.d( "highlight", "btn pressed..." );
-
-                                if (row != -1 && usrSudokuArr.PuzzleOriginal[row][col] == 0) {
-                                    // increase the count of inserted numbers if needed
-                                    usrSudokuArr.track(currentRectColoured); //important, 'track' must occur before 'usrSudokuArr.Puzzle[][] = x'
-
-                                    //remove duplicates from (x,y) in preparation of new input and new duplication check
-                                    usrSudokuArr.removeDuplicates(row,col);
-
-                                    //if new value is not equal to the old one add last value and its coordinate to history before changing it
-                                    if (usrSudokuArr.getPuzzle()[row][col] != var) {
-                                        usrSudokuArr.addHistroy(row, col);
-                                        usrSudokuArr.printHistory();
-                                    }
-
-                                    if( rotation[0] == 0 && undoBtnPressed[0] == 0 ){ //if rotate or pressed 'undo', skip setDrawParameter
-                                        Log.d( "highlight", "setDrawParameters called from ButtonListener" );
-                                        drawR.setDrawParameters(touchX, touchY, lastRectColoured, currentRectColoured);
-                                    }
-
-                                    // set the cell in the Puzzle to corresponding number based on button user input
-                                    //if( zoomButtonDisableUpdate[0] == 0 ) // do not update entry when switching modes - causes errors
-                                    usrSudokuArr.Puzzle[row][col] = var;
-
-                                    // redraw square matrix and text overlay
-                                    btnClicked[0] = 1; //this flag allows (for efficiency) class drw to update TextView as well in zoom mode
-
-                                    if( undoBtnPressed[0] == 1 ){ //
-                                        //if user has 'undone' some some moves, when inserting a new entry, do not call drw.setDrawParameters because it resets currentRectColoured
-                                    }
+                                                             }
+                                                         }, 4000);
 
 
-                                    //if( rotation[0] == 1 )
-                                    //{ rotation[0] = 0; } //disable rotation flag after user inserted cell
-
-                                    // check if there is a duplicate in row/col/section. MAKE SURE TO HAVE AFTER PUZZLE INPUT IS SET
-                                    int currentSelectedisCorrect = 0;
-                                    if (usrSudokuArr.checkDuplicate(row, col)) {
-                                        Log.d("TESTI", "Duplicate in given coordinate detected");
-                                        currentSelectedisCorrect = 2;
-                                    }
-                                    else {
-                                        Log.d("TESTI", "No duplicate detected");
-                                        currentSelectedisCorrect = 1;
-                                    }
-                                    drawR.reDraw(currentRectColoured, usrLangPref, currentSelectedisCorrect);
-
-                                    btnClicked[0] = 0;
-                                    //textOverlay.reDrawText( usrLangPref );
-
-                                    Log.d("highlight", "btn clicked: " + var);
-
-                                    //check if word inserted is correct (used to decrease probability of word being selected in WordArray.selectWord() )
-                                    if (var == usrSudokuArr.getSolution()[row][col]) //if input matches solution
-                                    {
-                                        Log.d("selectW", "btn listener: user sqr input correct");
-                                        if (wordArray.getWordAlreadyUsedInGameAtIndex(var - 1) == false) //if correctly using this word for the first time in game
-                                        {
-                                            Log.d("selectW", "btn listener: decrease difficulty");
-
-                                            wordArray.setWordUsedInGameAtIndex(var - 1); //mark as used
-                                            wordArray.setWordToAllowToDecreaseDifficultyAtIndex(var - 1); //allow for difficulty to be decreased
-                                        }
-                                    }
-                                    // do not include "else if inserted wrong input, do not allow to be decreased" because user is likely to make mistakes
-                                    // SO FAR keep the idea that "if inserted correct word once without using HintClick, it implies the user is getting better with that word"
-
-                                    //have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
-                                    if (usrSudokuArr.canCheck()) {
-                                        usrSudokuArr.checkPuzzle(view, btnArr);
-                                        for (int k=0; k<WORD_COUNT;k++){
-                                            wordArray.setGameStateAtIndex(k,true);
-                                        }
-
-                                    }
-
-                                    Log.d( "highlight", "marked rectArr (in ButtonListener) as selected at: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );
-
-                                }
-
-                                //debug
-                                usrSudokuArr.printCurrent( );
-
-								return super.onSingleTapConfirmed(e);
-							}
-
-							@Override
-							public void onLongPress(MotionEvent e) {
-                                Log.d("selectW", "long button press");
-                                Hint.setBackgroundColor(R.drawable.buttons);
-
-                                Log.d("Hint","Hint number"+(wordArray.getWordStateAtIndex(index)));
-                                if (usrLangPref == 0) {
-                                    if (usrModePref == 1) {
-                                        //listening comprehension mode
-                                        Hint.setText(wordArray.getWordNativeAtIndex(orderArr[index]) + " : " + numArray[orderArr[index]]);
-                                    } else {
-                                        //standard mode
-                                        Hint.setText(wordArray.getWordNativeAtIndex(index) + " : " + wordArray.getWordTranslationAtIndex(index));
-                                    }
-                                } else {
-                                    if (usrModePref == 1) {
-                                        //listening comprehension mode
-                                        Hint.setText(wordArray.getWordTranslationAtIndex(orderArr[index]) + " : " + numArray[orderArr[index]]);
-                                    } else {
-                                        //standard mode
-                                        Hint.setText(wordArray.getWordTranslationAtIndex(index) + " : " + wordArray.getWordNativeAtIndex(index));
-                                    }
-                                }
-                                wordArray.wordIncrementHintClickAtIndex(index);
-
-                                wordArray.setWordUsedInGameAtIndex(index); //mark as used
-                                wordArray.setWordDoNotAllowToDecreaseDifficultyAtIndex(index); //allow for difficulty to be decreased
+                                                         return true;
+                                                     }
+                                                 }
 
 
-                }
-						});
+                );
+                btnArr[i].setOnClickListener(new View.OnClickListener() {
+                                                 @Override
+                                                 public void onClick(View v) {
+                                                     //if current button selected is valid and is not restricted
+                                                     int row = currentRectColoured.getRow();
+                                                     int col = currentRectColoured.getColumn();
+
+                                                     Log.d( "highlight", "btn pressed..." );
+
+                                                     if (row != -1 && usrSudokuArr.PuzzleOriginal[row][col] == 0) {
+                                                         // increase the count of inserted numbers if needed
+                                                         usrSudokuArr.track(currentRectColoured); //important, 'track' must occur before 'usrSudokuArr.Puzzle[][] = x'
+
+                                                         //remove duplicates from (x,y) in preparation of new input and new duplication check
+                                                         usrSudokuArr.removeDuplicates(row,col);
+
+                                                         //if new value is not equal to the old one add last value and its coordinate to history before changing it
+                                                         if (usrSudokuArr.getPuzzle()[row][col] != var) {
+                                                             usrSudokuArr.addHistroy(row, col);
+                                                             usrSudokuArr.printHistory();
+                                                         }
+
+                                                         if( rotation[0] == 0 && undoBtnPressed[0] == 0 ){ //if rotate or pressed 'undo', skip setDrawParameter
+                                                             Log.d( "highlight", "setDrawParameters called from ButtonListener" );
+                                                             drawR.setDrawParameters(touchX, touchY, lastRectColoured, currentRectColoured);
+                                                         }
+
+                                                         // set the cell in the Puzzle to corresponding number based on button user input
+                                                         //if( zoomButtonDisableUpdate[0] == 0 ) // do not update entry when switching modes - causes errors
+                                                         usrSudokuArr.Puzzle[row][col] = var;
+
+                                                         // redraw square matrix and text overlay
+                                                         btnClicked[0] = 1; //this flag allows (for efficiency) class drw to update TextView as well in zoom mode
+
+                                                         if( undoBtnPressed[0] == 1 ){ //
+                                                             //if user has 'undone' some some moves, when inserting a new entry, do not call drw.setDrawParameters because it resets currentRectColoured
+                                                         }
 
 
-						@Override
-						public boolean onTouch(View v, MotionEvent event) {
-							Log.d("TEST", "Raw event: " + event.getAction() + ", (" + event.getRawX() + ", " + event.getRawY() + ")");
+                                                         //if( rotation[0] == 1 )
+                                                         //{ rotation[0] = 0; } //disable rotation flag after user inserted cell
 
-							gestureDetector.onTouchEvent(event);
-                            Hint.setBackgroundColor(Color.TRANSPARENT);
-                            Hint.setText("");
-							return true;
-						}
-					});
-			}
-		}
-	}
-	public Button[] getbtnArr () {return btnArr;}
+                                                         // check if there is a duplicate in row/col/section. MAKE SURE TO HAVE AFTER PUZZLE INPUT IS SET
+                                                         int currentSelectedisCorrect = 0;
+                                                         if (usrSudokuArr.checkDuplicate(row, col)) {
+                                                             Log.d("TESTI", "Duplicate in given coordinate detected");
+                                                             currentSelectedisCorrect = 2;
+                                                         }
+                                                         else {
+                                                             Log.d("TESTI", "No duplicate detected");
+                                                             currentSelectedisCorrect = 1;
+                                                         }
+                                                         drawR.reDraw(currentRectColoured, usrLangPref, currentSelectedisCorrect);
+
+                                                         btnClicked[0] = 0;
+                                                         //textOverlay.reDrawText( usrLangPref );
+
+                                                         Log.d("highlight", "btn clicked: " + var);
+
+                                                         //check if word inserted is correct (used to decrease probability of word being selected in WordArray.selectWord() )
+                                                         if (var == usrSudokuArr.getSolution()[row][col]) //if input matches solution
+                                                         {
+                                                             Log.d("selectW", "btn listener: user sqr input correct");
+                                                             if (wordArray.getWordAlreadyUsedInGameAtIndex(var - 1) == false) //if correctly using this word for the first time in game
+                                                             {
+                                                                 Log.d("selectW", "btn listener: decrease difficulty");
+
+                                                                 wordArray.setWordUsedInGameAtIndex(var - 1); //mark as used
+                                                                 wordArray.setWordToAllowToDecreaseDifficultyAtIndex(var - 1); //allow for difficulty to be decreased
+                                                             }
+                                                         }
+                                                         // do not include "else if inserted wrong input, do not allow to be decreased" because user is likely to make mistakes
+                                                         // SO FAR keep the idea that "if inserted correct word once without using HintClick, it implies the user is getting better with that word"
+
+                                                         //have to check if puzzle is correct (only when allowed by efficiency) and if true, disable buttonListener
+                                                         if (usrSudokuArr.canCheck()) {
+                                                             usrSudokuArr.checkPuzzle(v, btnArr);
+                                                             for (int k=0; k<WORD_COUNT;k++){
+                                                                 wordArray.setGameStateAtIndex(k,true);
+                                                             }
+
+                                                         }
+
+                                                         Log.d( "highlight", "marked rectArr (in ButtonListener) as selected at: " + currentRectColoured.getRow() + ", " + currentRectColoured.getColumn() );
+
+                                                     }
+
+                                                     //debug
+                                                     usrSudokuArr.printCurrent( );
+                                                 }
+                                             }
+
+                );
+            }
+        }
+    }
+    public Button[] getbtnArr () {return btnArr;}
 }
