@@ -260,7 +260,6 @@ public class MainActivity extends AppCompatActivity
                                              // Select Package from main activity
                                              RadioButton radBtnSelected = findViewById(pkgRadioGroup.getCheckedRadioButtonId());
                                              String fileNameSelected = wordPackageFileIndexArr.getPackageFileAtIndex(pkgRadioGroup.indexOfChild(radBtnSelected)).getInternalFileName(); //get pkg internal file name to find csv
-                                             resumingMiniGame = true;
                                              startDialog(fileNameSelected);
                                          }
                                      });
@@ -282,7 +281,7 @@ public class MainActivity extends AppCompatActivity
 			}
 		});
 
-
+	
 
 		//implement STOP btn
 		Button btnStop = (Button) findViewById( R.id.button_stop );
@@ -301,12 +300,15 @@ public class MainActivity extends AppCompatActivity
 									}
 		);
 
-
+		Log.d( "cardArray", "state: "+state+" resumingMiniGame: "+resumingMiniGame );
+		
 		Button btnResume = (Button) findViewById(R.id.button_resume);
 		if (state == 0 && resumingMiniGame == false ) {
 			btnResume.setEnabled(false); //block Resume button unless a previous game is saved
 			//DISABLE "REMOVE PKG" button when game is started
 			removeBtnEnable[0] = true;
+			
+			Log.d( "cardArray", "disabling btn resume..." );
 		}
 		else {
 			removeBtnEnable[0] = false;
@@ -679,6 +681,9 @@ public class MainActivity extends AppCompatActivity
 	public void savetheInstanceState (int RorS, Bundle savedInstanceState, int sis_state, WordArray sis_wordArray, int sis_usrLangPref, SudokuGenerator sis_usrSudokuArr, int sis_usrModePref, String sis_language, String sis_STTlanguage, String[] sis_numArray, int [] sis_orderArr, int sis_HCTMP, Pair sis_currentRectColoured, int sis_currentSelectedIsCorrect, boolean sis_resumingMiniGame,
                                       int[] sis_viewInvisible, int sis_selectedLast, String[] sis_cardArray, int[] sis_cardKey,
                                       int sis_gridRowCount, int sis_gridColCount, int sis_size) {
+		
+		Log.d( "cardArray", "data for rotation: state "+state+" resumingMiniGame "+resumingMiniGame);
+		
 		if (RorS == 0) {
 			//we are receiving
 			state = (int) savedInstanceState.getSerializable("state");
@@ -761,7 +766,9 @@ public class MainActivity extends AppCompatActivity
 		final View view = getLayoutInflater().inflate(R.layout.activity_sub_menu, null);
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this,R.style.Theme_AppCompat_DayNight_Dialog_Alert);
 		alertDialog.setView(view);
-
+		
+		Log.d( "cardArray", "calling sub menu: state "+state+" resumingMiniGame "+resumingMiniGame);
+		
 		usrPuzzleTypePref[0] = -1;
 		usrModePref = 0;
 
