@@ -14,30 +14,18 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:gravity="center"
-		android:orientation="vertical"
-		app:layout_constraintBottom_toBottomOf="parent"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toTopOf="parent">
-
-		<GridLayout
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:orientation="vertical"
-			android:rowCount="3">
+		android:orientation="vertical">
 
 		<LinearLayout
 			android:layout_width="wrap_content"
 			android:layout_height="150dp"
-			android:orientation="horizontal"
-			android:background="@color/blueviolet">
-
+			android:orientation="horizontal">
 
 
 			<ImageView
-
 				android:layout_width="150dp"
 				android:layout_height="match_parent"
+				android:paddingLeft="20dp"
 				android:src="@drawable/newlogo" />
 
 
@@ -47,11 +35,12 @@
 				android:gravity="center">
 
 				<TextView
-					android:layout_width="170dp"
+					android:layout_width="160dp"
 					android:layout_height="wrap_content"
 					android:text="@string/sudoku"
 					android:textColor="@color/navy"
 					android:fontFamily="casual"
+					android:paddingLeft="10dp"
 					android:textSize="30dp"
 					android:textStyle="bold"
 					android:shadowColor="@color/navy"
@@ -75,6 +64,7 @@
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+			android:gravity="center"
 			android:orientation="vertical">
 
 			<Button
@@ -160,16 +150,17 @@
 
 		</LinearLayout>
 
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_margin="10sp"
+			android:orientation="horizontal"
+			android:gravity="center">
+
 			<LinearLayout
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:layout_margin="10sp"
-				android:orientation="horizontal">
-
-				<LinearLayout
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:orientation="vertical">
+				android:orientation="vertical">
 
 				<TextView
 					android:layout_width="wrap_content"
@@ -212,38 +203,33 @@
 
 				</LinearLayout>
 
-				</LinearLayout>
+			</LinearLayout>
 
-					<LinearLayout
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:layout_marginBottom="5dp"
-						android:background="@color/colorAccent"
-						android:gravity="center"
-						android:orientation="vertical"
-						app:layout_constraintBottom_toBottomOf="parent"
-						app:layout_constraintRight_toRightOf="parent">
-						<ProgressBar
-							android:id="@+id/progressBar"
-							android:layout_width="wrap_content"
-							android:layout_height="match_parent"
-							android:indeterminate="false"
-							android:progressDrawable="@drawable/circular"
-							style="?android:attr/progressBarStyleHorizontal"
-							android:secondaryProgress="100"/>
-						<TextView
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content" />
-					</LinearLayout>
-
-
+			<LinearLayout
+				android:layout_width="wrap_content"
+				android:layout_height="match_parent"
+				android:layout_marginBottom="5dp"
+				android:gravity="center"
+				android:orientation="vertical"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintRight_toRightOf="parent">
+				<ProgressBar
+					android:id="@+id/progressBar"
+					android:layout_width="wrap_content"
+					android:layout_height="match_parent"
+					android:indeterminate="false"
+					android:progressDrawable="@drawable/circular"
+					style="?android:attr/progressBarStyleHorizontal"
+					android:secondaryProgress="100"/>
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content" />
+			</LinearLayout>
 
 
 		</LinearLayout>
 
 
-
-		</GridLayout>
 	</LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
