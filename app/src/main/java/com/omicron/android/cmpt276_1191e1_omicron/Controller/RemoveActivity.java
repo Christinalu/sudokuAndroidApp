@@ -43,11 +43,11 @@ public class RemoveActivity extends AppCompatActivity
 										   @Override
 										   public void onClick(View v)
 										   {
-										   		int res = 1; //1 means user trying to delete default pkg - not allowed
-											   	
+												int res = 1; //1 means user trying to delete default pkg - not allowed
+												
 											   res = removePkg( pkgInternalFileName, indexOfRadBtnToRemove );
-											   	
-											   	if( res == 1 ){ //if user tried to remove default pkg
+												
+												if( res == 1 ){ //if user tried to remove default pkg
 													Toast.makeText(RemoveActivity.this, "Cannot remove \"" + pkgName + "\" Word Package", Toast.LENGTH_LONG).show();
 												}else{
 													Toast.makeText(RemoveActivity.this, "Word Package Removed", Toast.LENGTH_LONG).show();
