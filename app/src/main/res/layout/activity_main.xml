@@ -47,15 +47,13 @@
 					android:shadowColor="@color/navy"
 					/>
 
-
-
-			<ImageButton
-				android:id="@+id/calendar_button"
-				android:layout_width="50dp"
-				android:layout_height="50dp"
-
-				android:background="@android:color/transparent"
-				app:srcCompat="@android:drawable/ic_menu_my_calendar" />
+				<ImageButton
+					android:id="@+id/calendar_button"
+					android:layout_width="50dp"
+					android:layout_height="50dp"
+					android:background="@android:color/transparent"
+					android:visibility="gone"
+					app:srcCompat="@android:drawable/ic_menu_my_calendar" />
 			</LinearLayout>
 
 
@@ -180,16 +178,14 @@
 					app:layout_constraintLeft_toLeftOf="parent">
 
 					<LinearLayout
-						android:layout_width="wrap_content"
-						android:layout_height="match_parent"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
 						android:orientation="vertical">
-
 
 						<ScrollView
 							android:id="@+id/radio_scroll_view"
 							android:layout_width="match_parent"
-							android:layout_height="match_parent"
-
+							android:layout_height="50dp"
 							android:paddingHorizontal="10dp">
 
 							<RadioGroup
@@ -202,7 +198,6 @@
 
 						</ScrollView>
 					</LinearLayout>
-
 				</LinearLayout>
 
 			</LinearLayout>
