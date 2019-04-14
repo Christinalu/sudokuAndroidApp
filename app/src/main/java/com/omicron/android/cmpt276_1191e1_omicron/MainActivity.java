@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity
 	private Calendar mCalendar;
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 	private Date curDate;
-	private Double progress_percentage;
+	private double progress_percentage;
 
 	// TODO: separate all of Intent activity.putExtra( ) outside of MainActivity in different functions
 
@@ -530,7 +530,7 @@ public class MainActivity extends AppCompatActivity
             buffRead.close( );
             Progress.setProgress(numTrueStatus);
             Progress.setMax(numFalseStatus+numTrueStatus);
-			progress_percentage = (double)numTrueStatus/(numFalseStatus+numTrueStatus);
+			progress_percentage = ((double)numTrueStatus/(numFalseStatus+numTrueStatus))*100;
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -805,7 +805,6 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				int ModeId = group.getCheckedRadioButtonId();
-				modeName = ((RadioButton)findViewById(checkedId)).getText().toString();
 				switch (ModeId)
 				{
 					case R.id.button_mStandard:
@@ -814,10 +813,12 @@ public class MainActivity extends AppCompatActivity
 
 					case R.id.button_mSpeech:
 						usrModePref = 1;
+						modeName = "Listening Comprehension";
 						break;
 
 					case R.id.button_mini_game:
 						usrModePref = 3;
+						modeName = "Mini Game";
 						break;
 				}
 			}
