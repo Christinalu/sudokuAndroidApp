@@ -49,13 +49,6 @@
 
 
 
-			<ImageButton
-				android:id="@+id/calendar_button"
-				android:layout_width="50dp"
-				android:layout_height="50dp"
-
-				android:background="@android:color/transparent"
-				app:srcCompat="@android:drawable/ic_menu_my_calendar" />
 			</LinearLayout>
 
 

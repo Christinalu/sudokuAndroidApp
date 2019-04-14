@@ -263,6 +263,7 @@ public class MainActivity extends AppCompatActivity
 
 		// SET UP CALENDAR DIALOG
 
+		/*
 		calendar_button = findViewById(R.id.calendar_button);
 		calendar_button.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -276,7 +277,7 @@ public class MainActivity extends AppCompatActivity
 				startActivity(eventActivityIntent);
 			}
 		});
-
+		*/
 	
 
 		//implement STOP btn

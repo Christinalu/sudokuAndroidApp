@@ -78,13 +78,6 @@
 					android:textColor="@color/navy"
 					android:textStyle="bold"/>
 
-				<ImageButton
-					android:id="@+id/calendar_button"
-					android:layout_width="40dp"
-					android:layout_height="40dp"
-					android:layout_gravity="end"
-					android:background="@android:color/transparent"
-					app:srcCompat="@android:drawable/ic_menu_my_calendar" />
 
 			</LinearLayout>
 
