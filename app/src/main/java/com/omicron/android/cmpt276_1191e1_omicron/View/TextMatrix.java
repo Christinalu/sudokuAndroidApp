@@ -16,6 +16,7 @@ public class TextMatrix
 {
 	private float TXT_SIZE_NORMAL;
 	private float TXT_SIZE_ZOOM;
+	private float TXT_SIZE_NORMAL_SMALL;
 	
 	private float TXT_SIZE_RATIO_4x4 = 0.16f; //ratio to determine size of text inside square
 	private float TXT_SIZE_RATIO_6x6 = 0.25f;
@@ -36,7 +37,7 @@ public class TextMatrix
 	private int puzzleTypeSize; //stores number or row/col a puzzle has
 
 	public TextMatrix( Context context, int sqrSizeWidth2, int sqrSizeHeight2, float[] ZOOM_SCALE2,
-					   int puzzleTypeSize2 )
+					   int puzzleTypeSize2, boolean smallDisplay )
 	{
 		/*
 		 * NOTE: individual LinearLayout are required for each TextView to fix issue where
@@ -77,11 +78,19 @@ public class TextMatrix
 			//TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
 			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL;
 		}
-		else if( puzzleTypeSize == 13 ){
-			TXT_SIZE_NORMAL = 12;//sqrSizeHeight * TXT_SIZE_RATIO_12x12;
+		else if( puzzleTypeSize == 12 ){
+			if( smallDisplay == true ){//if display too small, set smaller size
+				TXT_SIZE_NORMAL = 9;//sqrSizeHeight * TXT_SIZE_RATIO_12x12;
+				Log.d( "screenSize", "smallDisplay: " + smallDisplay );
+			}else{
+				TXT_SIZE_NORMAL = 13;
+			}
 			ZOOM_SCALE_TXT = (ZOOM_SCALE[0] - 1f)/2f + 1;
 			//TXT_SIZE_ZOOM = TXT_SIZE_NORMAL * (ZOOM_SCALE_TXT);
+			
 			TXT_SIZE_ZOOM = TXT_SIZE_NORMAL;
+			
+		
 		}
 		else {
 			TXT_SIZE_NORMAL = 13;//sqrSizeHeight * TXT_SIZE_RATIO_9x9;

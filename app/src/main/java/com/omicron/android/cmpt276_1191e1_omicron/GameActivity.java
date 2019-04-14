@@ -147,6 +147,7 @@ public class GameActivity extends AppCompatActivity
 	private int zoomLevel_MAX = 3; //max allowed to zoom
 	private int PUZZLE_FULL_SIZE_WIDTH; // size of full puzzle from left most column pixel to right most column pixel
 	private long STATISTIC_MULTIPLE = 2; //used to multiply by factor the number of "Hint Clicks" a user used, to more likely show these words
+	private boolean smallDisplay = false;
 	
 	private int[] zoomButtonSafe = { 0 }; //used to prevent a 'click coordinate' from being tested if it is in a rect when switching to "zoom" mode because switching to the mode, should not test click
 	private int[] zoomClickSafe = { 0 }; //used to block touchX update when user switches mode
@@ -300,7 +301,13 @@ public class GameActivity extends AppCompatActivity
 		
 		paint.setColor(Color.parseColor("#c2c2c2"));
 
-		textMatrix = new TextMatrix( this, sqrSizeWidth, sqrSizeHeight, ZOOM_SCALE, WORD_COUNT );
+		if( screenW < 600 || screenH < 600 ){
+			smallDisplay = true;
+		}else{
+			smallDisplay = false;
+		}
+		
+		textMatrix = new TextMatrix( this, sqrSizeWidth, sqrSizeHeight, ZOOM_SCALE, WORD_COUNT, smallDisplay );
 
 
 		// set up object to translate to selected square in "zoom" mode
