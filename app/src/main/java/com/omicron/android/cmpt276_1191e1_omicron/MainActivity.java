@@ -124,11 +124,7 @@ public class MainActivity extends AppCompatActivity
 	private Calendar mCalendar;
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 	private Date curDate;
-
-	// TODO: separate all of Intent activity.putExtra( ) outside of MainActivity in different functions
-
-	// TODO: fix bug where when starting Sudoky game, then going to main menu, press 'start new game' but
-	// TODO:	then press cancel... it does not resume the game
+	
 
 	@Override
 	protected void onCreate( Bundle savedInstanceState )

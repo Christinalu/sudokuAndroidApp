@@ -51,26 +51,6 @@ public class MiniGameActivity extends AppCompatActivity
 			rotation = true;
 		}
 		
-		//Intent resumeIntent = getIntent( );
-		
-		
-		// TODO: add resume option
-		// TODO: save data on 'back' btn press
-		// TODO: implement saveInstanceState for state saving when rotating
-		// TODO: dont include SudokuArray in intent
-		// TODO: allow constant word card count ie always 9 words == 18 cards
-		// TODO: when initializing word array, make it to always initialize 9 words
-		// TODO: make sure to also save on rotation in MainActivity
-		// TODO: once game finished, make sure it stays finished even when resuming
-		// TODO: also do unit tests for Card and CardArray
-		// TODO: remove Card object if not necessary
-		// TODO: play mini game, go to main menu, rotate screen, then resume game
-		// TODO: test when rotating, while animating, before animation ends, if allowToSelect[] gets properly changed/saved
-		
-		// TODO: when resuming game, set all data
-		// TODO: bug? start app, start mini game, go back to main menu, click "start new game" btn, this
-		// TODO:	should start new REGULAR game, because its selected, but it starts mini game instead
-		// TODO: add the same app background as in main menu
 		
 		//detect if restoring a game
 		Intent intentSrc = getIntent( );

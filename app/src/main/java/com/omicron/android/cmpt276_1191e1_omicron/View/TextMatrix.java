@@ -250,7 +250,7 @@ public class TextMatrix
 		( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setEllipsize( TextUtils.TruncateAt.MARQUEE ); //set marquee animation
 		( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setSingleLine( true ); //limit to single line
 		( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setMarqueeRepeatLimit( -1 ); //makes marquee loop forever
-		textViewArr[i][j].getRelativeLayout().setPadding( 10, 10, 10,10 ); //add padding so text is not shown right at the edge
+		textViewArr[i][j].getRelativeLayout().setPadding( 10, 5, 10,5 ); //add padding so text is not shown right at the edge
 		( (TextView) textViewArr[i][j].getRelativeLayout().getChildAt(0)).setTextSize( TXT_SIZE_NORMAL ); //set text size
 
 		//add the original sqrT/L coordinates
